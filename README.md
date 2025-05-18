@@ -12,6 +12,6 @@
 https://github.com/gonzalodfuentes/Championsita2025/wiki
 
 ## Como ejecutar
-  -Descargar archivo ZIP del programa
-  -Importar la carpeta Championsita2025 en un IDE (en este caso utilizamos Eclipse nosotros) como proyecto de Gradle
-  -Dentro de las tareas de Gradle, buscar el ejecutable run en la carpeta Championsita2025-lwjgl3
+*  Descargar archivo ZIP del programa
+*  Importar la carpeta Championsita2025 en un IDE (en este caso utilizamos Eclipse nosotros) como proyecto de Gradle
+*  Dentro de las tareas de Gradle, buscar el ejecutable run en la carpeta Championsita2025-lwjgl3
