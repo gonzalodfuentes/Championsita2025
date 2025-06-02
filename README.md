@@ -19,13 +19,16 @@
 ## 📸 Capturas de Pantalla
 
 ### Menú Principal
-![Menú principal](media/menu_principal.png)
+![image](https://github.com/user-attachments/assets/b870d3a9-83eb-4aa7-bd7b-e5a79ca05ee5)
+
 
 ### Selector de Personajes
-![Selector de personajes](media/selector_personaje.png)
+![image](https://github.com/user-attachments/assets/f596e7d8-aed1-4409-8123-add7fdf4f20a)
+
 
 ### Lobby de Partido
-![Lobby](media/lobby.png)
+![image](https://github.com/user-attachments/assets/28838a3b-9ad4-4f78-8266-44d9a677effc)
+
 
 ---
 
