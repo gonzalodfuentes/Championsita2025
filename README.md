@@ -90,6 +90,10 @@ Elegí entre distintas habilidades como: Grandote, Pequeñín, Zurdo, Diestro, A
 
 ---
 
+## 🐦‍🔥 Estado actual proyecto
+
+- Configuración inicial y estructura del proyecto
+
 ## 💬 Contacto
 
 ¿Tenés dudas? Creá un [issue](https://github.com/gonzalodfuentes/Championsita2025/issues) o hablá con nosotros.
