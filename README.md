@@ -92,7 +92,7 @@ Elegí entre distintas habilidades como: Grandote, Pequeñín, Zurdo, Diestro, A
 
 ## 🐦‍🔥 Estado actual proyecto
 
-- Configuración inicial y estructura del proyecto
+- Estructurando el proyecto y definiendo las bases sobre las que se construirá, para la aprobacion de este
 
 ## 💬 Contacto
 
