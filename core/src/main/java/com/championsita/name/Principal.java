@@ -16,71 +16,43 @@ public class Principal extends ApplicationAdapter {
     private Texture canchaDeFutbol;
     private Texture texturaDelPersonaje;
     private Sprite spriteDelPersonaje;
+    private Personaje personaje;
     private FitViewport viewport;
-    private SpriteBatch spriteBatch;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
         canchaDeFutbol = new Texture("CampoDeJuego.png");
         texturaDelPersonaje = new Texture("Jugador.png");
-        spriteBatch = new SpriteBatch();
-        spriteDelPersonaje = new Sprite(texturaDelPersonaje); // Initialize the sprite based on the texture
-        spriteDelPersonaje.setSize(0.3f, 0.3f); // Define the size of the sprite
+        personaje = new Personaje(0.005f);
         viewport = new FitViewport(8, 5);
     }
 
     @Override
     public void render() {
-        ingreso();
-        logica();
+	    float delta = Gdx.graphics.getDeltaTime();
+	    personaje.update(delta);
+	    personaje.limitarMovimiento(viewport.getWorldWidth(), viewport.getWorldHeight());
         dibujar();
     }
 
     private void dibujar() {
     	ScreenUtils.clear(Color.BLACK);
 		viewport.apply();
-		spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
-	    spriteBatch.begin();
+		batch.setProjectionMatrix(viewport.getCamera().combined);
 
+		batch.begin();
 	    float worldWidth = viewport.getWorldWidth();
 	    float worldHeight = viewport.getWorldHeight();
 
-	    spriteBatch.draw(canchaDeFutbol, 0, 0, worldWidth, worldHeight);
-	    spriteDelPersonaje.draw(spriteBatch);
-
-	    spriteBatch.end();
+	    batch.draw(canchaDeFutbol, 0, 0, worldWidth, worldHeight);
+	    personaje.render(batch);
+	    batch.end();
 	}
 
-	private void logica() {
-	    float worldWidth = viewport.getWorldWidth();
-	    float worldHeight = viewport.getWorldHeight();
-	    float PlayerWidth = spriteDelPersonaje.getWidth();
-	    float PlayerHeight = spriteDelPersonaje.getHeight();
+	//private void logica()
 
-	    spriteDelPersonaje.setX(MathUtils.clamp(spriteDelPersonaje.getX(), 0, worldWidth - PlayerWidth));
-	    spriteDelPersonaje.setY(MathUtils.clamp(spriteDelPersonaje.getY(), 0, worldHeight - PlayerHeight));
-
-	}
-
-	private void ingreso() {
-		float speed = 1;
-		float delta = Gdx.graphics.getDeltaTime();
-		float actualSpeed = speed * delta;
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-	        spriteDelPersonaje.translateX(-actualSpeed);
-	    }
-		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-	        spriteDelPersonaje.translateX(actualSpeed);
-	    }
-		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-	        spriteDelPersonaje.translateY(-actualSpeed);
-	    }
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-	        spriteDelPersonaje.translateY(actualSpeed);
-	    }
-
-	}
+	//private void ingreso()
 
 	@Override
     public void resize(int width, int height) {
