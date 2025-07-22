@@ -24,7 +24,7 @@ public class Principal extends ApplicationAdapter {
         batch = new SpriteBatch();
         canchaDeFutbol = new Texture("CampoDeJuego.png");
         texturaDelPersonaje = new Texture("Jugador.png");
-        personaje = new Personaje(0.005f);
+        personaje = new Personaje(0.003f);
         viewport = new FitViewport(8, 5);
     }
 
