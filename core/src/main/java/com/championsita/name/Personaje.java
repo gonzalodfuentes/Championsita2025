@@ -7,52 +7,62 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Personaje {
-    private TextureRegion frameQuieto;
+
+    // === Constantes ===
+    private static final float VELOCIDAD = 1f;
+
+    // === Texturas y Animaciones ===
     private Texture textureQuieto;
+    private TextureRegion frameQuieto;
+
     private Animation<TextureRegion> animacionDerecha;
     private Animation<TextureRegion> animacionIzquierda;
-    private Animation<TextureRegion> animArribaDerecha;
-    private Animation<TextureRegion> animArribaIzquierda;
-    private Animation<TextureRegion> animAbajoDerecha;
-    private Animation<TextureRegion> animAbajoIzquierda;
-    private Animation<TextureRegion> animArriba;
-    private Animation<TextureRegion> animAbajo;
+    private Animation<TextureRegion> animacionArriba;
+    private Animation<TextureRegion> animacionAbajo;
+    private Animation<TextureRegion> animacionArribaDerecha;
+    private Animation<TextureRegion> animacionArribaIzquierda;
+    private Animation<TextureRegion> animacionAbajoDerecha;
+    private Animation<TextureRegion> animacionAbajoIzquierda;
 
+    // === Estado del personaje ===
     private float x, y;
     private float width, height;
     private float stateTime;
     private boolean estaMoviendo;
+    private boolean espacioPresionado = false;
+    private Direccion direccionActual = Direccion.ABAJO;
 
-    private Direccion direccionActual;
+    private Rectangle hitbox;
 
+    // === Constructor ===
     public Personaje(float escala) {
         // Cargar texturas
-        Texture sheetDerecha = new Texture("jugadorCorriendoDerecha.png");
-        Texture sheetIzquierda = new Texture("jugadorCorriendoIzquierda.png");
-        Texture texArribaDerecha = new Texture("jugadorMirandoArribaDerecha.png");
-        Texture texArribaIzquierda = new Texture("jugadorMirandoArribaIzquierda.png");
-        Texture texAbajoDerecha = new Texture("jugadorMirandoAbajoDerecha.png");
-        Texture texAbajoIzquierda = new Texture("jugadorMirandoAbajoIzquierda.png");
-        Texture texArriba = new Texture("jugadorMirandoArriba.png");
-        Texture sheetAbajo = new Texture("jugadorCorriendoAbajo.png");
-        Texture sheetArriba = new Texture("jugadorCorriendoArriba.png");
-
         textureQuieto = new Texture("Jugador.png");
         frameQuieto = new TextureRegion(textureQuieto);
+
+        Texture sheetDerecha = new Texture("jugadorCorriendoDerecha.png");
+        Texture sheetIzquierda = new Texture("jugadorCorriendoIzquierda.png");
+        Texture sheetArriba = new Texture("jugadorCorriendoArriba.png");
+        Texture sheetAbajo = new Texture("jugadorCorriendoAbajo.png");
+        Texture sheetArribaDerecha = new Texture("jugadorCorriendoArribaDerecha.png");
+        Texture sheetArribaIzquierda = new Texture("jugadorCorriendoArribaIzquierda.png");
+        Texture sheetAbajoDerecha = new Texture("jugadorCorriendoAbajoDerecha.png");
+        Texture sheetAbajoIzquierda = new Texture("jugadorCorriendoAbajoIzquierda.png");
 
         // Crear animaciones
         animacionDerecha = crearAnimacion(sheetDerecha, 7, 1);
         animacionIzquierda = crearAnimacion(sheetIzquierda, 7, 1);
-        animArribaDerecha = crearAnimacion(texArribaDerecha, 1, 1);
-        animArribaIzquierda = crearAnimacion(texArribaIzquierda, 1, 1);
-        animAbajoDerecha = crearAnimacion(texAbajoDerecha, 1, 1);
-        animAbajoIzquierda = crearAnimacion(texAbajoIzquierda, 1, 1);
-        animArriba = crearAnimacion(sheetArriba, 6, 1);
-        animAbajo = crearAnimacion(sheetAbajo, 6, 1);
+        animacionArriba = crearAnimacion(sheetArriba, 6, 1);
+        animacionAbajo = crearAnimacion(sheetAbajo, 6, 1);
+        animacionArribaDerecha = crearAnimacion(sheetArribaDerecha, 6, 1);
+        animacionArribaIzquierda = crearAnimacion(sheetArribaIzquierda, 6, 1);
+        animacionAbajoDerecha = crearAnimacion(sheetAbajoDerecha, 6, 1);
+        animacionAbajoIzquierda = crearAnimacion(sheetAbajoIzquierda, 6, 1);
 
-        // Calcular tamaño basado en el primer frame
+        // Calcular tamaño
         TextureRegion frame = animacionDerecha.getKeyFrame(0);
         width = frame.getRegionWidth() * escala;
         height = frame.getRegionHeight() * escala;
@@ -61,7 +71,11 @@ public class Personaje {
         x = 1;
         y = 1;
         stateTime = 0f;
+
+        hitbox = new Rectangle(x, y, width, height);
     }
+
+    // === Métodos privados auxiliares ===
 
     private Animation<TextureRegion> crearAnimacion(Texture sheet, int columnas, int filas) {
         TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth() / columnas, sheet.getHeight() / filas);
@@ -86,19 +100,20 @@ public class Personaje {
         if (derecha) return Direccion.DERECHA;
         if (arriba) return Direccion.ARRIBA;
         if (abajo) return Direccion.ABAJO;
-        return direccionActual; // No cambia si no hay entrada válida
+        return direccionActual;
     }
 
+    // === Métodos públicos ===
+
     public void update(float delta) {
-        float speed = 1f;
-        float move = speed * delta;
-        estaMoviendo = false;
+        if (estaMoviendo) {
+            stateTime += delta;
+        }
+    }
 
-        boolean izquierda = Gdx.input.isKeyPressed(Input.Keys.A);
-        boolean derecha = Gdx.input.isKeyPressed(Input.Keys.D);
-        boolean arriba = Gdx.input.isKeyPressed(Input.Keys.W);
-        boolean abajo = Gdx.input.isKeyPressed(Input.Keys.S);
-
+    // Esto lo llama el ManejadorInput
+    public void moverDesdeInput(boolean arriba, boolean abajo, boolean izquierda, boolean derecha, float delta) {
+        float move = VELOCIDAD * delta;
         estaMoviendo = izquierda || derecha || arriba || abajo;
 
         if (estaMoviendo) {
@@ -110,8 +125,7 @@ public class Personaje {
             if (arriba) dy += 1;
             if (abajo) dy -= 1;
 
-            // Normalización para movimiento diagonal más fluido
-            float len = (float)Math.sqrt(dx * dx + dy * dy);
+            float len = (float) Math.sqrt(dx * dx + dy * dy);
             if (len != 0) {
                 dx /= len;
                 dy /= len;
@@ -119,13 +133,8 @@ public class Personaje {
 
             x += dx * move;
             y += dy * move;
-            stateTime += delta;
+            hitbox.setPosition(x, y);
         }
-    }
-
-    public void limitarMovimiento(float worldWidth, float worldHeight) {
-        x = MathUtils.clamp(x, 0, worldWidth - width);
-        y = MathUtils.clamp(y, 0, worldHeight - height);
     }
 
     public void render(SpriteBatch batch) {
@@ -134,29 +143,21 @@ public class Personaje {
         if (estaMoviendo) {
             switch (direccionActual) {
                 case DERECHA:
-                    frameActual = animacionDerecha.getKeyFrame(stateTime, true);
-                    break;
+                    frameActual = animacionDerecha.getKeyFrame(stateTime, true); break;
                 case IZQUIERDA:
-                    frameActual = animacionIzquierda.getKeyFrame(stateTime, true);
-                    break;
-                case ARRIBA_DERECHA:
-                    frameActual = animArribaDerecha.getKeyFrame(stateTime, true);
-                    break;
-                case ARRIBA_IZQUIERDA:
-                    frameActual = animArribaIzquierda.getKeyFrame(stateTime, true);
-                    break;
-                case ABAJO_DERECHA:
-                    frameActual = animAbajoDerecha.getKeyFrame(stateTime, true);
-                    break;
-                case ABAJO_IZQUIERDA:
-                    frameActual = animAbajoIzquierda.getKeyFrame(stateTime, true);
-                    break;
+                    frameActual = animacionIzquierda.getKeyFrame(stateTime, true); break;
                 case ARRIBA:
-                	frameActual = animArriba.getKeyFrame(stateTime, true);
-                	break;
+                    frameActual = animacionArriba.getKeyFrame(stateTime, true); break;
                 case ABAJO:
-                	frameActual = animAbajo.getKeyFrame(stateTime, true);
-                	break;
+                    frameActual = animacionAbajo.getKeyFrame(stateTime, true); break;
+                case ARRIBA_DERECHA:
+                    frameActual = animacionArribaDerecha.getKeyFrame(stateTime, true); break;
+                case ARRIBA_IZQUIERDA:
+                    frameActual = animacionArribaIzquierda.getKeyFrame(stateTime, true); break;
+                case ABAJO_DERECHA:
+                    frameActual = animacionAbajoDerecha.getKeyFrame(stateTime, true); break;
+                case ABAJO_IZQUIERDA:
+                    frameActual = animacionAbajoIzquierda.getKeyFrame(stateTime, true); break;
                 default:
                     frameActual = frameQuieto;
             }
@@ -165,6 +166,27 @@ public class Personaje {
         }
 
         batch.draw(frameActual, x, y, width, height);
+    }
+
+    public void limitarMovimiento(float worldWidth, float worldHeight) {
+        x = MathUtils.clamp(x, 0, worldWidth - width);
+        y = MathUtils.clamp(y, 0, worldHeight - height);
+    }
+
+    public Direccion getDireccion() {
+        return direccionActual;
+    }
+
+    public Rectangle getHitbox() {
+        return hitbox;
+    }
+
+    public void setEspacioPresionado(boolean valor) {
+        this.espacioPresionado = valor;
+    }
+
+    public boolean estaEspacioPresionado() {
+        return espacioPresionado;
     }
 
     public void dispose() {
