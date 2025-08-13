@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.championsita.name.personajes.Normal;
 
 public class Principal extends ApplicationAdapter {
 
@@ -30,12 +31,14 @@ public class Principal extends ApplicationAdapter {
 
     @Override
     public void create() {
+
+        personaje = new Normal();
         batch = new SpriteBatch();
 
         canchaDeFutbol = new Texture("CampoDeJuego.png");
         texturaDelPersonaje = new Texture("Jugador.png");
 
-        personaje = new Personaje(0.003f);
+
         manejadorInput = new ManejadorInput(personaje);
         pelota = new Pelota(3, 3, 0.002f);
 
@@ -49,6 +52,7 @@ public class Principal extends ApplicationAdapter {
         float delta = Gdx.graphics.getDeltaTime();
 
         personaje.update(delta);
+        System.out.println(personaje.getStamina());
         manejadorInput.actualizar(delta);
         personaje.limitarMovimiento(viewport.getWorldWidth(), viewport.getWorldHeight());
         pelota.actualizar(delta);

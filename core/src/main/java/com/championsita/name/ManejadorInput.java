@@ -9,6 +9,7 @@ public class ManejadorInput implements InputProcessor {
 
     private boolean arriba, abajo, izquierda, derecha;
     private boolean espacioPresionado;
+    private boolean sprintPresionado;
 
     public ManejadorInput(Personaje personaje) {
         this.personaje = personaje;
@@ -22,6 +23,7 @@ public class ManejadorInput implements InputProcessor {
             case Input.Keys.A: izquierda = true; break;
             case Input.Keys.D: derecha = true; break;
             case Input.Keys.SPACE: espacioPresionado = true; break;
+            case Input.Keys.SHIFT_LEFT: sprintPresionado = true; break;
         }
         return true;
     }
@@ -34,13 +36,14 @@ public class ManejadorInput implements InputProcessor {
             case Input.Keys.A: izquierda = false; break;
             case Input.Keys.D: derecha = false; break;
             case Input.Keys.SPACE: espacioPresionado = false; break;
+            case Input.Keys.SHIFT_LEFT: sprintPresionado = false; break;
         }
         return true;
     }
 
     // Llamá esto desde Principal.render()
     public void actualizar(float delta) {
-        personaje.moverDesdeInput(arriba, abajo, izquierda, derecha, delta);
+        personaje.moverDesdeInput(arriba, abajo, izquierda, derecha,sprintPresionado, delta);
         personaje.setEspacioPresionado(espacioPresionado); // para disparo
     }
 
