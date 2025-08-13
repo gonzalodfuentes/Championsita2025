@@ -11,7 +11,15 @@ import com.badlogic.gdx.math.Rectangle;
 
 public abstract class Personaje {
 
+    private HudPersonaje hud;
+
+
+
+
     // === Constantes ===
+
+    private static final float LIMITE_STAMINA_BLOQUEO = 0.9f;
+    private static final float TIEMPO_BLOQUEO_RECARGA = 2f;
 
     private final float escala;
     private final String nombre;
@@ -62,6 +70,8 @@ public abstract class Personaje {
         this.velocidadSprint = velocidadSprint;
         this.staminaMax = staminaMax;
         this.stamina = staminaMax;
+
+
 
         textureQuieto = new Texture("Jugador.png");
         frameQuieto = new TextureRegion(textureQuieto);
@@ -134,11 +144,9 @@ public abstract class Personaje {
         }
     }
 
-    float tiempoBloqueo;
+    float move;
 
-
-    // Esto lo llama el ManejadorInput
-    public void moverDesdeInput(boolean arriba, boolean abajo, boolean izquierda, boolean derecha,boolean sprint, float delta) {
+    private void actualizarVelocidad(boolean sprint, float delta){
 
         float velocidadActual = velocidadBase;
 
@@ -148,7 +156,7 @@ public abstract class Personaje {
             stamina -= consumoSprint * delta;
             if (stamina < 0) stamina = 0;
 
-            if(stamina < 0.9f){
+            if(stamina < LIMITE_STAMINA_BLOQUEO){
                 velocidadActual = velocidadBase; //Si se gasta , baja la velocidad
                 bloqueoRecarga = true;
                 tiempoDesdeShiftSoltado = 0f;
@@ -158,14 +166,14 @@ public abstract class Personaje {
         else{
             if(bloqueoRecarga){
 
-                    if(!sprint){
+                if(!sprint){
                     tiempoDesdeShiftSoltado += delta;
-                    if(tiempoDesdeShiftSoltado >= 2f){
+                    if(tiempoDesdeShiftSoltado >= TIEMPO_BLOQUEO_RECARGA){
                         bloqueoRecarga = false;
                     }
 
-                    }
                 }
+            }
 
             else {
                 velocidadActual = velocidadBase;
@@ -174,8 +182,10 @@ public abstract class Personaje {
             }
         }
 
-        float move = velocidadActual * delta;
+        move = velocidadActual * delta;
+    }
 
+    private void actualizarDireccion(boolean izquierda, boolean derecha, boolean arriba, boolean abajo) {
         estaMoviendo = izquierda || derecha || arriba || abajo;
 
         if (estaMoviendo) {
@@ -197,6 +207,16 @@ public abstract class Personaje {
             y += dy * move;
             hitbox.setPosition(x, y);
         }
+    }
+
+
+
+    // Esto lo llama el ManejadorInput
+    public void actualizarEstadojugador(boolean arriba, boolean abajo, boolean izquierda, boolean derecha,boolean sprint, float delta) {
+
+        actualizarVelocidad(sprint, delta);
+        actualizarDireccion(izquierda, derecha, arriba, abajo);
+
     }
 
     public void render(SpriteBatch batch) {

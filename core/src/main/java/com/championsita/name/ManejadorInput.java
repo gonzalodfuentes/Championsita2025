@@ -43,7 +43,7 @@ public class ManejadorInput implements InputProcessor {
 
     // Llamá esto desde Principal.render()
     public void actualizar(float delta) {
-        personaje.moverDesdeInput(arriba, abajo, izquierda, derecha,sprintPresionado, delta);
+        personaje.actualizarEstadojugador(arriba, abajo, izquierda, derecha,sprintPresionado, delta);
         personaje.setEspacioPresionado(espacioPresionado); // para disparo
     }
 
