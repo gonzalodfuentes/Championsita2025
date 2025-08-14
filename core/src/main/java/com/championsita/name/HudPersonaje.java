@@ -17,8 +17,8 @@ public class HudPersonaje {
     private OrthographicCamera camaraHUD;
 
 
-    float anchoBarra = 1000;
-    float altoBarra = 100;
+    float anchoBarra = 0.5f;
+    float altoBarra = 0.5f;
 
    float porcentaje;
     float stamina;
@@ -35,20 +35,23 @@ public class HudPersonaje {
 
     }
 
-    public void dibujarBarraStamina(SpriteBatch batch) {
+    public void dibujarBarraStamina(SpriteBatch batch, float xPersonaje, float yPersonaje) {
 
-        camaraHUD.update();
-        batch.setProjectionMatrix(camaraHUD.combined);
+        //camaraHUD.update();
+        //batch.setProjectionMatrix(camaraHUD.combined);
 
         // Calcular porcentaje de stamina
         float porcentaje = personaje.getStamina() / personaje.getStaminaMax();
 
+        // Centrar la barra horizontalmente sobre el jugador
+        float posX = (personaje.getWidth() - anchoBarra) / 2f;
+
+
+        float posY = personaje.getHeight() -0.3f; // ajustar según escala del personaje
+
         // Dibujar barra proporcional a la stamina
-        batch.draw(texturaBarra, 20, 650, anchoBarra * porcentaje, altoBarra);
+        batch.draw(texturaBarra, xPersonaje + posX, yPersonaje + posY, anchoBarra * porcentaje, altoBarra);
         System.out.println("Deberia funcionar");
-
-
-
 
 
     }

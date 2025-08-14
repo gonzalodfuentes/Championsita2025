@@ -207,6 +207,8 @@ public abstract class Personaje {
             x += dx * move;
             y += dy * move;
             hitbox.setPosition(x, y);
+
+
         }
     }
 
@@ -248,8 +250,9 @@ public abstract class Personaje {
             frameActual = frameQuieto;
         }
 
+
         batch.draw(frameActual, x, y, width, height);
-        hud.dibujarBarraStamina(batch);
+
 
     }
 
@@ -285,5 +288,20 @@ public abstract class Personaje {
 
     public void dispose() {
         textureQuieto.dispose();
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getX() {
+        return x;
+    }
+    public float getY() {
+        return y;
+    }
+
+    public float getHeight() {
+        return height;
     }
 }

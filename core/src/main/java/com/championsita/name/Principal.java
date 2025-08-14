@@ -83,11 +83,11 @@ public class Principal extends ApplicationAdapter {
 
         viewport.apply();
         batch.setProjectionMatrix(viewport.getCamera().combined);
-
         batch.begin();
         batch.draw(canchaDeFutbol, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
         personaje.render(batch);
         pelota.render(batch);
+        personaje.hud.dibujarBarraStamina(batch, personaje.getX(), personaje.getY());
         batch.end();
     }
 
