@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Rectangle;
 
 public abstract class Personaje {
 
-    private HudPersonaje hud;
+    HudPersonaje hud;
 
 
 
@@ -71,6 +71,7 @@ public abstract class Personaje {
         this.staminaMax = staminaMax;
         this.stamina = staminaMax;
 
+        hud = new HudPersonaje(this);
 
 
         textureQuieto = new Texture("Jugador.png");
@@ -248,6 +249,8 @@ public abstract class Personaje {
         }
 
         batch.draw(frameActual, x, y, width, height);
+        hud.dibujarBarraStamina(batch);
+
     }
 
     public void limitarMovimiento(float worldWidth, float worldHeight) {
@@ -276,6 +279,9 @@ public abstract class Personaje {
 
     }
 
+    public float getStaminaMax(){
+        return staminaMax;
+    }
 
     public void dispose() {
         textureQuieto.dispose();

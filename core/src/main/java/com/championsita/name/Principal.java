@@ -19,6 +19,7 @@ public class Principal extends ApplicationAdapter {
 
     private Texture canchaDeFutbol;
     private Texture texturaDelPersonaje;
+    private Texture barraStamina;
 
     private Personaje personaje;
     private Pelota pelota;
@@ -39,6 +40,7 @@ public class Principal extends ApplicationAdapter {
         texturaDelPersonaje = new Texture("Jugador.png");
 
 
+
         manejadorInput = new ManejadorInput(personaje);
         pelota = new Pelota(3, 3, 0.002f);
 
@@ -52,7 +54,7 @@ public class Principal extends ApplicationAdapter {
         float delta = Gdx.graphics.getDeltaTime();
 
         personaje.update(delta);
-        System.out.println(personaje.getStamina());
+        //System.out.println(personaje.getStamina());
         manejadorInput.actualizar(delta);
         personaje.limitarMovimiento(viewport.getWorldWidth(), viewport.getWorldHeight());
         pelota.actualizar(delta);
