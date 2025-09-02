@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="dfa01e62-23d0-4945-a54d-11917639eb03" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="30Zqi0Rq1TVewBn8lFUt7TUdqHs" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Lwjgl3Launcher.executor": "Coverage",
+    "Gradle.Build Championsita2025-menus.executor": "Run",
+    "Gradle.Build Championsita2025-menus2.executor": "Run",
+    "Gradle.Championsita2025-develop:lwjgl3 [:lwjgl3:com.championsita.name.lwjgl3.Lwjgl3Launcher.main()].executor": "Run",
+    "Gradle.Championsita2025-menus2:lwjgl3 [:lwjgl3:com.championsita.name.lwjgl3.Lwjgl3Launcher.main()].executor": "Run",
+    "Gradle.Championsita2025-menus:lwjgl3 [:lwjgl3:com.championsita.name.lwjgl3.Lwjgl3Launcher.main()].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/somig/Intellij/Championsita2025-menus2",
+    "settings.editor.selected.configurable": "preferences.lookFeel"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="Lwjgl3Launcher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.championsita.name.lwjgl3.Lwjgl3Launcher" />
+      <module name="Championsita2025-menus2.lwjgl3.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.championsita.name.lwjgl3.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="dfa01e62-23d0-4945-a54d-11917639eb03" name="Changes" comment="" />
+      <created>1753845565700</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1753845565700</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Championsita2025_menus2$Lwjgl3Launcher.ic" NAME="Lwjgl3Launcher Coverage Results" MODIFIED="1756428270012" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true">
+      <FILTER>com.championsita.name.lwjgl3.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/Championsita2025_menus$Lwjgl3Launcher.ic" NAME="Lwjgl3Launcher Coverage Results" MODIFIED="1755520313602" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true">
+      <FILTER>com.championsita.name.lwjgl3.*</FILTER>
+    </SUITE>
+  </component>
+</project>
