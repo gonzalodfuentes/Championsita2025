@@ -77,6 +77,9 @@ public class Pelota {
         hitbox.setPosition(x, y);
     }
 
+    public void actualizar(float delta) {
+        actualizar(delta, false); // llama al nuevo con un valor por defecto
+    }
 
 
 
