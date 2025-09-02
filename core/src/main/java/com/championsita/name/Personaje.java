@@ -9,10 +9,33 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 
-public class Personaje {
+public abstract class Personaje {
+
+    HudPersonaje hud;
+
+
+
 
     // === Constantes ===
-    private static final float VELOCIDAD = 1f;
+
+    private static final float LIMITE_STAMINA_BLOQUEO = 0.9f;
+    private static final float TIEMPO_BLOQUEO_RECARGA = 2f;
+
+    private final float escala;
+    private final String nombre;
+
+    private final float velocidadBase;      // Velocidad normal (pasada en constructor)
+    private final float velocidadSprint;    // Velocidad al sprintar
+    private float stamina;                  // Stamina actual
+    private final float staminaMax; // Máximo de stamina
+    private final float consumoSprint = 5f; // Stamina que se consume por segundo al sprintar
+    private final float recargaStamina = 10f; // Stamina que se recupera por segundo cuando no sprinta
+
+    private boolean sprintActivo = false;
+
+    private boolean bloqueoRecarga = false;
+    private float tiempoDesdeShiftSoltado = 0f;
+
 
     // === Texturas y Animaciones ===
     private Texture textureQuieto;
@@ -38,8 +61,19 @@ public class Personaje {
     private Rectangle hitbox;
 
     // === Constructor ===
-    public Personaje(float escala) {
+    public Personaje(String nombre, float escala, float velocidadBase, float velocidadSprint, float staminaMax) {
         // Cargar texturas
+
+        this.nombre = nombre;
+        this.escala = escala;
+        this.velocidadBase = velocidadBase;
+        this.velocidadSprint = velocidadSprint;
+        this.staminaMax = staminaMax;
+        this.stamina = staminaMax;
+
+        hud = new HudPersonaje(this);
+
+
         textureQuieto = new Texture("Jugador.png");
         frameQuieto = new TextureRegion(textureQuieto);
 
@@ -111,9 +145,48 @@ public class Personaje {
         }
     }
 
-    // Esto lo llama el ManejadorInput
-    public void moverDesdeInput(boolean arriba, boolean abajo, boolean izquierda, boolean derecha, float delta) {
-        float move = VELOCIDAD * delta;
+    float move;
+
+    private void actualizarVelocidad(boolean sprint, float delta){
+
+        float velocidadActual = velocidadBase;
+
+        if (sprint && stamina > 0) {
+            velocidadActual = velocidadSprint;
+
+            stamina -= consumoSprint * delta;
+            if (stamina < 0) stamina = 0;
+
+            if(stamina < LIMITE_STAMINA_BLOQUEO){
+                velocidadActual = velocidadBase; //Si se gasta , baja la velocidad
+                bloqueoRecarga = true;
+                tiempoDesdeShiftSoltado = 0f;
+            }
+
+        }
+        else{
+            if(bloqueoRecarga){
+
+                if(!sprint){
+                    tiempoDesdeShiftSoltado += delta;
+                    if(tiempoDesdeShiftSoltado >= TIEMPO_BLOQUEO_RECARGA){
+                        bloqueoRecarga = false;
+                    }
+
+                }
+            }
+
+            else {
+                velocidadActual = velocidadBase;
+                stamina += recargaStamina * delta;  //recarga
+                if (stamina > staminaMax) stamina = staminaMax;
+            }
+        }
+
+        move = velocidadActual * delta;
+    }
+
+    private void actualizarDireccion(boolean izquierda, boolean derecha, boolean arriba, boolean abajo) {
         estaMoviendo = izquierda || derecha || arriba || abajo;
 
         if (estaMoviendo) {
@@ -134,7 +207,19 @@ public class Personaje {
             x += dx * move;
             y += dy * move;
             hitbox.setPosition(x, y);
+
+
         }
+    }
+
+
+
+    // Esto lo llama el ManejadorInput
+    public void actualizarEstadojugador(boolean arriba, boolean abajo, boolean izquierda, boolean derecha,boolean sprint, float delta) {
+
+        actualizarVelocidad(sprint, delta);
+        actualizarDireccion(izquierda, derecha, arriba, abajo);
+
     }
 
     public void render(SpriteBatch batch) {
@@ -165,7 +250,10 @@ public class Personaje {
             frameActual = frameQuieto;
         }
 
+
         batch.draw(frameActual, x, y, width, height);
+
+
     }
 
     public void limitarMovimiento(float worldWidth, float worldHeight) {
@@ -189,7 +277,31 @@ public class Personaje {
         return espacioPresionado;
     }
 
+    public float getStamina(){
+        return stamina;
+
+    }
+
+    public float getStaminaMax(){
+        return staminaMax;
+    }
+
     public void dispose() {
         textureQuieto.dispose();
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getX() {
+        return x;
+    }
+    public float getY() {
+        return y;
+    }
+
+    public float getHeight() {
+        return height;
     }
 }
