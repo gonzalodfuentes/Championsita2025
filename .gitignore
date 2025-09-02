@@ -1,2 +1,22 @@
-/.gradle/
-/build/
+﻿#
+# Gradle
+.gradle/
+**/build/
+build/
+out/
+bin/
+
+# Java
+*.class
+*.jar
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
