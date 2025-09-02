@@ -10,8 +10,8 @@ public class Pelota {
 
     // === Constantes ===
     private static final float FRICCION = 0.95f;
-    private static final float FUERZA_DISPARO = 100f;
-    private static final float FUERZA_EMPUJE = 20f;
+    private static final float FUERZA_DISPARO = 2.5f;
+    private static final float FUERZA_EMPUJE = 1f; // más chico que disparo
 
     // === Atributos ===
     private Texture sheet;
@@ -44,7 +44,7 @@ public class Pelota {
             }
         }
 
-        animacion = new Animation<>(0.02f, frames);
+        animacion = new Animation<>(0.08f, frames);
         stateTime = 0f;
 
         width = frames[0].getRegionWidth() * escala;
@@ -57,41 +57,45 @@ public class Pelota {
     }
 
     // === Métodos públicos ===
-
-    public void actualizar(float delta) {
-        if (animar) {
+    public void actualizar(float delta, boolean alguienEmpuja) {
+        if (Math.abs(velocidadX) > 0.01f || Math.abs(velocidadY) > 0.01f || alguienEmpuja) {
+            animar = true;
             stateTime += delta;
+        } else {
+            animar = false;
         }
 
-        x += velocidadX;
-        y += velocidadY;
+        x += velocidadX * delta;
+        y += velocidadY * delta;
 
         velocidadX *= FRICCION;
         velocidadY *= FRICCION;
 
-        if (Math.abs(velocidadX) < 0.0001f && Math.abs(velocidadY) < 0.0001f) {
-            animar = false;
-            velocidadX = 0;
-            velocidadY = 0;
-        }
+        if (Math.abs(velocidadX) < 0.01f) velocidadX = 0;
+        if (Math.abs(velocidadY) < 0.01f) velocidadY = 0;
 
         hitbox.setPosition(x, y);
     }
 
+
+
+
     public void disparar(float dx, float dy) {
-        velocidadX = dx * FUERZA_DISPARO;
-        velocidadY = dy * FUERZA_DISPARO;
+        velocidadX = dx * getFuerzaDisparo();
+        velocidadY = dy * getFuerzaDisparo();
         animar = true;
+        stateTime = 0f; // reiniciar animación
+    }
+
+    public void empujar(float dx, float dy) {
+        velocidadX = dx * getFuerzaEmpuje();
+        velocidadY = dy * getFuerzaEmpuje();
+        animar = true;
+        stateTime = 0f; // reiniciar animación
     }
 
     public void detener() {
         animar = false;
-    }
-
-    public void empujar(float dx, float dy) {
-        x += dx * FUERZA_EMPUJE;
-        y += dy * FUERZA_EMPUJE;
-        animar = true;
     }
 
     public void render(SpriteBatch batch) {
@@ -104,22 +108,24 @@ public class Pelota {
     }
 
     // === Getters y Setters ===
-
     public Rectangle getHitbox() {
         return hitbox;
     }
 
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
-    }
+    public float getX() { return x; }
+    public float getY() { return y; }
 
     public void setPosition(float nuevaX, float nuevaY) {
         this.x = nuevaX;
         this.y = nuevaY;
         hitbox.setPosition(nuevaX, nuevaY);
     }
+
+	public static float getFuerzaEmpuje() {
+		return FUERZA_EMPUJE;
+	}
+
+	public static float getFuerzaDisparo() {
+		return FUERZA_DISPARO;
+	}
 }
