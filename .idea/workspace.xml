@@ -4,7 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dfa01e62-23d0-4945-a54d-11917639eb03" name="Changes" comment="" />
+    <list default="true" id="dfa01e62-23d0-4945-a54d-11917639eb03" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/Direccion.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/ManejadorInput.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/Pelota.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/Personaje.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/controlables/Direccion.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/controlables/Jugador.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/controlables/ManejadorInputJugador.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/controlables/Partido.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/controlables/Pelota.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/controlables/Personaje.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/menus/Carga.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/menus/Carga.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/menus/Doble.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/menus/Doble.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/menus/Inicial.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/menus/Inicial.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/menus/Menu.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/menus/Menu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/partidos/Jugador.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/partidos/Partido.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/com/championsita/name/partidos/Pelota.java" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -34,6 +54,9 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
 }</component>
@@ -52,6 +75,9 @@
     "Gradle.Championsita2025-menus:lwjgl3 [:lwjgl3:com.championsita.name.lwjgl3.Lwjgl3Launcher.main()].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "menus",
     "last_opened_file_path": "C:/Users/somig/Intellij/Championsita2025-menus2",
     "settings.editor.selected.configurable": "preferences.lookFeel"
   }

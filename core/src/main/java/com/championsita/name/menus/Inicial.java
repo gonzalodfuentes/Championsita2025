@@ -11,7 +11,6 @@ public class Inicial extends Menu {
     private Sprite[] botones;
     private float anchoBotones;
     private float altoBotones;
-    private Color color;
 
     public Inicial(Principal juego) {
         super(juego);
@@ -32,7 +31,6 @@ public class Inicial extends Menu {
 
         this.anchoBotones = botones[0].getWidth() - 100;
         this.altoBotones = botones[0].getHeight() - 20;
-        this.color = new Color(botones[0].getColor());
 
         for (int i = 0; i < botones.length; i++) {
             botones[i].setSize(anchoBotones, altoBotones);
@@ -102,10 +100,10 @@ public class Inicial extends Menu {
                     y >= by && y <= by + altoBotones;
 
             if (dentro) {
-                boton.setColor(0, 1, 0, 1); // verde
+                boton.setColor(super.colorAccion); // verde
                 paso = true;
             } else {
-                boton.setColor(this.color);
+                boton.setColor(super.colorBoton);
             }
 
             i++;

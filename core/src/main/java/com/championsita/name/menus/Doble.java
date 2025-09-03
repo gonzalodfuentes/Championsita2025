@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.name.Principal;
-import com.championsita.name.controlables.Partido;
 
 public class Doble extends Menu {
 

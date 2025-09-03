@@ -20,6 +20,7 @@ public class Menu extends InputAdapter implements Screen {
     protected Texture atras;
     protected Sprite atrasSprite;
     protected Color colorBoton;
+    protected Color colorAccion;
     protected Texture flecha, flechaCursor;
     protected Sprite[] flechas, flechasInvertidas;
 
@@ -38,6 +39,7 @@ public class Menu extends InputAdapter implements Screen {
         this.atrasSprite = new Sprite(this.atras);
 
         this.colorBoton = new Color(this.atrasSprite.getColor());
+        this.colorAccion = new Color(0, 1, 0, 1);
 
         this.fondo = new Texture("fondoChampionsita.png");
         this.fondoSprite = new Sprite(this.fondo);
@@ -91,7 +93,7 @@ public class Menu extends InputAdapter implements Screen {
 
         if(!click) {
             if(dentro) {
-                this.atrasSprite.setColor(0, 1, 0, 1);
+                this.atrasSprite.setColor(this.colorAccion);
             }
             else {
                 this.atrasSprite.setColor(this.colorBoton);

@@ -1,5 +1,6 @@
 package com.championsita.name.menus;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.name.Principal;
@@ -18,6 +19,10 @@ public class Carga extends Menu {
     private int flechasUsadas;
     private String[] campos;
     private int numCampo;
+    private Sprite goles;
+    private Sprite tiempo;
+    private int numGoles, numTiempo;
+    private float[] golesXY, tiempoXY;
 
     public Carga(Principal juego, boolean modoDosJugadores) {
         super(juego);
@@ -76,6 +81,23 @@ public class Carga extends Menu {
         super.flechas[this.flechasUsadas + 1].setPosition(this.campoSprite.getX() + campoSprite.getWidth() + 5, y - 20);
         this.flechasUsadas += 2;
 
+        int ubiX = 30, ubiY = 70;
+        this.goles = new Sprite(new Texture("menuCreacion/golesCartel1.png"));
+        this.goles.setPosition(ubiX, ubiY);
+        this.tiempo = new Sprite(new Texture("menuCreacion/tiempoCartel1.png"));
+        ubiX += this.tiempo.getWidth();
+        this.tiempo.setPosition(Gdx.graphics.getWidth() - ubiX, ubiY);
+        this.numGoles = 1;
+        this.numTiempo = 1;
+        this.golesXY = new float[] {
+                this.goles.getX(),
+                this.goles.getY()
+        };
+        this.tiempoXY = new float[] {
+                this.tiempo.getX(),
+                this.tiempo.getY()
+        };
+
         Gdx.input.setInputProcessor(this);
     }
 
@@ -95,6 +117,8 @@ public class Carga extends Menu {
         this.campoSprite.draw(super.batch);
         super.flechas[4].draw(super.batch);
         super.flechas[5].draw(super.batch);
+        this.goles.draw(super.batch);
+        this.tiempo.draw(super.batch);
         super.batch.end();
     }
 
@@ -105,19 +129,55 @@ public class Carga extends Menu {
 
     @Override
     public boolean mouseMoved(int x, int y) {
-        boolean paso = false;
         y = Gdx.graphics.getHeight() - y;
+        boolean paso = false;
         int i = 0;
 
         do {
             paso = condicionFlechas(super.flechas[i], x, y);
             i++;
-        }
-        while (i < this.flechasUsadas && !paso);
+        } while (i < this.flechasUsadas && !paso);
+
+        paso = definirLimitesTiempoGoles(this.goles, x, y);
+        this.goles.setColor(paso ? super.colorAccion : super.colorBoton);
+
+        paso = definirLimitesTiempoGoles(this.tiempo, x, y);
+        this.tiempo.setColor(paso ? super.colorAccion : super.colorBoton);
 
         paso = super.condicionAtras(x, y, super.atrasSprite, false);
 
         return paso;
+    }
+
+    private boolean definirLimitesTiempoGoles(Sprite sprite, int x, int y) {
+        float xS = sprite.getX();
+        float yS = sprite.getY();
+        float anS = sprite.getWidth();
+        float alS = sprite.getHeight();
+        boolean dentro = x >= xS && x <= xS + anS && y >= yS && y <= yS + alS;
+
+        return dentro;
+    }
+
+    @Override
+    public boolean touchDown(int x, int y, int pointer, int mouse) {
+        boolean clickeado = false;
+        int i = 0;
+        y = Gdx.graphics.getHeight() - y;
+
+        clickeado = definirLimitesTiempoGoles(this.goles, x, y);
+        if(clickeado) {
+            this.goles.setSize(this.goles.getTexture().getWidth() - 12, this.goles.getTexture().getHeight() - 6);
+            this.goles.setPosition(this.golesXY[0] + 6, this.golesXY[1] + 3);
+        }
+
+        clickeado = definirLimitesTiempoGoles(this.tiempo, x, y);
+        if(clickeado) {
+            this.tiempo.setSize(this.tiempo.getTexture().getWidth() - 12, this.tiempo.getTexture().getHeight() - 6);
+            this.tiempo.setPosition(this.tiempoXY[0] + 6, this.tiempoXY[1] + 3);
+        }
+
+        return clickeado;
     }
 
     @Override
@@ -145,6 +205,28 @@ public class Carga extends Menu {
         }
         while (i < this.flechasUsadas && !clickeado);
 
+        clickeado = definirLimitesTiempoGoles(this.goles, x, y);
+        if(clickeado) {
+            int num = cambiarCantiadGolesTiempo(true, this.numGoles);
+            if(this.numGoles != num) {
+                this.numGoles = num;
+                this.goles.setTexture(new Texture("menuCreacion/golesCartel" + this.numGoles + ".png"));
+            }
+        }
+        this.goles.setSize(this.goles.getTexture().getWidth(), this.goles.getTexture().getHeight());
+        this.goles.setPosition(this.golesXY[0], this.golesXY[1]);
+
+        clickeado = definirLimitesTiempoGoles(this.tiempo, x, y);
+        if(clickeado) {
+            int num = cambiarCantiadGolesTiempo(false, this.numTiempo);
+            if(this.numTiempo != num) {
+                this.numTiempo = num;
+                this.tiempo.setTexture(new Texture("menuCreacion/tiempoCartel" + this.numTiempo + ".png"));
+            }
+        }
+        this.tiempo.setSize(this.tiempo.getTexture().getWidth(), this.tiempo.getTexture().getHeight());
+        this.tiempo.setPosition(this.tiempoXY[0], this.tiempoXY[1]);
+
         clickeado = super.condicionAtras(x, y, this.atrasSprite, true);
         if(clickeado) {
             Menu doble = new Doble(super.juego);
@@ -152,6 +234,16 @@ public class Carga extends Menu {
         }
 
         return clickeado;
+    }
+
+    private int cambiarCantiadGolesTiempo(boolean goles, int num) {
+        switch(num) {
+            case 1: num = goles ? 3 : 2; break;
+            case 2: num = 3; break;
+            case 3: num = goles ? 5 : 1; break;
+            case 5: num = 1;
+        }
+        return num;
     }
 
     private void controlUnJugador(float acomodarX, float y) {
