@@ -1,5 +1,6 @@
 package com.championsita.name;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 
 public class ManejadorInput implements InputProcessor {
@@ -8,6 +9,7 @@ public class ManejadorInput implements InputProcessor {
     private final int arriba, abajo, izquierda, derecha, accion;
 
     private boolean arribaPresionada, abajoPresionada, izquierdaPresionada, derechaPresionada, accionPresionada;
+    private boolean sprintPresionado;
 
     public ManejadorInput(Personaje personaje, int arriba, int abajo, int izquierda, int derecha, int accion) {
         this.personaje = personaje;
@@ -20,24 +22,31 @@ public class ManejadorInput implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if(keycode == arriba) arribaPresionada = true;
-        if(keycode == abajo) abajoPresionada = true;
-        if(keycode == izquierda) izquierdaPresionada = true;
-        if(keycode == derecha) derechaPresionada = true;
-        if(keycode == accion) accionPresionada = true;
-        return false;
+        switch (keycode) {
+            case Input.Keys.W: arriba = true; break;
+            case Input.Keys.S: abajo = true; break;
+            case Input.Keys.A: izquierda = true; break;
+            case Input.Keys.D: derecha = true; break;
+            case Input.Keys.SPACE: espacioPresionado = true; break;
+            case Input.Keys.SHIFT_LEFT: sprintPresionado = true; break;
+        }
+        return true;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        if(keycode == arriba) arribaPresionada = false;
-        if(keycode == abajo) abajoPresionada = false;
-        if(keycode == izquierda) izquierdaPresionada = false;
-        if(keycode == derecha) derechaPresionada = false;
-        if(keycode == accion) accionPresionada = false;
-        return false;
+        switch (keycode) {
+            case Input.Keys.W: arriba = false; break;
+            case Input.Keys.S: abajo = false; break;
+            case Input.Keys.A: izquierda = false; break;
+            case Input.Keys.D: derecha = false; break;
+            case Input.Keys.SPACE: espacioPresionado = false; break;
+            case Input.Keys.SHIFT_LEFT: sprintPresionado = false; break;
+        }
+        return true;
     }
 
+    // Llamá esto desde Principal.render()
     public void actualizar(float delta) {
         personaje.moverDesdeInput(arribaPresionada, abajoPresionada, izquierdaPresionada, derechaPresionada, delta);
         personaje.setEspacioPresionado(accionPresionada);

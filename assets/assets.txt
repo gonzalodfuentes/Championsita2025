@@ -1,5 +1,9 @@
+
 CampoDeJuego.png
 Jugador.png
+barraStamina.png
+fondoBarraStamina.png
+interiorBarraStamina.png
 jugadorCorriendoAbajo.png
 jugadorCorriendoAbajoDerecha.png
 jugadorCorriendoAbajoIzquierda.png
