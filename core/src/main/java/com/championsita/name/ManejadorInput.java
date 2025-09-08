@@ -6,50 +6,48 @@ import com.badlogic.gdx.InputProcessor;
 public class ManejadorInput implements InputProcessor {
 
     private final Personaje personaje;
-    private final int arriba, abajo, izquierda, derecha, accion;
 
-    private boolean arribaPresionada, abajoPresionada, izquierdaPresionada, derechaPresionada, accionPresionada;
-    private boolean sprintPresionado;
+    private final int keyArriba, keyAbajo, keyIzquierda, keyDerecha, keyAccion;
+    private final int keySprint = Input.Keys.SHIFT_LEFT;
+
+    private boolean arriba, abajo, izquierda, derecha, espacioPresionado, sprintPresionado;
 
     public ManejadorInput(Personaje personaje, int arriba, int abajo, int izquierda, int derecha, int accion) {
         this.personaje = personaje;
-        this.arriba = arriba;
-        this.abajo = abajo;
-        this.izquierda = izquierda;
-        this.derecha = derecha;
-        this.accion = accion;
+        this.keyArriba = arriba;
+        this.keyAbajo = abajo;
+        this.keyIzquierda = izquierda;
+        this.keyDerecha = derecha;
+        this.keyAccion = accion;
     }
 
     @Override
     public boolean keyDown(int keycode) {
-        switch (keycode) {
-            case Input.Keys.W: arriba = true; break;
-            case Input.Keys.S: abajo = true; break;
-            case Input.Keys.A: izquierda = true; break;
-            case Input.Keys.D: derecha = true; break;
-            case Input.Keys.SPACE: espacioPresionado = true; break;
-            case Input.Keys.SHIFT_LEFT: sprintPresionado = true; break;
-        }
-        return true;
+        boolean handled = false;
+        if (keycode == keyArriba)    { arriba = true; handled = true; }
+        if (keycode == keyAbajo)     { abajo = true; handled = true; }
+        if (keycode == keyIzquierda) { izquierda = true; handled = true; }
+        if (keycode == keyDerecha)   { derecha = true; handled = true; }
+        if (keycode == keyAccion)    { espacioPresionado = true; handled = true; }
+        if (keycode == keySprint)    { sprintPresionado = true; handled = true; }
+        return handled; // <-- SOLO true si esta instancia efectivamente manejó la tecla
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        switch (keycode) {
-            case Input.Keys.W: arriba = false; break;
-            case Input.Keys.S: abajo = false; break;
-            case Input.Keys.A: izquierda = false; break;
-            case Input.Keys.D: derecha = false; break;
-            case Input.Keys.SPACE: espacioPresionado = false; break;
-            case Input.Keys.SHIFT_LEFT: sprintPresionado = false; break;
-        }
-        return true;
+        boolean handled = false;
+        if (keycode == keyArriba)    { arriba = false; handled = true; }
+        if (keycode == keyAbajo)     { abajo = false; handled = true; }
+        if (keycode == keyIzquierda) { izquierda = false; handled = true; }
+        if (keycode == keyDerecha)   { derecha = false; handled = true; }
+        if (keycode == keyAccion)    { espacioPresionado = false; handled = true; }
+        if (keycode == keySprint)    { sprintPresionado = false; handled = true; }
+        return handled; // <-- idem
     }
 
-    // Llamá esto desde Principal.render()
     public void actualizar(float delta) {
-        personaje.moverDesdeInput(arribaPresionada, abajoPresionada, izquierdaPresionada, derechaPresionada, delta);
-        personaje.setEspacioPresionado(accionPresionada);
+        personaje.actualizarEstadojugador(arriba, abajo, izquierda, derecha, sprintPresionado, delta);
+        personaje.setEspacioPresionado(espacioPresionado);
     }
 
     // Métodos no usados

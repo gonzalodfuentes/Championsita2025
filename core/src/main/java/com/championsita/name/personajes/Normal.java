@@ -1,21 +1,19 @@
 package com.championsita.name.personajes;
 
 import com.championsita.name.Personaje;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
+import com.championsita.name.PersonajeConfig;
 
 public class Normal extends Personaje {
 
-    public Normal() {
-        // Aquí defines nombre, escala, velocidad al crear el personaje
-        super("Normal", 0.003f, 1.5f, 3f, 20f);
+    // Ajustá los valores a gusto
+    public Normal(String nombre, PersonajeConfig config, float escala,
+                  float velocidadBase, float velocidadSprint, float staminaMax) {
+        super(nombre, config, escala, velocidadBase, velocidadSprint, staminaMax);
+    }
 
-        // Puedes personalizar texturas y animaciones distintas,
-        // pero en tu clase Personaje actual cargas siempre las mismas.
-        // Si quieres personalizarlas, haz métodos abstractos para eso o sobreescribe.
-
-        // Por ejemplo, si quieres cambiar texturaQuieto y animaciones,
-        // agrega métodos protegidos para modificarlas o carga aquí texturas adicionales.
+    // Atajo cómodo si querés usar un nombre por defecto
+    public Normal(PersonajeConfig config, float escala,
+                  float velocidadBase, float velocidadSprint, float staminaMax) {
+        this("Normal", config, escala, velocidadBase, velocidadSprint, staminaMax);
     }
 }
-

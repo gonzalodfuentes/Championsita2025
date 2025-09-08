@@ -12,47 +12,51 @@ import java.util.Map;
 
 public abstract class Personaje {
 
-    // === HUD ===
+    // === HUD (acceso package para usar desde Principal) ===
     HudPersonaje hud;
 
-    // === Constantes de stamina/sprint ===
-    private static final float LIMITE_STAMINA_BLOQUEO = 0.9f;   // umbral a partir del cual recorta velocidad y bloquea recarga
-    private static final float TIEMPO_BLOQUEO_RECARGA = 2f;     // segundos de bloqueo tras vaciarse
+    // === Constantes sprint/stamina ===
+    private static final float LIMITE_STAMINA_BLOQUEO = 0.9f; // cuando cae por debajo, bloquea recarga breve
+    private static final float TIEMPO_BLOQUEO_RECARGA = 2f;
 
-    // === Identidad / configuración dinámica ===
+    // === Identidad / configuración ===
     private final String nombre;
     private final float escala;
     private final float velocidadBase;
     private final float velocidadSprint;
     private final float staminaMax;
 
-    // === Estado de stamina/sprint ===
+    // === Estado sprint/stamina ===
     private float stamina;
-    private final float consumoSprint = 5f;    // por segundo
-    private final float recargaStamina = 10f;  // por segundo
+    private final float consumoSprint = 5f;   // por segundo
+    private final float recargaStamina = 10f; // por segundo
     private boolean bloqueoRecarga = false;
     private float tiempoDesdeShiftSoltado = 0f;
-    private float move = 0f;
+    private float move = 0f; // distancia por frame (velocidad * delta)
 
-    // === Estado del personaje ===
+    // === Estado de render/movimiento ===
     private float x, y, width, height, stateTime;
     private boolean estaMoviendo;
     private boolean espacioPresionado = false;
     private Direccion direccionActual = Direccion.ABAJO;
+
+    // Hitbox (más angosta/alta para colisiones agradables)
     private Rectangle hitbox;
+
+    // Offset fijo para mantener la hitbox centrada respecto al sprite
+    // (recalculado cuando cambian width/height; reutilizado en setPosition/clamp)
+    private float hbW, hbH, hbOx, hbOy;
 
     // === Texturas / animaciones ===
     private Texture textureQuieto;
     private TextureRegion frameQuieto;
 
-    // guardo las sheets para poder hacer dispose exacto una sola vez
     private Texture sheetDerecha, sheetIzquierda, sheetArriba, sheetAbajo,
                     sheetArribaDerecha, sheetArribaIzquierda, sheetAbajoDerecha, sheetAbajoIzquierda;
 
     private final Map<Direccion, Animation<TextureRegion>> animaciones = new EnumMap<>(Direccion.class);
 
     // === Constructor ===
-    // Mantiene PersonajeConfig (como tu versión A) + parámetros de sprint (como tu versión B)
     public Personaje(String nombre, PersonajeConfig config, float escala,
                      float velocidadBase, float velocidadSprint, float staminaMax) {
 
@@ -65,11 +69,11 @@ public abstract class Personaje {
 
         hud = new HudPersonaje(this);
 
-        // textura quieto
+        // Textura quieto
         textureQuieto = new Texture(config.texturaQuieto);
         frameQuieto = new TextureRegion(textureQuieto);
 
-        // cargo sheets desde config (sin hardcodear rutas)
+        // Sheets desde config (no hardcodeamos rutas)
         sheetDerecha         = new Texture(config.sheetDerecha);
         sheetIzquierda       = new Texture(config.sheetIzquierda);
         sheetArriba          = new Texture(config.sheetArriba);
@@ -79,7 +83,7 @@ public abstract class Personaje {
         sheetAbajoDerecha    = new Texture(config.sheetAbajoDerecha);
         sheetAbajoIzquierda  = new Texture(config.sheetAbajoIzquierda);
 
-        // creo animaciones (como en tu versión A pero con sheets ya cargadas)
+        // Animaciones
         animaciones.put(Direccion.DERECHA,          crearAnimacion(sheetDerecha, 7, 1));
         animaciones.put(Direccion.IZQUIERDA,        crearAnimacion(sheetIzquierda, 7, 1));
         animaciones.put(Direccion.ARRIBA,           crearAnimacion(sheetArriba, 6, 1));
@@ -89,17 +93,20 @@ public abstract class Personaje {
         animaciones.put(Direccion.ABAJO_DERECHA,    crearAnimacion(sheetAbajoDerecha, 6, 1));
         animaciones.put(Direccion.ABAJO_IZQUIERDA,  crearAnimacion(sheetAbajoIzquierda, 6, 1));
 
-        // tamaño base (desde frame de derecha)
-        TextureRegion frame0 = animaciones.get(Direccion.DERECHA).getKeyFrame(0);
-        width  = frame0.getRegionWidth()  * escala;
-        height = frame0.getRegionHeight() * escala;
+        // Tamaño base (desde un frame de derecha)
+        TextureRegion f0 = animaciones.get(Direccion.DERECHA).getKeyFrame(0);
+        width  = f0.getRegionWidth()  * escala;
+        height = f0.getRegionHeight() * escala;
 
-        // posición inicial + hitbox "afinada" (60% ancho, 80% alto, centrada; mejora colisiones)
+        // Posición inicial
         x = 1f; y = 1f; stateTime = 0f;
-        float hbW = width * 0.6f;
-        float hbH = height * 0.8f;
-        float hbOx = (width - hbW) / 2f;
-        float hbOy = 0f;
+
+        // Hitbox centrada (60% ancho, 80% alto; apoyada abajo)
+        hbW = width  * 0.60f;
+        hbH = height * 0.80f;
+        hbOx = (width - hbW) / 2f;
+        hbOy = 0f;
+
         hitbox = new Rectangle(x + hbOx, y + hbOy, hbW, hbH);
     }
 
@@ -108,7 +115,9 @@ public abstract class Personaje {
         TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth() / columnas, sheet.getHeight() / filas);
         TextureRegion[] frames = new TextureRegion[columnas * filas];
         int k = 0;
-        for (int i = 0; i < filas; i++) for (int j = 0; j < columnas; j++) frames[k++] = tmp[i][j];
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) frames[k++] = tmp[i][j];
+        }
         return new Animation<>(0.1f, frames);
     }
 
@@ -139,7 +148,6 @@ public abstract class Personaje {
             }
         } else {
             if (bloqueoRecarga) {
-                // sólo contamos tiempo si ya no está sprintando
                 if (!sprint) {
                     tiempoDesdeShiftSoltado += delta;
                     if (tiempoDesdeShiftSoltado >= TIEMPO_BLOQUEO_RECARGA) {
@@ -147,7 +155,6 @@ public abstract class Personaje {
                     }
                 }
             } else {
-                // recarga normal
                 stamina += recargaStamina * delta;
                 if (stamina > staminaMax) stamina = staminaMax;
                 v = velocidadBase;
@@ -174,10 +181,7 @@ public abstract class Personaje {
         x += dx * move;
         y += dy * move;
 
-        // mantener hitbox centrada abajo como definimos
-        float hbW = hitbox.getWidth(), hbH = hitbox.getHeight();
-        float hbOx = (width - hbW) / 2f;
-        float hbOy = 0f;
+        // Sincronizar hitbox con offset
         hitbox.setPosition(x + hbOx, y + hbOy);
     }
 
@@ -188,9 +192,9 @@ public abstract class Personaje {
         actualizarDireccionYPos(izquierda, derecha, arriba, abajo);
     }
 
-    // compatible con código antiguo si algo aún llama a esto
+    // Compatibilidad con código viejo (sin sprint)
     public void moverDesdeInput(boolean arriba, boolean abajo, boolean izquierda, boolean derecha, float delta) {
-        move = velocidadBase * delta; // sin sprint
+        move = velocidadBase * delta;
         actualizarDireccionYPos(izquierda, derecha, arriba, abajo);
     }
 
@@ -209,25 +213,26 @@ public abstract class Personaje {
         x = MathUtils.clamp(x, 0, worldWidth - width);
         y = MathUtils.clamp(y, 0, worldHeight - height);
 
-        // mantener hitbox alineada tras el clamp
-        float hbW = hitbox.getWidth(), hbH = hitbox.getHeight();
-        float hbOx = (width - hbW) / 2f;
-        float hbOy = 0f;
+        // Re-sincronizar hitbox tras el clamp
         hitbox.setPosition(x + hbOx, y + hbOy);
     }
 
-    // === Getters / setters útiles ===
+    // === Getters / setters ===
     public void setEspacioPresionado(boolean valor) { this.espacioPresionado = valor; }
     public boolean estaEspacioPresionado() { return espacioPresionado; }
     public Direccion getDireccion() { return direccionActual; }
     public Rectangle getHitbox() { return hitbox; }
-
-    public float getStamina()     { return stamina; }
-    public float getStaminaMax()  { return staminaMax; }
-
+    public float getStamina() { return stamina; }
+    public float getStaminaMax() { return staminaMax; }
     public float getX() { return x; }
     public float getY() { return y; }
-    public void  setPosition(float nx, float ny) { this.x = nx; this.y = ny; }
+
+    // >>> FIX CLAVE: setPosition actualiza la hitbox con el MISMO offset <<<
+    public void setPosition(float nx, float ny) {
+        this.x = nx;
+        this.y = ny;
+        hitbox.setPosition(x + hbOx, y + hbOy);
+    }
 
     public float getWidth()  { return width; }
     public float getHeight() { return height; }
@@ -235,7 +240,6 @@ public abstract class Personaje {
     // === Limpieza de recursos ===
     public void dispose() {
         if (textureQuieto != null) textureQuieto.dispose();
-        // disposo cada sheet exactamente una vez
         if (sheetDerecha != null)         sheetDerecha.dispose();
         if (sheetIzquierda != null)       sheetIzquierda.dispose();
         if (sheetArriba != null)          sheetArriba.dispose();

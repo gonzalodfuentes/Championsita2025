@@ -9,123 +9,124 @@ import com.badlogic.gdx.math.Rectangle;
 public class Pelota {
 
     // === Constantes ===
-    private static final float FRICCION = 0.95f;
-    private static final float FUERZA_DISPARO = 2.5f;
-    private static final float FUERZA_EMPUJE = 1f; // más chico que disparo
+    private static final float FRICCION        = 0.95f;
+    private static final float FUERZA_DISPARO  = 2.5f;
+    private static final float FUERZA_EMPUJE   = 1f;   // si querés empuje continuo sosteniendo contacto, podés usarlo
+    private static final float KICK_FORCE      = 0.35f; // “pateo” automático cortito en flanco de contacto
+    private static final float UMBRAL_MOV      = 0.01f; // umbral de “velocidad ≈ 0”
 
-    // === Atributos ===
+    // === Animación ===
     private Texture sheet;
     private Animation<TextureRegion> animacion;
-
-    private float x, y;
-    private float width, height;
-    private float stateTime;
-
-    private float velocidadX = 0;
-    private float velocidadY = 0;
+    private float stateTime = 0f;
     private boolean animar = false;
 
+    // === Estado ===
+    private float x, y;
+    private float width, height;
+    private float velocidadX = 0f;
+    private float velocidadY = 0f;
     private Rectangle hitbox;
 
-    // === Constructor ===
+    // Flags de contacto (para detectar flanco)
+    private boolean huboContactoEsteFrame = false;
+    private boolean huboContactoPrevio    = false;
+
     public Pelota(float xInicial, float yInicial, float escala) {
         sheet = new Texture("pelotaAnimada.png");
 
-        int columnas = 6;
-        int filas = 1;
-
+        int columnas = 6, filas = 1;
         TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth() / columnas, sheet.getHeight() / filas);
         TextureRegion[] frames = new TextureRegion[columnas * filas];
-
-        int index = 0;
+        int idx = 0;
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
-                frames[index++] = tmp[i][j];
+                frames[idx++] = tmp[i][j];
             }
         }
-
         animacion = new Animation<>(0.08f, frames);
-        stateTime = 0f;
 
-        width = frames[0].getRegionWidth() * escala;
+        width  = frames[0].getRegionWidth()  * escala;
         height = frames[0].getRegionHeight() * escala;
 
         this.x = xInicial;
         this.y = yInicial;
-
         hitbox = new Rectangle(x, y, width, height);
     }
 
-    // === Métodos públicos ===
-    public void actualizar(float delta, boolean alguienEmpuja) {
-        if (Math.abs(velocidadX) > 0.01f || Math.abs(velocidadY) > 0.01f || alguienEmpuja) {
+    /**
+     * Registrar contacto de un jugador este frame.
+     * @param dx dirección X normalizada hacia donde empuja/dispara el jugador
+     * @param dy dirección Y normalizada
+     * @param disparo true si está presionando “disparo” (SPACE u otro)
+     */
+    public void registrarContacto(float dx, float dy, boolean disparo) {
+        huboContactoEsteFrame = true;
+
+        if (disparo) {
+            // Disparo fuerte: setea velocidad y reinicia animación
+            velocidadX = dx * FUERZA_DISPARO;
+            velocidadY = dy * FUERZA_DISPARO;
             animar = true;
-            stateTime += delta;
+            stateTime = 0f;
+        } else {
+            // Empuje “automático” cortito SOLO en flanco de subida (primer frame de contacto)
+            if (!huboContactoPrevio) {
+                velocidadX += dx * KICK_FORCE;
+                velocidadY += dy * KICK_FORCE;
+                animar = true;
+                stateTime = 0f;
+            } else {
+                // Si querés empuje continuo mientras se mantiene el contacto, descomenta:
+                // velocidadX += dx * (FUERZA_EMPUJE * 0.0f); // 0.0f para no sobreacelerar; poné 0.05f si querés leve
+            }
+        }
+    }
+
+    public void actualizar(float delta) {
+        // Animar si hay contacto o si seguimos en movimiento
+        boolean enMovimiento = Math.abs(velocidadX) > UMBRAL_MOV || Math.abs(velocidadY) > UMBRAL_MOV;
+        if (huboContactoEsteFrame || enMovimiento) {
+            // opcional: escalar velocidad de animación según velocidad lineal
+            float speed = (float) Math.hypot(velocidadX, velocidadY);
+            float factor = 1.0f + 2.0f * speed; // tunear a gusto (1.0f = base)
+            animar = true;
+            stateTime += delta * factor;
         } else {
             animar = false;
         }
 
+        // Integración simple + fricción
         x += velocidadX * delta;
         y += velocidadY * delta;
 
         velocidadX *= FRICCION;
         velocidadY *= FRICCION;
 
-        if (Math.abs(velocidadX) < 0.01f) velocidadX = 0;
-        if (Math.abs(velocidadY) < 0.01f) velocidadY = 0;
+        if (Math.abs(velocidadX) < UMBRAL_MOV) velocidadX = 0f;
+        if (Math.abs(velocidadY) < UMBRAL_MOV) velocidadY = 0f;
 
         hitbox.setPosition(x, y);
-    }
 
-
-
-
-    public void disparar(float dx, float dy) {
-        velocidadX = dx * getFuerzaDisparo();
-        velocidadY = dy * getFuerzaDisparo();
-        animar = true;
-        stateTime = 0f; // reiniciar animación
-    }
-
-    public void empujar(float dx, float dy) {
-        velocidadX = dx * getFuerzaEmpuje();
-        velocidadY = dy * getFuerzaEmpuje();
-        animar = true;
-        stateTime = 0f; // reiniciar animación
-    }
-
-    public void detener() {
-        animar = false;
+        // preparar flags para el próximo frame
+        huboContactoPrevio    = huboContactoEsteFrame;
+        huboContactoEsteFrame = false;
     }
 
     public void render(SpriteBatch batch) {
-        TextureRegion frameActual = animacion.getKeyFrame(stateTime, true);
-        batch.draw(frameActual, x, y, width, height);
+        TextureRegion frame = animar ? animacion.getKeyFrame(stateTime, true)
+                                     : animacion.getKeyFrame(0, true);
+        batch.draw(frame, x, y, width, height);
     }
 
-    public void dispose() {
-        sheet.dispose();
-    }
+    public void dispose() { sheet.dispose(); }
 
-    // === Getters y Setters ===
-    public Rectangle getHitbox() {
-        return hitbox;
-    }
-
+    // Getters
+    public Rectangle getHitbox() { return hitbox; }
     public float getX() { return x; }
     public float getY() { return y; }
+    public void setPosition(float nuevaX, float nuevaY) { this.x = nuevaX; this.y = nuevaY; hitbox.setPosition(nuevaX, nuevaY); }
 
-    public void setPosition(float nuevaX, float nuevaY) {
-        this.x = nuevaX;
-        this.y = nuevaY;
-        hitbox.setPosition(nuevaX, nuevaY);
-    }
-
-	public static float getFuerzaEmpuje() {
-		return FUERZA_EMPUJE;
-	}
-
-	public static float getFuerzaDisparo() {
-		return FUERZA_DISPARO;
-	}
+    public static float getFuerzaEmpuje()  { return FUERZA_EMPUJE; }
+    public static float getFuerzaDisparo() { return FUERZA_DISPARO; }
 }
