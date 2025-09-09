@@ -1,13 +1,12 @@
 package com.championsita.name.menus;
+
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.name.Principal;
 
 public class Carga extends Menu {
 
-    private boolean modoDosJugadores;
     private Texture controlUno;
     private Texture controlDos;
     private Sprite unoSprite;
@@ -24,9 +23,8 @@ public class Carga extends Menu {
     private float[] golesXY, tiempoXY;
     private Campo[] campos;
 
-    public Carga(Principal juego, boolean modoDosJugadores) {
+    public Carga(Principal juego) {
         super(juego);
-        this.modoDosJugadores = modoDosJugadores;
     }
 
     @Override
@@ -39,28 +37,18 @@ public class Carga extends Menu {
 
         this.controlUno = new Texture("menuCreacion/primerJugador.png");
         this.controlDos = new Texture("menuCreacion/segundoJugador.png");
-        if(this.modoDosJugadores) {
-            super.fondoSprite.setTexture(new Texture("menuCreacion/menuDosJug.png"));
-            this.dosSprite = new Sprite(this.controlDos);
-        }
+        super.fondoSprite.setTexture(new Texture("menuCreacion/menuDosJug.png"));
         this.unoSprite = new Sprite(this.controlUno);
+        this.dosSprite = new Sprite(this.controlDos);
 
         float y = 335;
+        controlesDosJugadores(y);
 
-        if(this.modoDosJugadores) {
-            controlesDosJugadores(y);
-            super.flechas[0].setPosition(this.unoSprite.getX() - super.flechas[0].getWidth() - 5, y - 20);
-            super.flechas[1].setPosition(this.unoSprite.getX() + unoSprite.getWidth() + 5, y - 20);
-            super.flechas[2].setPosition(this.dosSprite.getX() - super.flechas[2].getWidth() - 5, y - 20);
-            super.flechas[3].setPosition(this.dosSprite.getX() + dosSprite.getWidth() + 5, y - 20);
-            this.flechasUsadas = 4;
-        }
-        else {
-            controlUnJugador(0, y);
-            super.flechas[0].setPosition(this.unoSprite.getX() - super.flechas[0].getWidth() - 5, y - 20);
-            super.flechas[1].setPosition(this.unoSprite.getX() + unoSprite.getWidth() + 5, y - 20);
-            this.flechasUsadas = 2;
-        }
+        super.flechas[0].setPosition(this.unoSprite.getX() - super.flechas[0].getWidth() - 5, y - 20);
+        super.flechas[1].setPosition(this.unoSprite.getX() + unoSprite.getWidth() + 5, y - 20);
+        super.flechas[2].setPosition(this.dosSprite.getX() - super.flechas[2].getWidth() - 5, y - 20);
+        super.flechas[3].setPosition(this.dosSprite.getX() + dosSprite.getWidth() + 5, y - 20);
+        this.flechasUsadas = 4;
 
         this.campos = Campo.values();
         this.numCampo = 0;
@@ -71,8 +59,7 @@ public class Carga extends Menu {
         this.campoSprite = new Sprite(this.campo);
         float anchoCampo = this.cartelCampoSprite.getWidth(), altoCampo = 200;
         this.campoSprite.setSize(anchoCampo, altoCampo);
-        this.campoSprite.setPosition(this.cartelCampoSprite.getX(),
-                                        this.cartelCampoSprite.getY() - altoCampo);
+        this.campoSprite.setPosition(this.cartelCampoSprite.getX(), this.cartelCampoSprite.getY() - altoCampo);
         y = campoSprite.getY() + campoSprite.getHeight() / 3.5f;
         super.flechas[this.flechasUsadas].setPosition(this.campoSprite.getX() - super.flechas[this.flechasUsadas].getWidth() - 5, y - 20);
         super.flechas[this.flechasUsadas + 1].setPosition(this.campoSprite.getX() + campoSprite.getWidth() + 5, y - 20);
@@ -86,14 +73,8 @@ public class Carga extends Menu {
         this.tiempo.setPosition(Gdx.graphics.getWidth() - ubiX, ubiY);
         this.numGoles = 1;
         this.numTiempo = 1;
-        this.golesXY = new float[] {
-                this.goles.getX(),
-                this.goles.getY()
-        };
-        this.tiempoXY = new float[] {
-                this.tiempo.getX(),
-                this.tiempo.getY()
-        };
+        this.golesXY = new float[]{ this.goles.getX(), this.goles.getY() };
+        this.tiempoXY = new float[]{ this.tiempo.getX(), this.tiempo.getY() };
 
         Gdx.input.setInputProcessor(this);
 
@@ -107,9 +88,7 @@ public class Carga extends Menu {
         super.render(delta);
         super.cargarAtrasSiguiente();
         this.unoSprite.draw(super.batch);
-        if(this.modoDosJugadores) {
-            this.dosSprite.draw(super.batch);
-        }
+        this.dosSprite.draw(super.batch); // siempre se dibuja
         for(int i = 0; i < this.flechasUsadas; i++) {
             super.flechas[i].draw(super.batch);
         }
@@ -161,15 +140,12 @@ public class Carga extends Menu {
         float yS = sprite.getY();
         float anS = sprite.getWidth();
         float alS = sprite.getHeight();
-        boolean dentro = x >= xS && x <= xS + anS && y >= yS && y <= yS + alS;
-
-        return dentro;
+        return x >= xS && x <= xS + anS && y >= yS && y <= yS + alS;
     }
 
     @Override
     public boolean touchDown(int x, int y, int pointer, int mouse) {
         boolean clickeado = false;
-        int i = 0;
         y = Gdx.graphics.getHeight() - y;
 
         clickeado = definirLimitesTiempoGoles(this.goles, x, y);
@@ -190,13 +166,13 @@ public class Carga extends Menu {
     @Override
     public boolean touchUp(int x, int y, int pointer, int mouse) {
         boolean clickeado = false;
-        int i = 0;
         y = Gdx.graphics.getHeight() - y;
 
+        int i = 0;
         do {
             boolean dentro = super.condicionFlechas(super.flechas[i], x, y);
             if(dentro) {
-                if((this.modoDosJugadores && i < 4) || (!this.modoDosJugadores && i < 2)) {
+                if(i < 4) { // siempre controles de dos jugadores
                     elegirControles(i);
                 }
                 else {
@@ -207,7 +183,6 @@ public class Carga extends Menu {
             else {
                 clickeado = false;
             }
-
             i++;
         }
         while (i < this.flechasUsadas && !clickeado);
@@ -237,8 +212,6 @@ public class Carga extends Menu {
         clickeado = condicionDentro(x, y, this.atrasSprite);
         super.cambiarMenu(clickeado, new Doble(super.juego));
 
-        /* logica iniciar juego */
-
         return clickeado;
     }
 
@@ -267,17 +240,14 @@ public class Carga extends Menu {
         if(i < 2) {
             if(this.unoSprite.getTexture() == this.controlUno) {
                 this.unoSprite.setTexture(this.controlDos);
-            }
-            else {
+            } else {
                 this.unoSprite.setTexture(this.controlUno);
             }
         }
-
-        if(this.modoDosJugadores && i > 1) {
+        if(i > 1) {
             if(this.dosSprite.getTexture() == this.controlUno) {
                 this.dosSprite.setTexture(this.controlDos);
-            }
-            else {
+            } else {
                 this.dosSprite.setTexture(this.controlUno);
             }
         }
@@ -286,21 +256,10 @@ public class Carga extends Menu {
     private void elegirCampo(int i) {
         if(i % 2 == 0) {
             this.numCampo = (this.numCampo - 1 + this.campos.length) % this.campos.length;
-        }
-        else {
+        } else {
             this.numCampo = (this.numCampo + 1) % this.campos.length;
         }
-
         Texture nueva = new Texture("campos/campo" + this.campos[this.numCampo].getNombre() + ".png");
         this.campoSprite.setTexture(nueva);
     }
 }
-
-
-
-
-
-
-
-
-
