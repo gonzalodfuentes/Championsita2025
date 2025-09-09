@@ -36,6 +36,9 @@ public class Inicial extends Menu {
             botones[i].setSize(anchoBotones, altoBotones);
         }
 
+        int cantBotones = 6;
+        super.inicializarSonido(cantBotones);
+
         Gdx.input.setInputProcessor(this);
     }
 
@@ -96,15 +99,10 @@ public class Inicial extends Menu {
             float bx = boton.getX();
             float by = boton.getY();
 
-            boolean dentro = x >= bx && x <= bx + anchoBotones &&
-                    y >= by && y <= by + altoBotones;
+            boolean dentro = super.condicionDentro(x, y, boton);
+            super.condicionColor(dentro, boton);
 
-            if (dentro) {
-                boton.setColor(super.colorAccion); // verde
-                paso = true;
-            } else {
-                boton.setColor(super.colorBoton);
-            }
+            super.reproducirSonido(i, dentro);
 
             i++;
         } while (i < botones.length);
@@ -138,8 +136,5 @@ public class Inicial extends Menu {
     @Override
     public void dispose() {
         super.dispose();
-        for (Sprite boton : botones) {
-            boton.getTexture().dispose();
-        }
     }
 }

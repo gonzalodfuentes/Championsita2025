@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.championsita.name.Principal;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 
 public class Menu extends InputAdapter implements Screen {
 
@@ -23,6 +25,11 @@ public class Menu extends InputAdapter implements Screen {
     protected Color colorAccion;
     protected Texture flecha, flechaCursor;
     protected Sprite[] flechas, flechasInvertidas;
+    private Music musica;
+    protected Sound sonido;
+    protected boolean[] cursorSonido;
+    protected Texture siguiente;
+    protected Sprite siguienteSprite;
 
     public Menu(Principal juego) {
         this.juego = juego;
@@ -37,13 +44,48 @@ public class Menu extends InputAdapter implements Screen {
 
         this.atras = new Texture("atrasBoton.png");
         this.atrasSprite = new Sprite(this.atras);
+        this.atrasSprite.setSize(140, 70);
+        this.atrasSprite.setPosition(15, 670);
 
         this.colorBoton = new Color(this.atrasSprite.getColor());
         this.colorAccion = new Color(0, 1, 0, 1);
 
+        this.siguiente = new Texture("menuDosJugadores/okBoton.png");
+        this.siguienteSprite = new Sprite(this.siguiente);
+        this.siguienteSprite.setSize(140, 70);
+        this.siguienteSprite.setPosition(Gdx.graphics.getWidth() - this.siguienteSprite.getWidth() - 15, 670);
+
         this.fondo = new Texture("fondoChampionsita.png");
         this.fondoSprite = new Sprite(this.fondo);
         this.fondoSprite.setSize(this.anchoPantalla, this.altoPantalla);
+
+        this.musica = Gdx.audio.newMusic(Gdx.files.internal("futebol.mp3"));
+        this.musica.setVolume(0.03f);
+        this.musica.setLooping(true);
+        this.musica.play();
+
+        this.sonido = Gdx.audio.newSound(Gdx.files.internal("cursor.mp3"));
+        int cantBotonesGlobales = 2;
+        inicializarSonido(cantBotonesGlobales);
+    }
+
+    protected void inicializarSonido(int cantBotones) {
+        this.cursorSonido = new boolean[cantBotones];
+        for(int i = 0; i < this.cursorSonido.length; i++) {
+            this.cursorSonido[i] = false;
+        }
+    }
+
+    protected void reproducirSonido(int i, boolean dentro) {
+        if(dentro) {
+            if(!this.cursorSonido[i]) {
+                this.sonido.play(0.5f);
+                this.cursorSonido[i] = true;
+            }
+        }
+        else {
+            this.cursorSonido[i] = false;
+        }
     }
 
     protected void crearFlechas(int cantFlechas) {
@@ -63,18 +105,14 @@ public class Menu extends InputAdapter implements Screen {
         }
     }
 
-    protected void crearAtras(float ancho, float alto, float x, float y) {
-        this.atrasSprite.setSize(ancho, alto);
-        this.atrasSprite.setPosition(x, y);
-    }
-
     @Override
     public void render(float delta) {
         this.fondoSprite.draw(this.batch);
     }
 
-    protected void cargarAtras() {
+    protected void cargarAtrasSiguiente() {
         this.atrasSprite.draw(this.batch);
+        this.siguienteSprite.draw(this.batch);
     }
 
     @Override public void resize(int width, int height) {}
@@ -85,22 +123,31 @@ public class Menu extends InputAdapter implements Screen {
     @Override
     public void dispose() {
         this.fondo.dispose();
+        this.musica.dispose();
     }
 
-    protected boolean condicionAtras(int x, int y, Sprite sprite, boolean click) {
+    protected boolean condicionDentro(int x, int y, Sprite sprite) {
         boolean dentro = x >= sprite.getX() && x <= sprite.getX() + sprite.getWidth() &&
                 y >= sprite.getY() && y <= sprite.getY() + sprite.getHeight() ? true : false;
 
-        if(!click) {
-            if(dentro) {
-                this.atrasSprite.setColor(this.colorAccion);
-            }
-            else {
-                this.atrasSprite.setColor(this.colorBoton);
-            }
+        return dentro;
+    }
+
+    protected boolean condicionColor(boolean dentro, Sprite sprite) {
+        if(dentro) {
+            sprite.setColor(this.colorAccion);
+        }
+        else {
+            sprite.setColor(this.colorBoton);
         }
 
         return dentro;
+    }
+
+    protected void cambiarMenu(boolean dentro, Menu atrasAdelante) {
+        if(dentro) {
+            this.juego.actualizarPantalla(atrasAdelante);
+        }
     }
 
     protected boolean condicionFlechas(Sprite flecha, int x, int y) {

@@ -12,8 +12,6 @@ public class Doble extends Menu {
     private Sprite[] personajesWASD;
     private Sprite[] personajesAIAD;
     private int indiceWASD, indiceAIAD;
-    private Texture jugar;
-    private Sprite jugarSprite;
 
 
     public Doble(Principal juego) {
@@ -44,7 +42,6 @@ public class Doble extends Menu {
             this.personajesAIAD[i].setSize(400, 400);
         }
 
-        super.crearAtras(140, 70, 15, 670);
         super.crearFlechas(4);
 
         int y = 166;
@@ -54,10 +51,8 @@ public class Doble extends Menu {
         super.flechas[2].setPosition(519, y);
         super.flechas[3].setPosition(839, y);
 
-        this.jugar = new Texture("menuDosJugadores/okBoton.png");
-        this.jugarSprite = new Sprite(this.jugar);
-        this.jugarSprite.setSize(140, 70);
-        this.jugarSprite.setPosition(Gdx.graphics.getWidth() - this.jugarSprite.getWidth() - 15, 670);
+        int cantBotonesHabiles = 2;
+        super.inicializarSonido(cantBotonesHabiles);
     }
 
     private void mostrarPersonaje(int i) {
@@ -108,11 +103,10 @@ public class Doble extends Menu {
     public void render(float delta) {
         super.batch.begin();
         super.render(delta);
-        super.cargarAtras();
+        super.cargarAtrasSiguiente();
         for(int i = 0; i < super.flechas.length; i++) {
             this.flechas[i].draw(super.batch);
         }
-        this.jugarSprite.draw(super.batch);
         this.personajesWASD[this.indiceWASD].draw(super.batch);
         this.personajesAIAD[this.indiceAIAD].draw(super.batch);
         super.batch.end();
@@ -125,20 +119,18 @@ public class Doble extends Menu {
         int i = 0;
 
         do {
-            paso = condicionFlechas(super.flechas[i], x, y);
+            paso = super.condicionFlechas(super.flechas[i], x, y);
             i++;
         }
         while (i < this.flechas.length && !paso);
 
-        paso = super.condicionAtras(x, y, super.atrasSprite, false);
+        paso = condicionDentro(x, y, super.atrasSprite);
+        super.condicionColor(paso, super.atrasSprite);
+        super.reproducirSonido(0, paso);
 
-        paso = condicionJugar(x, y);
-        if(paso) {
-            this.jugarSprite.setColor(0, 1, 0, 1);
-        }
-        else {
-            this.jugarSprite.setColor(super.colorBoton);
-        }
+        paso = condicionDentro(x, y, super.siguienteSprite);
+        super.condicionColor(paso, super.siguienteSprite);
+        super.reproducirSonido(1, paso);
 
         return paso;
     }
@@ -165,26 +157,13 @@ public class Doble extends Menu {
         }
         while (i < super.flechas.length && !clickeado);
 
-        clickeado = super.condicionAtras(x, y, this.atrasSprite, true);
-        if(clickeado) {
-            Menu inicial = new Inicial(super.juego);
-            super.juego.actualizarPantalla(inicial);
-        }
+        clickeado = condicionDentro(x, y, super.atrasSprite);
+        super.cambiarMenu(clickeado, new Inicial(super.juego));
 
-        clickeado = condicionJugar(x, y);
-        if(clickeado) {
-            Carga carga = new Carga(super.juego, true);
-            super.juego.actualizarPantalla(carga);
-        }
+        clickeado = condicionDentro(x, y, super.siguienteSprite);
+        super.cambiarMenu(clickeado, new Carga(super.juego, true));
 
         return clickeado;
-    }
-
-    private boolean condicionJugar(int x, int y) {
-        boolean dentro = true ? x >= this.jugarSprite.getX() && x <= this.jugarSprite.getX() + this.jugarSprite.getWidth() &&
-                y >= this.jugarSprite.getY() && y <= this.jugarSprite.getY() + this.jugarSprite.getHeight() : false;
-
-        return dentro;
     }
 
     @Override

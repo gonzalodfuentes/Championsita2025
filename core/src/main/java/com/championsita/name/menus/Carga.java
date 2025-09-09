@@ -17,12 +17,12 @@ public class Carga extends Menu {
     private Texture campo;
     private Sprite campoSprite;
     private int flechasUsadas;
-    private String[] campos;
     private int numCampo;
     private Sprite goles;
     private Sprite tiempo;
     private int numGoles, numTiempo;
     private float[] golesXY, tiempoXY;
+    private Campo[] campos;
 
     public Carga(Principal juego, boolean modoDosJugadores) {
         super(juego);
@@ -32,8 +32,10 @@ public class Carga extends Menu {
     @Override
     public void show() {
         super.show();
-        super.crearAtras(140, 70, 15, 670);
         super.crearFlechas(8);
+
+        super.siguiente = new Texture("menuDosJugadores/jugarBoton.png");
+        super.siguienteSprite.setTexture(super.siguiente);
 
         this.controlUno = new Texture("menuCreacion/primerJugador.png");
         this.controlDos = new Texture("menuCreacion/segundoJugador.png");
@@ -60,17 +62,12 @@ public class Carga extends Menu {
             this.flechasUsadas = 2;
         }
 
-        this.campos = new String[] {
-                "Verde",
-                "VerdeOscuro",
-                "Naranja",
-                "Azul"
-        };
+        this.campos = Campo.values();
         this.numCampo = 0;
         this.cartelCampo = new Texture("menuCreacion/campoCartel.png");
         this.cartelCampoSprite = new Sprite(this.cartelCampo);
         this.cartelCampoSprite.setPosition(Gdx.graphics.getWidth() / 2 - this.cartelCampo.getWidth() / 2, 215);
-        this.campo = new Texture("campos/campo" + this.campos[0] + ".png");
+        this.campo = new Texture("campos/campo" + this.campos[this.numCampo].getNombre() + ".png");
         this.campoSprite = new Sprite(this.campo);
         float anchoCampo = this.cartelCampoSprite.getWidth(), altoCampo = 200;
         this.campoSprite.setSize(anchoCampo, altoCampo);
@@ -99,13 +96,16 @@ public class Carga extends Menu {
         };
 
         Gdx.input.setInputProcessor(this);
+
+        int cantBotonesHabiles = 2;
+        super.inicializarSonido(cantBotonesHabiles);
     }
 
     @Override
     public void render(float delta) {
         super.batch.begin();
         super.render(delta);
-        super.cargarAtras();
+        super.cargarAtrasSiguiente();
         this.unoSprite.draw(super.batch);
         if(this.modoDosJugadores) {
             this.dosSprite.draw(super.batch);
@@ -117,6 +117,7 @@ public class Carga extends Menu {
         this.campoSprite.draw(super.batch);
         super.flechas[4].draw(super.batch);
         super.flechas[5].draw(super.batch);
+        super.cargarAtrasSiguiente();
         this.goles.draw(super.batch);
         this.tiempo.draw(super.batch);
         super.batch.end();
@@ -144,7 +145,13 @@ public class Carga extends Menu {
         paso = definirLimitesTiempoGoles(this.tiempo, x, y);
         this.tiempo.setColor(paso ? super.colorAccion : super.colorBoton);
 
-        paso = super.condicionAtras(x, y, super.atrasSprite, false);
+        paso = super.condicionDentro(x, y, this.atrasSprite);
+        super.condicionColor(paso, this.atrasSprite);
+        super.reproducirSonido(0, paso);
+
+        paso = super.condicionDentro(x, y, this.siguienteSprite);
+        super.condicionColor(paso, this.siguienteSprite);
+        super.reproducirSonido(1, paso);
 
         return paso;
     }
@@ -227,11 +234,10 @@ public class Carga extends Menu {
         this.tiempo.setSize(this.tiempo.getTexture().getWidth(), this.tiempo.getTexture().getHeight());
         this.tiempo.setPosition(this.tiempoXY[0], this.tiempoXY[1]);
 
-        clickeado = super.condicionAtras(x, y, this.atrasSprite, true);
-        if(clickeado) {
-            Menu doble = new Doble(super.juego);
-            super.juego.actualizarPantalla(doble);
-        }
+        clickeado = condicionDentro(x, y, this.atrasSprite);
+        super.cambiarMenu(clickeado, new Doble(super.juego));
+
+        /* logica iniciar juego */
 
         return clickeado;
     }
@@ -279,23 +285,13 @@ public class Carga extends Menu {
 
     private void elegirCampo(int i) {
         if(i % 2 == 0) {
-            if(this.numCampo == 0) {
-                this.numCampo = this.campos.length - 1;
-            }
-            else {
-                this.numCampo--;
-            }
+            this.numCampo = (this.numCampo - 1 + this.campos.length) % this.campos.length;
         }
         else {
-            if(this.numCampo == this.campos.length - 1) {
-                this.numCampo = 0;
-            }
-            else {
-                this.numCampo++;
-            }
+            this.numCampo = (this.numCampo + 1) % this.campos.length;
         }
 
-        Texture nueva = new Texture("campos/campo" + this.campos[this.numCampo] + ".png");
+        Texture nueva = new Texture("campos/campo" + this.campos[this.numCampo].getNombre() + ".png");
         this.campoSprite.setTexture(nueva);
     }
 }
