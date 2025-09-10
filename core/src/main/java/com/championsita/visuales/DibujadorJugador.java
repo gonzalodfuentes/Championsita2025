@@ -2,14 +2,17 @@ package com.championsita.visuales;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.championsita.modelo.HudPersonaje;
 import com.championsita.modelo.Personaje;
 
 public class DibujadorJugador {
 
     private final Personaje personaje;
+    private final HudPersonaje hud;
 
     public DibujadorJugador(Personaje personaje) {
         this.personaje = personaje;
+        this.hud = new HudPersonaje(personaje);
     }
 
     public void dibujar(SpriteBatch batch) {

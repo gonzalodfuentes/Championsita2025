@@ -72,6 +72,7 @@ public abstract class Personaje {
         this.sprites  = sprites;
         this.atributos = atributos;
         this.escala   = escala;
+        this.hud = new HudPersonaje(this);
 
         this.staminaActual = atributos.getStaminaMaxima();
 

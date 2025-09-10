@@ -147,6 +147,7 @@ public class Principal extends ApplicationAdapter {
 
         dibujadorJugador1.dibujar(pintor);
         dibujadorJugador2.dibujar(pintor);
+        
         dibujadorPelota.dibujar(pintor);
 
         pintor.end();
