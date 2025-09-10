@@ -1,9 +1,10 @@
-package com.championsita.name;
+package com.championsita.entrada;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.championsita.modelo.Personaje;
 
-public class ManejadorInput implements InputProcessor {
+public class EntradaJugador implements InputProcessor {
 
     private final Personaje personaje;
 
@@ -12,7 +13,7 @@ public class ManejadorInput implements InputProcessor {
 
     private boolean arriba, abajo, izquierda, derecha, espacioPresionado, sprintPresionado;
 
-    public ManejadorInput(Personaje personaje, int arriba, int abajo, int izquierda, int derecha, int accion) {
+    public EntradaJugador(Personaje personaje, int arriba, int abajo, int izquierda, int derecha, int accion) {
         this.personaje = personaje;
         this.keyArriba = arriba;
         this.keyAbajo = abajo;
@@ -46,7 +47,7 @@ public class ManejadorInput implements InputProcessor {
     }
 
     public void actualizar(float delta) {
-        personaje.actualizarEstadojugador(arriba, abajo, izquierda, derecha, sprintPresionado, delta);
+        personaje.actualizarEstadoJugador(arriba, abajo, izquierda, derecha, sprintPresionado, delta);
         personaje.setEspacioPresionado(espacioPresionado);
     }
 

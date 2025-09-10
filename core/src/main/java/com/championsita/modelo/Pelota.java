@@ -1,4 +1,4 @@
-package com.championsita.name;
+package com.championsita.modelo;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -83,6 +83,8 @@ public class Pelota {
         }
     }
 
+
+
     public void actualizar(float delta) {
         // Animar si hay contacto o si seguimos en movimiento
         boolean enMovimiento = Math.abs(velocidadX) > UMBRAL_MOV || Math.abs(velocidadY) > UMBRAL_MOV;
@@ -113,12 +115,13 @@ public class Pelota {
         huboContactoEsteFrame = false;
     }
 
+    /*
     public void render(SpriteBatch batch) {
         TextureRegion frame = animar ? animacion.getKeyFrame(stateTime, true)
                                      : animacion.getKeyFrame(0, true);
         batch.draw(frame, x, y, width, height);
     }
-
+    */
     public void dispose() { sheet.dispose(); }
 
     // Getters
@@ -129,4 +132,14 @@ public class Pelota {
 
     public static float getFuerzaEmpuje()  { return FUERZA_EMPUJE; }
     public static float getFuerzaDisparo() { return FUERZA_DISPARO; }
+
+    public float getWidth()  { return width; }
+    public float getHeight() { return height; }
+
+
+    public TextureRegion obtenerFrameActual() {
+        // si querés que “quieta” muestre el primer frame:
+        return animar ? animacion.getKeyFrame(stateTime, true)
+                      : animacion.getKeyFrame(0, true);
+    }
 }

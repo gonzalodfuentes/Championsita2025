@@ -2,7 +2,7 @@ package com.championsita.name.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.championsita.name.Principal;
+import com.championsita.Principal;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {

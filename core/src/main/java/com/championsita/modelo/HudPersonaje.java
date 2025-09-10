@@ -1,4 +1,4 @@
-package com.championsita.name;
+package com.championsita.modelo;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -37,17 +37,13 @@ public class HudPersonaje {
 
     public void dibujarBarraStamina(SpriteBatch batch, float xPersonaje, float yPersonaje) {
 
-        //camaraHUD.update();
-        //batch.setProjectionMatrix(camaraHUD.combined);
-
         // Calcular porcentaje de stamina
-        float porcentaje = personaje.getStamina() / personaje.getStaminaMax();
+        float porcentaje = personaje.getStaminaActual() / personaje.getStaminaMaxima();
 
         // Centrar la barra horizontalmente sobre el jugador
-        float posX = (personaje.getWidth() - anchoBarra) / 2f;
+        float posX = (personaje.getAncho() - anchoBarra) / 2f;
 
-
-        float posY = personaje.getHeight() -0.3f; // ajustar según escala del personaje
+        float posY = personaje.getAlto() -0.3f; // ajustar según escala del personaje
 
         // Dibujar barra proporcional a la stamina
         batch.draw(texturaBarra, xPersonaje + posX, yPersonaje + posY, anchoBarra * porcentaje, altoBarra);
