@@ -12,11 +12,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.championsita.constantes.Constantes;
 import com.championsita.entrada.EntradaJugador;
-import com.championsita.modelo.Cancha;
-import com.championsita.modelo.ConfiguracionPersonaje;
-import com.championsita.modelo.Pelota;
-import com.championsita.modelo.Personaje;
+import com.championsita.modelo.*;
 import com.championsita.personajes.Normal;
+import com.championsita.sistemas.SistemaPartido;
 import com.championsita.visuales.DibujadorJugador;
 import com.championsita.visuales.DibujadorPelota;
 import com.championsita.sistemas.SistemaFisico;
@@ -51,6 +49,7 @@ public class Principal extends ApplicationAdapter {
     // Sistemas
     private SistemaFisico    sistemaFisico;
     private SistemaColisiones sistemaColisiones;
+    private SistemaPartido sistemaPartido;
 
     // Configs
     private final ConfiguracionPersonaje configJugador1 = ConfiguracionPersonaje.porDefecto();
@@ -153,6 +152,7 @@ public class Principal extends ApplicationAdapter {
     private void crearSistemas() {
         sistemaFisico    = new SistemaFisico();
         sistemaColisiones = new SistemaColisiones();
+        sistemaPartido = new SistemaPartido();
     }
 
     private void dibujarEscena() {
@@ -168,12 +168,24 @@ public class Principal extends ApplicationAdapter {
         dibujadorJugador2.dibujar(pintor);
         dibujadorPelota.dibujar(pintor);
 
+        sistemaPartido.verificarSiHayGol(pelota,cancha);
+
+
+
         // --- DEBUG HITBOXES ---
         debugRenderer.setProjectionMatrix(vistaAjustada.getCamera().combined); // usar la misma cámara
         debugRenderer.begin(ShapeRenderer.ShapeType.Line); // solo contornos
 
         debugRenderer.setColor(Color.RED);
-        debugRenderer.rect(cancha.getArco().getX(),cancha.getArco().getY(),cancha.getArco().getWidth(),cancha.getArco().getHeight());
+        debugRenderer.rect(cancha.getArcoIzquierdo().getX(),cancha.getArcoIzquierdo().getY(),cancha.getArcoIzquierdo().getWidth(),cancha.getArcoIzquierdo().getHeight());
+
+        debugRenderer.setColor(Color.RED);
+        debugRenderer.rect(cancha.getArcoIzquierdo().getX(),cancha.getArcoIzquierdo().getY(),cancha.getArcoIzquierdo().getWidth(),cancha.getArcoIzquierdo().getHeight());
+
+        debugRenderer.setColor(Color.RED);
+        debugRenderer.rect(cancha.getArcoDerecho().getX(),cancha.getArcoDerecho().getY(),cancha.getArcoDerecho().getWidth(),cancha.getArcoDerecho().getHeight());
+
+
 
         // Pelota
         debugRenderer.setColor(Color.BLUE);
