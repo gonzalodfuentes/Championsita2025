@@ -7,6 +7,9 @@ public final class Constantes {
 	  public static final float MUNDO_ANCHO = 8f;
 	  public static final float MUNDO_ALTO  = 5f;
 
+	  //fuentes
+	  public static final String FUENTE_NOTADOR = "fuentes/Minecraft.ttf";
+
 	  // Pelota
 	  public static final float ESCALA_PELOTA   = 0.002f;
 	  public static final float FRICCION_PELOTA = 0.95f;
@@ -14,6 +17,7 @@ public final class Constantes {
 	  public static final float FUERZA_EMPUJE   = 1.0f;
 	  public static final float UMBRAL_VEL_CASI_CERO = 0.01f;
 	  public static final float EMPUJON_CORTO = 0.35f;
+
 
 	  // Personaje
 	  public static final float ESCALA_PERSONAJE = 0.003f;

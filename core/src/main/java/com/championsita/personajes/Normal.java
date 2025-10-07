@@ -1,8 +1,8 @@
 package com.championsita.personajes;
 
-import com.championsita.modelo.Personaje;
-import com.championsita.modelo.AtributosPersonaje;
-import com.championsita.modelo.ConfiguracionPersonaje;
+import com.championsita.entidades.Personaje;
+import com.championsita.entidades.AtributosPersonaje;
+import com.championsita.entidades.ConfiguracionPersonaje;
 
 public class Normal extends Personaje {
     public Normal(String nombre, ConfiguracionPersonaje config, float escala) {

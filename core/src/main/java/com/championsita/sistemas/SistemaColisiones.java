@@ -1,8 +1,8 @@
 package com.championsita.sistemas;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.championsita.modelo.Pelota;
-import com.championsita.modelo.Personaje;
+import com.championsita.entidades.Pelota;
+import com.championsita.entidades.Personaje;
 
 public class SistemaColisiones {
 

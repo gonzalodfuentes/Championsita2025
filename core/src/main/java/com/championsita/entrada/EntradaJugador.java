@@ -2,7 +2,7 @@ package com.championsita.entrada;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.championsita.modelo.Personaje;
+import com.championsita.entidades.Personaje;
 
 public class EntradaJugador implements InputProcessor {
 

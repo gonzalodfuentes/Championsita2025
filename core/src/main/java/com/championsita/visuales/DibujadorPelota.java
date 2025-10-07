@@ -2,7 +2,7 @@ package com.championsita.visuales;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.championsita.modelo.Pelota;
+import com.championsita.entidades.Pelota;
 
 public class DibujadorPelota {
 

@@ -7,14 +7,14 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.championsita.constantes.Constantes;
 import com.championsita.entrada.EntradaJugador;
-import com.championsita.modelo.ConfiguracionPersonaje;
-import com.championsita.modelo.Pelota;
-import com.championsita.modelo.Personaje;
+import com.championsita.entidades.*;
 import com.championsita.personajes.Normal;
+import com.championsita.sistemas.SistemaPartido;
 import com.championsita.visuales.DibujadorJugador;
 import com.championsita.visuales.DibujadorPelota;
 import com.championsita.sistemas.SistemaFisico;
@@ -27,15 +27,22 @@ public class Principal extends ApplicationAdapter {
     private Texture texturaCancha;
     private FitViewport vistaAjustada;
 
+
+
     // Actores
     private Personaje jugador1;
     private Personaje jugador2;
     private Pelota    pelota;
+    private Cancha cancha;
+
+    private ShapeRenderer debugRenderer;
+
 
     // Vistas
     private DibujadorJugador dibujadorJugador1;
     private DibujadorJugador dibujadorJugador2;
     private DibujadorPelota  dibujadorPelota;
+
 
     // Entrada
     private EntradaJugador entradaJugador1;
@@ -45,10 +52,13 @@ public class Principal extends ApplicationAdapter {
     // Sistemas
     private SistemaFisico    sistemaFisico;
     private SistemaColisiones sistemaColisiones;
+    private SistemaPartido sistemaPartido;
 
     // Configs
     private final ConfiguracionPersonaje configJugador1 = ConfiguracionPersonaje.porDefecto();
     private final ConfiguracionPersonaje configJugador2 = ConfiguracionPersonaje.porDefecto();
+
+
 
     @Override
     public void create() {
@@ -56,7 +66,13 @@ public class Principal extends ApplicationAdapter {
         crearActores();
         configurarEntradas();
         crearSistemas();
+
+
+        debugRenderer = new ShapeRenderer();
+
     }
+
+
 
     @Override
     public void render() {
@@ -86,9 +102,12 @@ public class Principal extends ApplicationAdapter {
         // 6) Físicas: pelota (una sola vez)
         sistemaFisico.actualizarPelota(pelota, delta);
 
+
+
         // 7) Dibujo
         dibujarEscena();
     }
+
 
     @Override
     public void resize(int ancho, int alto) {
@@ -98,17 +117,20 @@ public class Principal extends ApplicationAdapter {
     @Override
     public void dispose() {
         if (pintor != null) pintor.dispose();
-        if (texturaCancha != null) texturaCancha.dispose();
+        if (cancha != null) cancha.dispose();
         // si tus modelos tienen dispose(), llamalos acá
     }
 
     // ======================== Privados ========================
 
-    private void inicializarRenderYCamara() {
+
+
+       private void inicializarRenderYCamara() {
         pintor = new SpriteBatch();
         texturaCancha = new Texture("CampoDeJuego.png");
         vistaAjustada = new FitViewport(Constantes.MUNDO_ANCHO, Constantes.MUNDO_ALTO);
     }
+
 
     private void crearActores() {
         jugador1 = new Normal("Jugador 1", configJugador1, Constantes.ESCALA_PERSONAJE);
@@ -119,6 +141,13 @@ public class Principal extends ApplicationAdapter {
 
         dibujadorJugador1 = new DibujadorJugador(jugador1);
         dibujadorJugador2 = new DibujadorJugador(jugador2);
+
+        float altoCancha = 0.9f;
+        float anchoCancha = 0.3f;
+
+        cancha = new Cancha(anchoCancha,altoCancha);
+
+
 
         pelota = new Pelota(Constantes.MUNDO_ANCHO / 2f, Constantes.MUNDO_ALTO / 2f, Constantes.ESCALA_PELOTA);
         dibujadorPelota = new DibujadorPelota(pelota);
@@ -134,21 +163,39 @@ public class Principal extends ApplicationAdapter {
     private void crearSistemas() {
         sistemaFisico    = new SistemaFisico();
         sistemaColisiones = new SistemaColisiones();
+        sistemaPartido = new SistemaPartido();
     }
 
     private void dibujarEscena() {
-        ScreenUtils.clear(Color.BLACK);
 
+        ScreenUtils.clear(Color.BLACK);
         vistaAjustada.apply();
         pintor.setProjectionMatrix(vistaAjustada.getCamera().combined);
+
         pintor.begin();
 
-        pintor.draw(texturaCancha, 0, 0, vistaAjustada.getWorldWidth(), vistaAjustada.getWorldHeight());
+        cancha.dibujarCancha(pintor, vistaAjustada);
 
         dibujadorJugador1.dibujar(pintor);
         dibujadorJugador2.dibujar(pintor);
         dibujadorPelota.dibujar(pintor);
 
         pintor.end();
+
+        sistemaPartido.verificarSiHayGol(pelota,cancha);
+
+
+
+        // Dibujo arco
+
+        debugRenderer.setProjectionMatrix(vistaAjustada.getCamera().combined); // usar la misma cámara
+        debugRenderer.begin(ShapeRenderer.ShapeType.Line); // solo contornos
+
+        cancha.getArcoIzquierdo().dibujar(debugRenderer);
+        cancha.getArcoDerecho().dibujar(debugRenderer);
+
+        debugRenderer.end();
+
+
     }
 }
