@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
-import com.championsita.jugabilidad.Jugabilidad;
+import com.championsita.partida.ControladorDePartida;
 import com.championsita.menus.Menu;
 import com.championsita.menus.menueleccion.Doble;
 
@@ -183,7 +183,7 @@ public class Carga extends Menu {
 
         clickeado = super.condicionDentro(x, y, this.siguienteSprite);
         if(clickeado) {
-            super.juego.actualizarPantalla(new Jugabilidad(this.campos[this.numCampo].getNombre(), this.pielUno, this.pielDos));
+            super.juego.actualizarPantalla(new ControladorDePartida(this.campos[this.numCampo].getNombre(), this.pielUno, this.pielDos));
         }
 
         return clickeado;

@@ -1,4 +1,4 @@
-package com.championsita.jugabilidad;
+package com.championsita.partida;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Keys;
@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.championsita.Principal;
 import com.championsita.jugabilidad.constantes.Constantes;
 import com.championsita.jugabilidad.entrada.EntradaJugador;
 import com.championsita.jugabilidad.modelo.ConfiguracionPersonaje;
@@ -18,15 +17,14 @@ import com.championsita.jugabilidad.visuales.DibujadorJugador;
 import com.championsita.jugabilidad.visuales.DibujadorPelota;
 import com.championsita.jugabilidad.sistemas.SistemaFisico;
 import com.championsita.jugabilidad.sistemas.SistemaColisiones;
-import com.championsita.menus.menucarga.Carga;
 
-public class Jugabilidad extends InputAdapter implements Screen {
+public class ControladorDePartida extends InputAdapter implements Screen {
 
     private String campoRuta, pielJugUno, pielJugDos;
     private final ConfiguracionPersonaje configJugador1;
     private final ConfiguracionPersonaje configJugador2;
 
-    public Jugabilidad(String campoRuta, String pielJugUno, String pielJugDos) {
+    public ControladorDePartida(String campoRuta, String pielJugUno, String pielJugDos) {
         this.campoRuta = campoRuta;
         this.pielJugUno = pielJugUno;
         this.pielJugDos = pielJugDos;
