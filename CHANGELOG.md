@@ -8,6 +8,19 @@ y el versionado está basado en [SemVer](https://semver.org/lang/es/).
 ## [Unreleased]
 
 ### Added
+- `feat:` Nueva clase HudPersonaje para mostrar información del jugador
+- `feat:` Lógica de recarga de stamina implementada
+- `feat:` Animaciones y mejoras en Personaje y ManejadorInput
+
+### Changed
+- `refactor:` Reorganización y limpieza de métodos en Personaje y ManejadorInput
+
+### Fixed
+- `fix:` Pequeños errores en la animación vertical del jugador
+
+## [Unreleased]
+
+### Added
 - `feat:` Animaciones completadas, pelota animada agregada, patada incorporada (`79acf73`)
 - `feat:` Agrega animaciones para correr en vertical (`0529db9`)
 - `feat:` Implementa fondo e interacción básica del jugador (`47b6e4c`)
