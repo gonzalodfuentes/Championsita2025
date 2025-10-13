@@ -3,6 +3,7 @@ package com.championsita.jugabilidad;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.championsita.Principal;
 import com.championsita.jugabilidad.constantes.Constantes;
 import com.championsita.jugabilidad.entrada.EntradaJugador;
+import com.championsita.jugabilidad.herramientas.Texto;
 import com.championsita.jugabilidad.modelo.ConfiguracionPersonaje;
 import com.championsita.jugabilidad.modelo.Pelota;
 import com.championsita.jugabilidad.modelo.Personaje;
@@ -20,11 +22,15 @@ import com.championsita.jugabilidad.sistemas.SistemaFisico;
 import com.championsita.jugabilidad.sistemas.SistemaColisiones;
 import com.championsita.menus.menucarga.Carga;
 
+import static com.championsita.jugabilidad.constantes.Constantes.fuente1;
+
 public class Jugabilidad extends InputAdapter implements Screen {
 
     private String campoRuta, pielJugUno, pielJugDos;
     private final ConfiguracionPersonaje configJugador1;
     private final ConfiguracionPersonaje configJugador2;
+    private Texto texto;
+    private OrthographicCamera hudCamara;
 
     public Jugabilidad(String campoRuta, String pielJugUno, String pielJugDos) {
         this.campoRuta = campoRuta;
@@ -132,6 +138,8 @@ public class Jugabilidad extends InputAdapter implements Screen {
         pintor = new SpriteBatch();
         texturaCancha = new Texture("campos/campo" + this.campoRuta + ".png");
         vistaAjustada = new FitViewport(Constantes.MUNDO_ANCHO, Constantes.MUNDO_ALTO);
+        hudCamara = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        hudCamara.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     private void crearActores() {
@@ -146,6 +154,10 @@ public class Jugabilidad extends InputAdapter implements Screen {
 
         pelota = new Pelota(Constantes.MUNDO_ANCHO / 2f, Constantes.MUNDO_ALTO / 2f, Constantes.ESCALA_PELOTA);
         dibujadorPelota = new DibujadorPelota(pelota);
+
+        texto = new Texto(Constantes.fuente1, 50, Color.WHITE);
+        texto.setTexto("Hola mundo!");
+        texto.setPosition(Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight()/2);
     }
 
     private void configurarEntradas() {
@@ -165,14 +177,21 @@ public class Jugabilidad extends InputAdapter implements Screen {
 
         vistaAjustada.apply();
         pintor.setProjectionMatrix(vistaAjustada.getCamera().combined);
+
         pintor.begin();
-
-        pintor.draw(texturaCancha, 0, 0, vistaAjustada.getWorldWidth(), vistaAjustada.getWorldHeight());
-
-        dibujadorJugador1.dibujar(pintor);
-        dibujadorJugador2.dibujar(pintor);
-        dibujadorPelota.dibujar(pintor);
-
+            pintor.draw(texturaCancha, 0, 0, vistaAjustada.getWorldWidth(), vistaAjustada.getWorldHeight());
+            dibujadorJugador1.dibujar(pintor);
+            dibujadorJugador2.dibujar(pintor);
+            jugador1.getHud().dibujarBarraStamina(pintor, jugador1.getX(), jugador1.getY());
+            dibujadorPelota.dibujar(pintor);
         pintor.end();
+
+        pintor.setProjectionMatrix(hudCamara.combined);
+        pintor.begin();
+            texto.dibujar(pintor);
+        pintor.end();
+
+    
+
     }
 }

@@ -23,6 +23,7 @@ public abstract class Personaje {
     private final float  escala;
     private final AtributosPersonaje atributos;
     private final ConfiguracionPersonaje sprites;
+    private HudPersonaje hudPersonaje;
 
     // =========================
     // Estado de stamina/sprint
@@ -67,6 +68,8 @@ public abstract class Personaje {
                      ConfiguracionPersonaje sprites,
                      AtributosPersonaje atributos,
                      float escala) {
+
+        hudPersonaje = new HudPersonaje(this);
 
         this.nombre   = nombre;
         this.sprites  = sprites;
@@ -146,6 +149,8 @@ public abstract class Personaje {
 
     private void actualizarVelocidadYStamina(boolean sprint, float delta) {
         float velocidad = atributos.getVelocidadBase();
+
+//        System.out.println(staminaActual);
 
         if (sprint && staminaActual > 0f) {
             velocidad = atributos.getVelocidadSprint();
@@ -261,7 +266,8 @@ public abstract class Personaje {
     public AtributosPersonaje getAtributos() { return atributos; }
     public float getEscala() { return escala; }
 
-    public HudPersonaje getHud() { return hud; }
+    public HudPersonaje getHud() { return hudPersonaje; }
+
     public TextureRegion obtenerFrameActual() {
         return estaMoviendo
                 ? animaciones.get(direccionActual).getKeyFrame(tiempoAnimacion, true)

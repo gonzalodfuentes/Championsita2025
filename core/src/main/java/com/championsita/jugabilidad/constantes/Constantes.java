@@ -3,9 +3,15 @@ package com.championsita.jugabilidad.constantes;
 public final class Constantes {
 	  private Constantes() {}
 
+
+
+
 	  // Mundo
 	  public static final float MUNDO_ANCHO = 8f;
 	  public static final float MUNDO_ALTO  = 5f;
+
+	  // Fuentes
+	  public static final String fuente1 = "sewer.ttf";
 
 	  // Pelota
 	  public static final float ESCALA_PELOTA   = 0.002f;

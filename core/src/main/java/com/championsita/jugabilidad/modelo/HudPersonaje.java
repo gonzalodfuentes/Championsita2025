@@ -28,7 +28,7 @@ public class HudPersonaje {
     public HudPersonaje(Personaje personaje) {
         this.personaje = personaje;
 
-        texturaBarra = new Texture("interiorBarraStamina.png");
+        texturaBarra = new Texture("BarraStamina.png");
         camaraHUD = new OrthographicCamera();
         camaraHUD.setToOrtho(false, 1280, 720);
 
@@ -46,7 +46,7 @@ public class HudPersonaje {
 
         // Dibujar barra proporcional a la stamina
         batch.draw(texturaBarra, xPersonaje + posX, yPersonaje + posY, anchoBarra * porcentaje, altoBarra);
-        System.out.println("Deberia funcionar");
+        //System.out.println("Deberia funcionar");
 
 
     }
