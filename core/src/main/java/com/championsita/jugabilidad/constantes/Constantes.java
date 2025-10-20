@@ -11,7 +11,12 @@ public final class Constantes {
 	  public static final float MUNDO_ALTO  = 5f;
 
 	  // Fuentes
-	  public static final String fuente1 = "sewer.ttf";
+	  public static final String fuente1 = "Minercraftory.ttf";
+	  public static final String fuente2 = "light-arial.ttf";
+
+	  // Cancha
+	  public static final float altoCancha = 0.9f;
+	  public static final float anchoCancha = 0.3f;
 
 	  // Pelota
 	  public static final float ESCALA_PELOTA   = 0.002f;

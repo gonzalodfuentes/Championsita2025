@@ -142,4 +142,12 @@ public class Pelota {
         return animar ? animacion.getKeyFrame(stateTime, true)
                       : animacion.getKeyFrame(0, true);
     }
+
+    public void setVelocidad(float nuevaVX, float nuevaVY) {
+        this.velocidadX = nuevaVX;
+        this.velocidadY = nuevaVY;
+        this.animar = false; // Detener la animación al detener la pelota
+        this.stateTime = 0f;
+    }
+
 }

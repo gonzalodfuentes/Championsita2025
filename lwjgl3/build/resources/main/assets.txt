@@ -1,3 +1,4 @@
+Minercraftory.ttf
 atrasBoton.png
 barraStamina.png
 campos/campoAzul.png
@@ -76,6 +77,7 @@ jugador/verde/jugadorMirandoArribaDerecha.png
 jugador/verde/jugadorMirandoArribaIzquierda.png
 jugador/verde/jugadorMirandoDerecha.png
 jugador/verde/jugadorMirandoIzquierda.png
+light-arial.ttf
 lobbyEspera/jugador1.png
 lobbyEspera/jugador2.png
 menuCreacion/campoCartel.png

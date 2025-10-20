@@ -16,28 +16,48 @@ public class Texto {
     private String texto = "";
     GlyphLayout layout;
 
-    public Texto(String rutaFuente, int dimension,Color color) {
+    public Texto(String rutaFuente, int dimension, Color color, float anchoBorde, Color colorBorde) {
+        // Inicializa el generador con el archivo de la fuente
         generator = new FreeTypeFontGenerator(Gdx.files.internal(rutaFuente));
         parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 
         parameter.size = dimension;
         parameter.color = color;
 
+        // Parámetros para el Outline
+        parameter.borderWidth = anchoBorde;
+        parameter.borderColor = colorBorde;
+        parameter.borderStraight = true;
+
+        // Agregar padding para evitar que el borde se recorte
+        int padding = (int)Math.ceil(anchoBorde);
+        parameter.padTop = padding;
+        parameter.padBottom = padding;
+        parameter.padLeft = padding;
+        parameter.padRight = padding;
+
+        // Generar la fuente y el layout
         fuente = generator.generateFont(parameter);
         layout = new GlyphLayout();
     }
 
+    public Texto(String rutaFuente, int dimension, Color color) {
+        this(rutaFuente, dimension, color, 0f, Color.BLACK);
+    }
+
     public void dibujar(SpriteBatch batch) {
-        System.out.println("DIBUJA");
         fuente.draw(batch, texto, x, y);
     }
+
     public void setColor(Color color){
         fuente.setColor(color);
     }
+
     public void setPosition(int x, int y){
         this.x=x;
         this.y=y;
     }
+
     public int getX() {
         return x;
     }
@@ -62,13 +82,25 @@ public class Texto {
         this.texto = texto;
         layout.setText(fuente, texto);
     }
+
     public float getAncho(){
         return layout.width;
     }
+
     public float getAlto(){
         return layout.height;
     }
+
     public Vector2 getDimension(){
         return new Vector2(layout.width, layout.height);
+    }
+
+    public void dispose() {
+        if (fuente != null) {
+            fuente.dispose();
+        }
+        if (generator != null) {
+            generator.dispose();
+        }
     }
 }
