@@ -147,8 +147,8 @@ public class ControladorDePartida extends InputAdapter implements Screen {
     }
 
     private void configurarEntradas() {
-        entradaJugador1 = new EntradaJugador(jugador1, Keys.W, Keys.S, Keys.A, Keys.D, Keys.CONTROL_LEFT);
-        entradaJugador2 = new EntradaJugador(jugador2, Keys.UP, Keys.DOWN, Keys.LEFT, Keys.RIGHT, Keys.CONTROL_RIGHT);
+        entradaJugador1 = new EntradaJugador(jugador1, Keys.W, Keys.S, Keys.A, Keys.D, Keys.CONTROL_LEFT, Keys.SHIFT_LEFT);
+        entradaJugador2 = new EntradaJugador(jugador2, Keys.UP, Keys.DOWN, Keys.LEFT, Keys.RIGHT, Keys.CONTROL_RIGHT, Keys.SHIFT_RIGHT);
         multiplexorEntradas = new InputMultiplexer(entradaJugador1, entradaJugador2);
         Gdx.input.setInputProcessor(multiplexorEntradas);
     }

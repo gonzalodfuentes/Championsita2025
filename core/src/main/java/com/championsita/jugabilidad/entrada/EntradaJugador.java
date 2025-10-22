@@ -11,18 +11,18 @@ public class EntradaJugador implements InputProcessor {
 
     private final Personaje personaje;
 
-    private final int keyArriba, keyAbajo, keyIzquierda, keyDerecha, keyAccion;
-    private final int keySprint = Input.Keys.SHIFT_LEFT;
+    private final int keyArriba, keyAbajo, keyIzquierda, keyDerecha, keyAccion, keySprint;
 
     private boolean arriba, abajo, izquierda, derecha, espacioPresionado, sprintPresionado;
 
-    public EntradaJugador(Personaje personaje, int arriba, int abajo, int izquierda, int derecha, int accion) {
+    public EntradaJugador(Personaje personaje, int arriba, int abajo, int izquierda, int derecha, int accion, int sprint) {
         this.personaje = personaje;
         this.keyArriba = arriba;
         this.keyAbajo = abajo;
         this.keyIzquierda = izquierda;
         this.keyDerecha = derecha;
         this.keyAccion = accion;
+        this.keySprint = sprint;
     }
 
     @Override
