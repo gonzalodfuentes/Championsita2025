@@ -4,9 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
-import com.championsita.menus.Menu;
+import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.menucarga.Carga;
 import com.championsita.menus.menuprincipal.Inicial;
+import com.championsita.menus.compartido.Assets;
 
 public class Doble extends Menu {
     private Texture fondo;
@@ -17,15 +18,14 @@ public class Doble extends Menu {
     private Sprite spriteWASD;
     private Sprite spriteIJKL;
 
-    public Doble(Principal juego) {
-        super(juego);
-    }
+    public Doble(Principal juego) { super(juego); }
 
     @Override
     public void show() {
         super.show();
         Gdx.input.setInputProcessor(this);
-        this.fondo = new Texture("menuDosJugadores/menuElegir2.png");
+
+        this.fondo = Assets.tex("menuDosJugadores/menuElegir2.png");
         super.fondoSprite.setTexture(this.fondo);
 
         this.skinsWASD = JugadorUno.values();
@@ -43,12 +43,12 @@ public class Doble extends Menu {
         super.flechas[2].setPosition(519, y);
         super.flechas[3].setPosition(839, y);
 
-        int cantBotonesHabiles = 2;
-        super.inicializarSonido(cantBotonesHabiles);
+        super.inicializarSonido(2);
     }
 
     private Sprite crearSpriteJugador(String nombre, float x, float y) {
-        Sprite sprite = new Sprite(new Texture("jugador/" + nombre.toLowerCase() + "/Jugador.png"));
+        String path = "jugador/" + nombre.toLowerCase() + "/Jugador.png";
+        Sprite sprite = new Sprite(Assets.tex(path));
         sprite.setPosition(x, y);
         sprite.setSize(400, 400);
         return sprite;
@@ -58,22 +58,19 @@ public class Doble extends Menu {
         switch (i) {
             case 0:
                 this.indiceWASD = (this.indiceWASD - 1 + this.skinsWASD.length) % this.skinsWASD.length;
-                this.spriteWASD.setTexture(new Texture("jugador/" + this.skinsWASD[this.indiceWASD].getNombre().toLowerCase() + "/Jugador.png"));
+                this.spriteWASD.setTexture(Assets.tex("jugador/" + this.skinsWASD[this.indiceWASD].getNombre().toLowerCase() + "/Jugador.png"));
                 break;
-
             case 1:
                 this.indiceWASD = (this.indiceWASD + 1) % this.skinsWASD.length;
-                this.spriteWASD.setTexture(new Texture("jugador/" + this.skinsWASD[this.indiceWASD].getNombre().toLowerCase() + "/Jugador.png"));
+                this.spriteWASD.setTexture(Assets.tex("jugador/" + this.skinsWASD[this.indiceWASD].getNombre().toLowerCase() + "/Jugador.png"));
                 break;
-
             case 2:
                 this.indiceIJKL = (this.indiceIJKL - 1 + this.skinsIJKL.length) % this.skinsIJKL.length;
-                this.spriteIJKL.setTexture(new Texture("jugador/" + this.skinsIJKL[this.indiceIJKL].getNombre().toLowerCase() + "/Jugador.png"));
+                this.spriteIJKL.setTexture(Assets.tex("jugador/" + this.skinsIJKL[this.indiceIJKL].getNombre().toLowerCase() + "/Jugador.png"));
                 break;
-
             case 3:
                 this.indiceIJKL = (this.indiceIJKL + 1) % this.skinsIJKL.length;
-                this.spriteIJKL.setTexture(new Texture("jugador/" + this.skinsIJKL[this.indiceIJKL].getNombre().toLowerCase() + "/Jugador.png"));
+                this.spriteIJKL.setTexture(Assets.tex("jugador/" + this.skinsIJKL[this.indiceIJKL].getNombre().toLowerCase() + "/Jugador.png"));
                 break;
         }
     }
@@ -83,11 +80,7 @@ public class Doble extends Menu {
         super.batch.begin();
         super.render(delta);
         super.cargarAtrasSiguiente();
-
-        for (int i = 0; i < super.flechas.length; i++) {
-            this.flechas[i].draw(super.batch);
-        }
-
+        for (int i = 0; i < super.flechas.length; i++) this.flechas[i].draw(super.batch);
         this.spriteWASD.draw(super.batch);
         this.spriteIJKL.draw(super.batch);
         super.batch.end();
@@ -124,30 +117,26 @@ public class Doble extends Menu {
         do {
             Sprite flecha = super.flechas[i];
             boolean dentro = super.condicionFlechas(flecha, x, y);
-            if (dentro) {
-                mostrarPersonaje(i);
-                clickeado = true;
-            } else {
-                clickeado = false;
-            }
+            if (dentro) { mostrarPersonaje(i); clickeado = true; }
+            else { clickeado = false; }
             i++;
         } while (i < super.flechas.length && !clickeado);
 
         clickeado = condicionDentro(x, y, super.atrasSprite);
         super.cambiarMenu(clickeado, new Inicial(super.juego));
-        clickeado = condicionDentro(x, y, super.siguienteSprite);
-        super.cambiarMenu(clickeado, new Carga(super.juego, this.skinsWASD[this.indiceWASD].getNombre(), this.skinsIJKL[this.indiceIJKL].getNombre()));
 
+        clickeado = condicionDentro(x, y, super.siguienteSprite);
+        super.cambiarMenu(clickeado, new Carga(
+                super.juego,
+                this.skinsWASD[this.indiceWASD].getNombre(),
+                this.skinsIJKL[this.indiceIJKL].getNombre()
+        ));
         return clickeado;
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        this.fondo.dispose();
-        this.flecha.dispose();
-        this.flechaCursor.dispose();
-        this.spriteWASD.getTexture().dispose();
-        this.spriteIJKL.getTexture().dispose();
+        // Nada que liberar aquí: las texturas/música/sonidos los gestiona Assets.
     }
 }

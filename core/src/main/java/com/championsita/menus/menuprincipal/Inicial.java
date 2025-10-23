@@ -4,9 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
+import com.championsita.menus.local.Local;
 import com.championsita.menus.menueleccion.Doble;
+import com.championsita.menus.menumodosdejuego.SelectorModo;
 
-public class Inicial extends com.championsita.menus.Menu {
+public class Inicial extends Menu {
 
     private Sprite[] botones;
     private float anchoBotones;
@@ -23,11 +25,10 @@ public class Inicial extends com.championsita.menus.Menu {
         this.botones = new Sprite[] {
                 new Sprite(new Texture("menuInicial/onlineBoton.png")),
                 new Sprite(new Texture("menuInicial/localBoton.png")),
-                new Sprite(new Texture("menuInicial/2jugadoresBoton.png")),
-                new Sprite(new Texture("menuInicial/practicaBoton.png")),
                 new Sprite(new Texture("menuInicial/opcionesBoton.png")),
                 new Sprite(new Texture("menuInicial/salirBoton.png"))
         };
+
 
         this.anchoBotones = botones[0].getWidth() - 100;
         this.altoBotones = botones[0].getHeight() - 20;
@@ -106,24 +107,13 @@ public class Inicial extends com.championsita.menus.Menu {
 
     private void cambiarMenu(int i) {
         switch (i) {
-            case 0: break;
-
-            case 1: break;
-
-            case 2: {
-                Doble doble = new Doble(super.juego);
-                super.juego.actualizarPantalla(doble);
+            case 0: break; // ONLINE (pendiente)
+            case 1: {      // LOCAL
+                super.juego.actualizarPantalla(new Local(super.juego));
                 break;
             }
-
-            case 3: break;
-
-            case 4: break;
-
-            case 5: {
-                Gdx.app.exit();
-                break;
-            }
+            case 2: break; // OPCIONES
+            case 3: { Gdx.app.exit(); break; }
         }
     }
 

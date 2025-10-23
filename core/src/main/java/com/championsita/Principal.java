@@ -4,7 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.championsita.menus.menuprincipal.Inicial;
-import com.championsita.menus.Menu;
+import com.championsita.menus.menuprincipal.Menu;
 
 public class Principal extends Game {
 
