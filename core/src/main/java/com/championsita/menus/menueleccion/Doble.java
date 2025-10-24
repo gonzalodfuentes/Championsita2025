@@ -1,49 +1,57 @@
 package com.championsita.menus.menueleccion;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
-import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.menucarga.Carga;
 import com.championsita.menus.menuprincipal.Inicial;
+import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.compartido.Assets;
 
+/**
+ * Menú de selección de skins para el modo de 2 jugadores.
+ * Controla dos sets de personajes (WASD / IJKL) y navega al menú de Carga.
+ */
 public class Doble extends Menu {
-    private Texture fondo;
+
+    private Sprite spriteWASD;
+    private Sprite spriteIJKL;
     private JugadorUno[] skinsWASD;
     private JugadorDos[] skinsIJKL;
     private int indiceWASD;
     private int indiceIJKL;
-    private Sprite spriteWASD;
-    private Sprite spriteIJKL;
 
-    public Doble(Principal juego) { super(juego); }
+    private final String modoDestino; // "1v1" o "practica" según origen
+
+    public Doble(Principal juego, String modoDestino) {
+        super(juego);
+        this.modoDestino = modoDestino == null ? "1v1" : modoDestino;
+    }
 
     @Override
     public void show() {
         super.show();
         Gdx.input.setInputProcessor(this);
 
-        this.fondo = Assets.tex("menuDosJugadores/menuElegir2.png");
-        super.fondoSprite.setTexture(this.fondo);
+        super.fondoSprite.setTexture(Assets.tex("menuDosJugadores/menuElegir2.png"));
 
         this.skinsWASD = JugadorUno.values();
         this.skinsIJKL = JugadorDos.values();
         this.indiceWASD = 0;
         this.indiceIJKL = 0;
 
-        this.spriteWASD = crearSpriteJugador(this.skinsWASD[this.indiceWASD].getNombre(), 130, 75);
-        this.spriteIJKL = crearSpriteJugador(this.skinsIJKL[this.indiceIJKL].getNombre(), 515, 75);
+        this.spriteWASD = crearSpriteJugador(skinsWASD[indiceWASD].getNombre(), 130, 75);
+        this.spriteIJKL = crearSpriteJugador(skinsIJKL[indiceIJKL].getNombre(), 515, 75);
 
         super.crearFlechas(4);
         int y = 166;
-        super.flechas[0].setPosition(134, y);
-        super.flechas[1].setPosition(455, y);
-        super.flechas[2].setPosition(519, y);
-        super.flechas[3].setPosition(839, y);
+        super.flechas[0].setPosition(134, y); // WASD izquierda
+        super.flechas[1].setPosition(455, y); // WASD derecha
+        super.flechas[2].setPosition(519, y); // IJKL izquierda
+        super.flechas[3].setPosition(839, y); // IJKL derecha
 
-        super.inicializarSonido(2);
+        // Sonidos: 4 flechas + atrás + ok → 6 slots
+        super.inicializarSonido(6);
     }
 
     private Sprite crearSpriteJugador(String nombre, float x, float y) {
@@ -54,24 +62,24 @@ public class Doble extends Menu {
         return sprite;
     }
 
-    private void mostrarPersonaje(int i) {
+    private void cambiarSkin(int i) {
         switch (i) {
-            case 0:
-                this.indiceWASD = (this.indiceWASD - 1 + this.skinsWASD.length) % this.skinsWASD.length;
-                this.spriteWASD.setTexture(Assets.tex("jugador/" + this.skinsWASD[this.indiceWASD].getNombre().toLowerCase() + "/Jugador.png"));
-                break;
-            case 1:
-                this.indiceWASD = (this.indiceWASD + 1) % this.skinsWASD.length;
-                this.spriteWASD.setTexture(Assets.tex("jugador/" + this.skinsWASD[this.indiceWASD].getNombre().toLowerCase() + "/Jugador.png"));
-                break;
-            case 2:
-                this.indiceIJKL = (this.indiceIJKL - 1 + this.skinsIJKL.length) % this.skinsIJKL.length;
-                this.spriteIJKL.setTexture(Assets.tex("jugador/" + this.skinsIJKL[this.indiceIJKL].getNombre().toLowerCase() + "/Jugador.png"));
-                break;
-            case 3:
-                this.indiceIJKL = (this.indiceIJKL + 1) % this.skinsIJKL.length;
-                this.spriteIJKL.setTexture(Assets.tex("jugador/" + this.skinsIJKL[this.indiceIJKL].getNombre().toLowerCase() + "/Jugador.png"));
-                break;
+            case 0 -> {
+                indiceWASD = (indiceWASD - 1 + skinsWASD.length) % skinsWASD.length;
+                spriteWASD.setTexture(Assets.tex("jugador/" + skinsWASD[indiceWASD].getNombre().toLowerCase() + "/Jugador.png"));
+            }
+            case 1 -> {
+                indiceWASD = (indiceWASD + 1) % skinsWASD.length;
+                spriteWASD.setTexture(Assets.tex("jugador/" + skinsWASD[indiceWASD].getNombre().toLowerCase() + "/Jugador.png"));
+            }
+            case 2 -> {
+                indiceIJKL = (indiceIJKL - 1 + skinsIJKL.length) % skinsIJKL.length;
+                spriteIJKL.setTexture(Assets.tex("jugador/" + skinsIJKL[indiceIJKL].getNombre().toLowerCase() + "/Jugador.png"));
+            }
+            case 3 -> {
+                indiceIJKL = (indiceIJKL + 1) % skinsIJKL.length;
+                spriteIJKL.setTexture(Assets.tex("jugador/" + skinsIJKL[indiceIJKL].getNombre().toLowerCase() + "/Jugador.png"));
+            }
         }
     }
 
@@ -80,63 +88,68 @@ public class Doble extends Menu {
         super.batch.begin();
         super.render(delta);
         super.cargarAtrasSiguiente();
-        for (int i = 0; i < super.flechas.length; i++) this.flechas[i].draw(super.batch);
-        this.spriteWASD.draw(super.batch);
-        this.spriteIJKL.draw(super.batch);
+        for (Sprite f : super.flechas) f.draw(super.batch);
+        spriteWASD.draw(super.batch);
+        spriteIJKL.draw(super.batch);
         super.batch.end();
     }
 
     @Override
     public boolean mouseMoved(int x, int y) {
-        boolean paso = false;
         y = Gdx.graphics.getHeight() - y;
+        boolean hit = false;
 
-        int i = 0;
-        do {
-            paso = super.condicionFlechas(super.flechas[i], x, y);
-            i++;
-        } while (i < this.flechas.length && !paso);
+        for (int i = 0; i < super.flechas.length; i++) {
+            boolean dentro = super.condicionFlechas(super.flechas[i], x, y);
+            super.reproducirSonido(i, dentro);
+            hit |= dentro;
+        }
 
-        paso = condicionDentro(x, y, super.atrasSprite);
-        super.condicionColor(paso, super.atrasSprite);
-        super.reproducirSonido(0, paso);
+        boolean dentroAtras = condicionDentro(x, y, super.atrasSprite);
+        condicionColor(dentroAtras, super.atrasSprite);
+        super.reproducirSonido(4, dentroAtras);
 
-        paso = condicionDentro(x, y, super.siguienteSprite);
-        super.condicionColor(paso, super.siguienteSprite);
-        super.reproducirSonido(1, paso);
+        boolean dentroOk = condicionDentro(x, y, super.siguienteSprite);
+        condicionColor(dentroOk, super.siguienteSprite);
+        super.reproducirSonido(5, dentroOk);
 
-        return paso;
+        return hit || dentroAtras || dentroOk;
     }
 
     @Override
     public boolean touchUp(int x, int y, int pointer, int button) {
-        boolean clickeado = false;
-        int i = 0;
         y = Gdx.graphics.getHeight() - y;
 
-        do {
-            Sprite flecha = super.flechas[i];
-            boolean dentro = super.condicionFlechas(flecha, x, y);
-            if (dentro) { mostrarPersonaje(i); clickeado = true; }
-            else { clickeado = false; }
-            i++;
-        } while (i < super.flechas.length && !clickeado);
+        // Flechas de selección
+        for (int i = 0; i < super.flechas.length; i++) {
+            if (super.condicionFlechas(super.flechas[i], x, y)) {
+                cambiarSkin(i);
+                return true;
+            }
+        }
 
-        clickeado = condicionDentro(x, y, super.atrasSprite);
-        super.cambiarMenu(clickeado, new Inicial(super.juego));
+        // Atrás → volver a Inicial
+        if (condicionDentro(x, y, super.atrasSprite)) {
+            super.cambiarMenu(true, new Inicial(super.juego));
+            return true;
+        }
 
-        clickeado = condicionDentro(x, y, super.siguienteSprite);
-        super.cambiarMenu(clickeado, new Carga(
-                super.juego,
-                this.skinsWASD[this.indiceWASD].getNombre(),
-                this.skinsIJKL[this.indiceIJKL].getNombre()
-        ));
-        return clickeado;
+        // OK → continuar a Carga con las skins elegidas y el modo de destino
+        if (condicionDentro(x, y, super.siguienteSprite)) {
+            super.juego.actualizarPantalla(new Carga(
+                    super.juego,
+                    skinsWASD[indiceWASD].getNombre(),
+                    skinsIJKL[indiceIJKL].getNombre(),
+                    this.modoDestino
+            ));
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        // Nada que liberar aquí: las texturas/música/sonidos los gestiona Assets.
     }
 }

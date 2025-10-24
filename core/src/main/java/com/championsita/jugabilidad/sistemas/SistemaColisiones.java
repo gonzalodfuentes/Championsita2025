@@ -81,6 +81,6 @@ public class SistemaColisiones {
             else                      nuevaBY -= solapeY + EPS;
         }
 
-        pelota.setPosition(nuevaBX, nuevaBY);
+        pelota.setPosicion(nuevaBX, nuevaBY);
     }
 }

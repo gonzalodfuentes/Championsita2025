@@ -9,8 +9,10 @@ import com.badlogic.gdx.audio.Sound;
 import com.championsita.Principal;
 import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.menueleccion.Doble;
-import com.championsita.partida.ControladorDePartida;
 import com.championsita.menus.compartido.Assets;
+import com.championsita.menus.compartido.OpcionDeGoles;
+import com.championsita.menus.compartido.OpcionDeTiempo;
+import com.championsita.partida.ControladorDePartida;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +22,8 @@ public class Carga extends Menu {
     private SpriteBatch batch;
     private final String pielJugador1;
     private final String pielJugador2;
+    private final String modo; // "1v1" o "practica"
+
 
     private Texture fondoTex;
     private Texture botonJugarTex;
@@ -67,10 +71,11 @@ public class Carga extends Menu {
     private static final float CAMPOS_ALTURA    = 200f;
     private static final float FLECHA_OFFSET    = 5f;
 
-    public Carga(Principal juego, String pielUno, String pielDos) {
+    public Carga(Principal juego, String pielUno, String pielDos, String modo) {
         super(juego);
         this.pielJugador1 = pielUno;
         this.pielJugador2 = pielDos;
+        this.modo = (modo == null ? "1v1" : modo);
     }
 
     @Override
@@ -212,16 +217,24 @@ public class Carga extends Menu {
         if (hit(flechaDer, x, y)) { cambiarCampo(+1); clic = true; }
 
         if (hit(super.atrasSprite, x, y)) {
-            super.cambiarMenu(true, new Doble(super.juego));
+            // en touchUp de Carga, al volver atrás:
+            super.cambiarMenu(true, new Doble(super.juego, this.modo));
+
             return true;
         }
 
         if (hit(super.siguienteSprite, x, y)) {
-            String nombreCampo = listaCampos[indiceCampo].getNombre();
-            // En el siguiente refactor podemos crear un GameConfig y pasar todo junto.
-            super.juego.actualizarPantalla(
-                    new ControladorDePartida(nombreCampo, this.pielJugador1, this.pielJugador2)
-            );
+            // Construye Config para el Controlador directamente
+            ControladorDePartida.Config config = new ControladorDePartida.Config.Builder()
+                    .jugador1Skin(this.pielJugador1)
+                    .jugador2Skin(this.pielJugador2)
+                    .campo(listaCampos[indiceCampo])
+                    .goles(mapGoles(opcionesGoles[indiceGoles]))
+                    .tiempo(mapTiempo(opcionesTiempo[indiceTiempo]))
+                    .modo(this.modo)   // <- importante
+                    .build();
+
+            super.juego.actualizarPantalla(new ControladorDePartida(config));
             return true;
         }
 
@@ -266,5 +279,24 @@ public class Carga extends Menu {
         this.controlJugador2 = new Sprite(controlJugador2Tex);
         this.controlJugador1.setPosition(xUno, y);
         this.controlJugador2.setPosition(xDos, y);
+    }
+
+    // Mapeos de valores de UI a enums del juego
+    private OpcionDeGoles mapGoles(int valor) {
+        return switch (valor) {
+            case 1 -> OpcionDeGoles.UNO;
+            case 3 -> OpcionDeGoles.TRES;
+            case 5 -> OpcionDeGoles.CINCO;
+            default -> OpcionDeGoles.UNO;
+        };
+    }
+
+    private OpcionDeTiempo mapTiempo(int cod) {
+        return switch (cod) {
+            case 1 -> OpcionDeTiempo.CORTO;
+            case 2 -> OpcionDeTiempo.MEDIO;
+            case 3 -> OpcionDeTiempo.LARGO;
+            default -> OpcionDeTiempo.CORTO;
+        };
     }
 }

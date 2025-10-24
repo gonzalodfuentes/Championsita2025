@@ -1,12 +1,10 @@
 package com.championsita.menus.menuprincipal;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
 import com.championsita.menus.local.Local;
-import com.championsita.menus.menueleccion.Doble;
-import com.championsita.menus.menumodosdejuego.SelectorModo;
+import com.championsita.menus.compartido.Assets;
 
 public class Inicial extends Menu {
 
@@ -14,49 +12,44 @@ public class Inicial extends Menu {
     private float anchoBotones;
     private float altoBotones;
 
-    public Inicial(Principal juego) {
-        super(juego);
-    }
+    public Inicial(Principal juego) { super(juego); }
 
     @Override
     public void show() {
         super.show();
 
+        // Cargar botones usando Assets para mantener el ciclo de vida unificado
         this.botones = new Sprite[] {
-                new Sprite(new Texture("menuInicial/onlineBoton.png")),
-                new Sprite(new Texture("menuInicial/localBoton.png")),
-                new Sprite(new Texture("menuInicial/opcionesBoton.png")),
-                new Sprite(new Texture("menuInicial/salirBoton.png"))
+                new Sprite(Assets.tex("menuInicial/onlineBoton.png")),
+                new Sprite(Assets.tex("menuInicial/localBoton.png")),
+                new Sprite(Assets.tex("menuInicial/opcionesBoton.png")),
+                new Sprite(Assets.tex("menuInicial/salirBoton.png"))
         };
 
-
         this.anchoBotones = botones[0].getWidth() - 100;
-        this.altoBotones = botones[0].getHeight() - 20;
+        this.altoBotones  = botones[0].getHeight() - 20;
 
         int apilar = 0;
-        for(int i = 0; i < botones.length; i++) {
+        for (int i = 0; i < botones.length; i++) {
             botones[i].setSize(anchoBotones, altoBotones);
-            float xBoton = super.anchoPantalla / 2f - anchoBotones / 2f;
-            float yBoton = super.altoPantalla / 1.6f - altoBotones / 2f - apilar;
-            this.botones[i].setPosition(xBoton, yBoton);
+            float x = super.anchoPantalla / 2f - anchoBotones / 2f;
+            float y = super.altoPantalla / 1.6f - altoBotones / 2f - apilar;
+            botones[i].setPosition(x, y);
             apilar += 80;
         }
 
-        int cantBotones = 6;
-        super.inicializarSonido(cantBotones);
+        // 4 botones + (opcional) atrás/ok globales => 6 slots de sonido
+        super.inicializarSonido(6);
 
+        // Registrar input en este menú
         Gdx.input.setInputProcessor(this);
     }
 
     @Override
     public void render(float delta) {
         super.batch.begin();
-        super.render(delta);
-
-        for(int i = 0; i < this.botones.length; i++) {
-            this.botones[i].draw(batch);
-        }
-
+        super.render(delta); // dibuja el fondo
+        for (Sprite b : this.botones) b.draw(super.batch);
         super.batch.end();
     }
 
@@ -64,61 +57,59 @@ public class Inicial extends Menu {
     public boolean touchUp(int x, int y, int pointer, int button) {
         y = Gdx.graphics.getHeight() - y;
 
-        int i = 0;
-        boolean clickeado = false;
-
-        do {
+        for (int i = 0; i < botones.length; i++) {
             Sprite boton = botones[i];
-
             float bx = boton.getX();
             float by = boton.getY();
-
-            if (x >= bx && x <= bx + anchoBotones &&
-                    y >= by && y <= by + altoBotones) {
+            if (x >= bx && x <= bx + anchoBotones && y >= by && y <= by + altoBotones) {
                 cambiarMenu(i);
-                clickeado = true;
+                return true;
             }
-
-            i++;
-        } while (i < botones.length && !clickeado);
-
-        return clickeado;
+        }
+        return false;
     }
 
     @Override
     public boolean mouseMoved(int x, int y) {
         y = Gdx.graphics.getHeight() - y;
-        boolean paso = false;
-        int i = 0;
+        boolean hitAlgo = false;
 
-        do {
+        for (int i = 0; i < botones.length; i++) {
             Sprite boton = botones[i];
-
             boolean dentro = super.condicionDentro(x, y, boton);
             super.condicionColor(dentro, boton);
-
             super.reproducirSonido(i, dentro);
-
-            i++;
-        } while (i < botones.length);
-
-        return paso;
+            hitAlgo |= dentro;
+        }
+        return hitAlgo;
     }
 
     private void cambiarMenu(int i) {
         switch (i) {
-            case 0: break; // ONLINE (pendiente)
-            case 1: {      // LOCAL
+            case 0: {
+                // ONLINE (pendiente)
+                break;
+            }
+            case 1: {
+                // LOCAL => submenú propio con 2 Jugadores y Práctica
                 super.juego.actualizarPantalla(new Local(super.juego));
                 break;
             }
-            case 2: break; // OPCIONES
-            case 3: { Gdx.app.exit(); break; }
+            case 2: {
+                // OPCIONES (pendiente)
+                break;
+            }
+            case 3: {
+                // SALIR
+                Gdx.app.exit();
+                break;
+            }
         }
     }
 
     @Override
     public void dispose() {
         super.dispose();
+        // Texturas y sonidos quedan bajo control de Assets
     }
 }
