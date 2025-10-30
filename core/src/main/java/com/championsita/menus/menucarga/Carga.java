@@ -13,6 +13,7 @@ import com.championsita.menus.menueleccion.Doble;
 import com.championsita.menus.compartido.Assets;
 import com.championsita.menus.compartido.OpcionDeGoles;
 import com.championsita.menus.compartido.OpcionDeTiempo;
+import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
 import com.championsita.partida.ControladorDePartida;
 
 import java.util.HashMap;
@@ -74,6 +75,7 @@ public class Carga extends Menu {
 
     //Gestores-Herramientas
     private GestorInputMenu gestorMenu;
+    private RenderizadorDeMenu renderizador;
 
     public Carga(Principal juego, String pielUno, String pielDos, String modo) {
         super(juego);
@@ -155,13 +157,14 @@ public class Carga extends Menu {
 
         //Inicializar Gestores y Herramientas
         gestorMenu = new GestorInputMenu(this);
+        renderizador = new RenderizadorDeMenu(this);
     }
 
     @Override
     public void render(float delta) {
         batch.begin();
-        super.render(delta);
-        super.cargarAtrasSiguiente();
+        renderizador.renderFondo(delta);
+        renderizador.cargarAtrasSiguiente();
 
         controlJugador1.draw(batch);
         controlJugador2.draw(batch);

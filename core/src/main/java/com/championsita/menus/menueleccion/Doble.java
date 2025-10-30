@@ -1,6 +1,7 @@
 package com.championsita.menus.menueleccion;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
 import com.championsita.menus.menucarga.Carga;
@@ -8,6 +9,7 @@ import com.championsita.menus.menuprincipal.GestorInputMenu;
 import com.championsita.menus.menuprincipal.Inicial;
 import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.compartido.Assets;
+import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
 
 /**
  * Menú de selección de skins para el modo de 2 jugadores.
@@ -24,6 +26,7 @@ public class Doble extends Menu {
 
     //Gestores-Herramientas
     GestorInputMenu gestorMenu;
+    RenderizadorDeMenu renderizador;
 
     private final String modoDestino; // "1v1" o "practica" según origen
 
@@ -47,7 +50,11 @@ public class Doble extends Menu {
         this.spriteWASD = crearSpriteJugador(skinsWASD[indiceWASD].getNombre(), 130, 75);
         this.spriteIJKL = crearSpriteJugador(skinsIJKL[indiceIJKL].getNombre(), 515, 75);
 
-        super.crearFlechas(4);
+        //Inicializar Gestores-Herramientas
+        this.gestorMenu = new GestorInputMenu(this);
+        this.renderizador = new  RenderizadorDeMenu(this);
+
+        renderizador.crearFlechas(4);
         int y = 166;
         super.flechas[0].setPosition(134, y); // WASD izquierda
         super.flechas[1].setPosition(455, y); // WASD derecha
@@ -56,9 +63,6 @@ public class Doble extends Menu {
 
         // Sonidos: 4 flechas + atrás + ok → 6 slots
         super.inicializarSonido(6);
-
-        //Inicializar Gestores-Herramientas
-        gestorMenu = new GestorInputMenu(this);
     }
 
     private Sprite crearSpriteJugador(String nombre, float x, float y) {
@@ -92,12 +96,16 @@ public class Doble extends Menu {
 
     @Override
     public void render(float delta) {
+        Gdx.gl.glClearColor(0, 0, 0, 1); // fondo negro (o el que quieras)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         super.batch.begin();
-        super.render(delta);
-        super.cargarAtrasSiguiente();
+        renderizador.renderFondo(delta);
+        renderizador.cargarAtrasSiguiente();
         for (Sprite f : super.flechas) f.draw(super.batch);
         spriteWASD.draw(super.batch);
         spriteIJKL.draw(super.batch);
+        System.out.println("RENDER MENU ELECCIÓN 2J");
         super.batch.end();
     }
 
@@ -143,6 +151,7 @@ public class Doble extends Menu {
 
         // OK → continuar a Carga con las skins elegidas y el modo de destino
         if (gestorMenu.condicionDentro(x, y, super.siguienteSprite)) {
+            Gdx.input.setInputProcessor(null); //borramos Pantalla Anterior
             super.juego.actualizarPantalla(new Carga(
                     super.juego,
                     skinsWASD[indiceWASD].getNombre(),
@@ -157,6 +166,9 @@ public class Doble extends Menu {
 
     @Override
     public void dispose() {
-        super.dispose();
+        this.renderizador = null;
+        this.gestorMenu = null;
+        this.spriteWASD = null;
+        this.spriteIJKL = null;
     }
 }

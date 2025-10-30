@@ -10,6 +10,7 @@ import com.championsita.menus.menuprincipal.GestorInputMenu;
 import com.championsita.menus.menuprincipal.Inicial;
 import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.compartido.Assets;
+import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
 
 public class Local extends Menu {
 
@@ -17,6 +18,7 @@ public class Local extends Menu {
     private float anchoBoton;
     private float altoBoton;
     GestorInputMenu gestorMenu;
+    RenderizadorDeMenu renderizador;
 
     public Local(Principal juego) { super(juego); }
 
@@ -49,21 +51,16 @@ public class Local extends Menu {
 
         //Inicializacion Gestores-Herramientas
         gestorMenu = new GestorInputMenu(this);
+        renderizador = new RenderizadorDeMenu(this);
     }
 
     @Override
     public void render(float delta) {
         super.batch.begin();
         super.render(delta); // fondo
-        cargarAtrasSiguiente(); // solo dibuja atrás en este menú
+        renderizador.cargarAtrasSiguiente(); // solo dibuja atrás en este menú
         for (Sprite b : botones) b.draw(super.batch);
         super.batch.end();
-    }
-
-    @Override
-    protected void cargarAtrasSiguiente() {
-        this.atrasSprite.draw(this.batch);
-        // No se dibuja botón OK en este submenú
     }
 
     @Override

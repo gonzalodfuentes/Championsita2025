@@ -12,6 +12,7 @@ public class Inicial extends Menu {
     private float anchoBotones;
     private float altoBotones;
     private GestorInputMenu gestorMenu;
+    private RenderizadorDeMenu renderizador;
 
     public Inicial(Principal juego) { super(juego); }
 
@@ -47,12 +48,13 @@ public class Inicial extends Menu {
 
         //Inicializar Gestores-Herramientas
         gestorMenu = new GestorInputMenu(this);
+        renderizador = new RenderizadorDeMenu(this);
     }
 
     @Override
     public void render(float delta) {
         super.batch.begin();
-        super.render(delta); // dibuja el fondo
+        renderizador.renderFondo(delta); // dibuja el fondo
         for (Sprite b : this.botones) b.draw(super.batch);
         super.batch.end();
     }

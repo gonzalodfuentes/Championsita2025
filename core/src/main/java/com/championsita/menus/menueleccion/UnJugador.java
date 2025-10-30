@@ -8,6 +8,7 @@ import com.championsita.menus.menuprincipal.Inicial;
 import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.compartido.Assets;
 import com.championsita.menus.menucarga.Campo;
+import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
 import com.championsita.partida.ControladorDePartida;
 
 /**
@@ -36,6 +37,7 @@ public class UnJugador extends Menu {
 
     //Gestores y Herramientas
     GestorInputMenu gestorMenu;
+    RenderizadorDeMenu renderizador;
 
     public UnJugador(Principal juego, String modoDestino) {
         super(juego);
@@ -63,8 +65,15 @@ public class UnJugador extends Menu {
         this.previewCampo = crearSpriteCampo(campos[idxCampo], 360, 390); // y aproximado bajo el primer bloque
         this.previewCampo.setSize(300, 170);
 
+        // Sonidos: 4 flechas + atrás + ok => 6
+        super.inicializarSonido(6);
+
+        //Inicializar Gestores/Herramientas
+        this.gestorMenu = new GestorInputMenu(this);
+        this.renderizador = new RenderizadorDeMenu(this);
+
         // Flechas: 4 en total (skin izq/der + campo izq/der)
-        super.crearFlechas(4);
+        renderizador.crearFlechas(4);
         int ySkin = 166;
         super.flechas[0].setPosition(318, ySkin); // skin izquierda
         super.flechas[1].setPosition(639, ySkin); // skin derecha
@@ -72,12 +81,6 @@ public class UnJugador extends Menu {
         int yCampo = 390;
         super.flechas[2].setPosition(270, yCampo); // campo izquierda
         super.flechas[3].setPosition(700, yCampo); // campo derecha
-
-        // Sonidos: 4 flechas + atrás + ok => 6
-        super.inicializarSonido(6);
-
-        //Inicializar Gestores/Herramientas
-        this.gestorMenu = new GestorInputMenu(this);
     }
 
     private Sprite crearSpriteJugador(String nombre, float x, float y) {
@@ -121,8 +124,8 @@ public class UnJugador extends Menu {
     @Override
     public void render(float delta) {
         super.batch.begin();
-        super.render(delta);
-        super.cargarAtrasSiguiente();
+        renderizador.renderFondo(delta);
+        renderizador.cargarAtrasSiguiente();
 
         // Dibujar flechas
         for (Sprite f : super.flechas) f.draw(super.batch);

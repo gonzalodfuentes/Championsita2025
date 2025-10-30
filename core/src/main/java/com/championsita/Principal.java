@@ -1,6 +1,7 @@
 package com.championsita;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.championsita.menus.menuprincipal.Inicial;
@@ -22,8 +23,16 @@ public class Principal extends Game {
         return this.batch;
     }
 
-    public void actualizarPantalla(Object futuraPantalla) {
-        setScreen((Screen) futuraPantalla);
+    public void actualizarPantalla(Screen futuraPantalla) {
+        Screen anterior = getScreen();
+        if (futuraPantalla == anterior) return;
+
+        setScreen(futuraPantalla);
+
+        // Esperar al siguiente frame para liberar la anterior
+        if (anterior != null && anterior != futuraPantalla) {
+            Gdx.app.postRunnable(anterior::dispose);
+        }
     }
 
     @Override

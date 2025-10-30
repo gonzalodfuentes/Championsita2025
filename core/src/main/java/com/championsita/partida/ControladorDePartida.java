@@ -75,7 +75,7 @@ public class ControladorDePartida implements Screen {
     private final Config config;
     private ModoDeJuego modoJuego;
 
-    private SpriteBatch batch;
+    private SpriteBatch batch = new SpriteBatch();
     private Texture texturaCancha;
     private FitViewport viewport;
 

@@ -94,47 +94,24 @@ public class Menu extends InputAdapter implements Screen {
         }
     }
 
-    protected void crearFlechas(int cantFlechas) {
-        this.flecha = Assets.tex("menuDosJugadores/flechaNormal.png");
-        this.flechaCursor = Assets.tex("menuDosJugadores/flechaInvertida.png");
-        this.flechas = new Sprite[cantFlechas];
-        this.flechasInvertidas = new Sprite[cantFlechas];
-
-        for (int i = 0; i < cantFlechas; i++) {
-            this.flechas[i] = new Sprite(this.flecha);
-            this.flechasInvertidas[i] = new Sprite(this.flechaCursor);
-            this.flechasInvertidas[i].setSize(this.flechas[i].getWidth(), this.flechas[i].getHeight());
-            if (i % 2 != 0) {
-                this.flechas[i].setRotation(180);
-                this.flechasInvertidas[i].setRotation(180);
-            }
-        }
-    }
-
     @Override
-    public void render(float delta) {
-        this.fondoSprite.draw(this.batch);
-    }
-
-    protected void cargarAtrasSiguiente() {
-        this.atrasSprite.draw(this.batch);
-        this.siguienteSprite.draw(this.batch);
-    }
-
+    public void render(float delta) {}
     @Override public void resize(int width, int height) {}
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void hide() {}
-
-    @Override
-    public void dispose() {
+    @Override public void dispose() {
         // Nada que disposear acá: lo maneja Assets.
         // Si en algún momento querés liberar todo (salida del juego), llamar a Assets.disposeAll() desde Principal.
     }
 
-    protected void cambiarMenu(boolean dentro, Menu atrasAdelante) {
-        if (dentro) {
-            this.juego.actualizarPantalla(atrasAdelante);
+    protected void cambiarMenu(boolean dentro, Menu nuevaPantalla) {
+        if (!dentro) return;
+
+        if (this.musica != null && this.musica.isPlaying()) {
+            this.musica.stop();
         }
+
+        this.juego.actualizarPantalla(nuevaPantalla);
     }
 }
