@@ -11,6 +11,7 @@ public class Inicial extends Menu {
     private Sprite[] botones;
     private float anchoBotones;
     private float altoBotones;
+    private GestorInputMenu gestorMenu;
 
     public Inicial(Principal juego) { super(juego); }
 
@@ -43,6 +44,9 @@ public class Inicial extends Menu {
 
         // Registrar input en este menú
         Gdx.input.setInputProcessor(this);
+
+        //Inicializar Gestores-Herramientas
+        gestorMenu = new GestorInputMenu(this);
     }
 
     @Override
@@ -76,8 +80,8 @@ public class Inicial extends Menu {
 
         for (int i = 0; i < botones.length; i++) {
             Sprite boton = botones[i];
-            boolean dentro = super.condicionDentro(x, y, boton);
-            super.condicionColor(dentro, boton);
+            boolean dentro = gestorMenu.condicionDentro(x, y, boton);
+            gestorMenu.condicionColor(dentro, boton);
             super.reproducirSonido(i, dentro);
             hitAlgo |= dentro;
         }

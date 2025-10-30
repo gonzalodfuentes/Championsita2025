@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.audio.Sound;
 import com.championsita.Principal;
+import com.championsita.menus.menuprincipal.GestorInputMenu;
 import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.menueleccion.Doble;
 import com.championsita.menus.compartido.Assets;
@@ -70,6 +71,9 @@ public class Carga extends Menu {
     private static final float CAMPOS_PANEL_Y   = 215f;
     private static final float CAMPOS_ALTURA    = 200f;
     private static final float FLECHA_OFFSET    = 5f;
+
+    //Gestores-Herramientas
+    private GestorInputMenu gestorMenu;
 
     public Carga(Principal juego, String pielUno, String pielDos, String modo) {
         super(juego);
@@ -148,6 +152,9 @@ public class Carga extends Menu {
         super.inicializarSonido(2);
 
         Gdx.input.setInputProcessor(this);
+
+        //Inicializar Gestores y Herramientas
+        gestorMenu = new GestorInputMenu(this);
     }
 
     @Override
@@ -179,11 +186,11 @@ public class Carga extends Menu {
         cartelTiempo.setColor(dentroT ? colorHover : colorNormal);
 
         boolean dentroAtras = hit(super.atrasSprite, x, y);
-        super.condicionColor(dentroAtras, super.atrasSprite);
+        gestorMenu.condicionColor(dentroAtras, super.atrasSprite);
         super.reproducirSonido(0, dentroAtras);
 
         boolean dentroJugar = hit(super.siguienteSprite, x, y);
-        super.condicionColor(dentroJugar, super.siguienteSprite);
+        gestorMenu.condicionColor(dentroJugar, super.siguienteSprite);
         super.reproducirSonido(1, dentroJugar);
 
         updateFlechaHover(flechaIzq, x, y, true);

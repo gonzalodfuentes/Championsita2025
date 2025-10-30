@@ -132,30 +132,9 @@ public class Menu extends InputAdapter implements Screen {
         // Si en algún momento querés liberar todo (salida del juego), llamar a Assets.disposeAll() desde Principal.
     }
 
-    protected boolean condicionDentro(int x, int y, Sprite sprite) {
-        return x >= sprite.getX() && x <= sprite.getX() + sprite.getWidth() &&
-                y >= sprite.getY() && y <= sprite.getY() + sprite.getHeight();
-    }
-
-    protected boolean condicionColor(boolean dentro, Sprite sprite) {
-        sprite.setColor(dentro ? this.colorAccion : this.colorBoton);
-        return dentro;
-    }
-
     protected void cambiarMenu(boolean dentro, Menu atrasAdelante) {
         if (dentro) {
             this.juego.actualizarPantalla(atrasAdelante);
         }
-    }
-
-    protected boolean condicionFlechas(Sprite flecha, int x, int y) {
-        float fx = flecha.getX();
-        float fy = flecha.getY();
-        float fAnc = flecha.getWidth();
-        float fAlt = flecha.getHeight();
-
-        boolean dentro = x >= fx && x <= fx + fAnc && y >= fy && y <= fy + fAlt;
-        flecha.setTexture(dentro ? this.flechaCursor : this.flecha);
-        return dentro;
     }
 }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
 import com.championsita.menus.menucarga.Carga;
+import com.championsita.menus.menuprincipal.GestorInputMenu;
 import com.championsita.menus.menuprincipal.Inicial;
 import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.compartido.Assets;
@@ -20,6 +21,9 @@ public class Doble extends Menu {
     private JugadorDos[] skinsIJKL;
     private int indiceWASD;
     private int indiceIJKL;
+
+    //Gestores-Herramientas
+    GestorInputMenu gestorMenu;
 
     private final String modoDestino; // "1v1" o "practica" según origen
 
@@ -52,6 +56,9 @@ public class Doble extends Menu {
 
         // Sonidos: 4 flechas + atrás + ok → 6 slots
         super.inicializarSonido(6);
+
+        //Inicializar Gestores-Herramientas
+        gestorMenu = new GestorInputMenu(this);
     }
 
     private Sprite crearSpriteJugador(String nombre, float x, float y) {
@@ -100,17 +107,17 @@ public class Doble extends Menu {
         boolean hit = false;
 
         for (int i = 0; i < super.flechas.length; i++) {
-            boolean dentro = super.condicionFlechas(super.flechas[i], x, y);
+            boolean dentro = gestorMenu.condicionFlechas(super.flechas[i], x, y);
             super.reproducirSonido(i, dentro);
             hit |= dentro;
         }
 
-        boolean dentroAtras = condicionDentro(x, y, super.atrasSprite);
-        condicionColor(dentroAtras, super.atrasSprite);
+        boolean dentroAtras = gestorMenu.condicionDentro(x, y, super.atrasSprite);
+        gestorMenu.condicionColor(dentroAtras, super.atrasSprite);
         super.reproducirSonido(4, dentroAtras);
 
-        boolean dentroOk = condicionDentro(x, y, super.siguienteSprite);
-        condicionColor(dentroOk, super.siguienteSprite);
+        boolean dentroOk = gestorMenu.condicionDentro(x, y, super.siguienteSprite);
+        gestorMenu.condicionColor(dentroOk, super.siguienteSprite);
         super.reproducirSonido(5, dentroOk);
 
         return hit || dentroAtras || dentroOk;
@@ -122,20 +129,20 @@ public class Doble extends Menu {
 
         // Flechas de selección
         for (int i = 0; i < super.flechas.length; i++) {
-            if (super.condicionFlechas(super.flechas[i], x, y)) {
+            if (gestorMenu.condicionFlechas(super.flechas[i], x, y)) {
                 cambiarSkin(i);
                 return true;
             }
         }
 
         // Atrás → volver a Inicial
-        if (condicionDentro(x, y, super.atrasSprite)) {
+        if (gestorMenu.condicionDentro(x, y, super.atrasSprite)) {
             super.cambiarMenu(true, new Inicial(super.juego));
             return true;
         }
 
         // OK → continuar a Carga con las skins elegidas y el modo de destino
-        if (condicionDentro(x, y, super.siguienteSprite)) {
+        if (gestorMenu.condicionDentro(x, y, super.siguienteSprite)) {
             super.juego.actualizarPantalla(new Carga(
                     super.juego,
                     skinsWASD[indiceWASD].getNombre(),

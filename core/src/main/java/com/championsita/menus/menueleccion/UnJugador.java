@@ -3,6 +3,7 @@ package com.championsita.menus.menueleccion;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
+import com.championsita.menus.menuprincipal.GestorInputMenu;
 import com.championsita.menus.menuprincipal.Inicial;
 import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.compartido.Assets;
@@ -32,6 +33,9 @@ public class UnJugador extends Menu {
     private String skinP2;
 
     private final String modoDestino; // normalmente "practica"
+
+    //Gestores y Herramientas
+    GestorInputMenu gestorMenu;
 
     public UnJugador(Principal juego, String modoDestino) {
         super(juego);
@@ -71,6 +75,9 @@ public class UnJugador extends Menu {
 
         // Sonidos: 4 flechas + atrás + ok => 6
         super.inicializarSonido(6);
+
+        //Inicializar Gestores/Herramientas
+        this.gestorMenu = new GestorInputMenu(this);
     }
 
     private Sprite crearSpriteJugador(String nombre, float x, float y) {
@@ -135,17 +142,17 @@ public class UnJugador extends Menu {
         boolean hit = false;
 
         for (int i = 0; i < super.flechas.length; i++) {
-            boolean dentro = super.condicionFlechas(super.flechas[i], x, y);
+            boolean dentro = gestorMenu.condicionFlechas(super.flechas[i], x, y);
             super.reproducirSonido(i, dentro);
             hit |= dentro;
         }
 
-        boolean dentroAtras = condicionDentro(x, y, super.atrasSprite);
-        condicionColor(dentroAtras, super.atrasSprite);
+        boolean dentroAtras = gestorMenu.condicionDentro(x, y, super.atrasSprite);
+        gestorMenu.condicionColor(dentroAtras, super.atrasSprite);
         super.reproducirSonido(4, dentroAtras);
 
-        boolean dentroOk = condicionDentro(x, y, super.siguienteSprite);
-        condicionColor(dentroOk, super.siguienteSprite);
+        boolean dentroOk = gestorMenu.condicionDentro(x, y, super.siguienteSprite);
+        gestorMenu.condicionColor(dentroOk, super.siguienteSprite);
         super.reproducirSonido(5, dentroOk);
 
         return hit || dentroAtras || dentroOk;
@@ -156,19 +163,19 @@ public class UnJugador extends Menu {
         y = Gdx.graphics.getHeight() - y;
 
         // Flechas
-        if (super.condicionFlechas(super.flechas[0], x, y)) { cambiarSkin(false); return true; } // skin izq
-        if (super.condicionFlechas(super.flechas[1], x, y)) { cambiarSkin(true);  return true; } // skin der
-        if (super.condicionFlechas(super.flechas[2], x, y)) { cambiarCampo(false); return true; } // campo izq
-        if (super.condicionFlechas(super.flechas[3], x, y)) { cambiarCampo(true);  return true; } // campo der
+        if (gestorMenu.condicionFlechas(super.flechas[0], x, y)) { cambiarSkin(false); return true; } // skin izq
+        if (gestorMenu.condicionFlechas(super.flechas[1], x, y)) { cambiarSkin(true);  return true; } // skin der
+        if (gestorMenu.condicionFlechas(super.flechas[2], x, y)) { cambiarCampo(false); return true; } // campo izq
+        if (gestorMenu.condicionFlechas(super.flechas[3], x, y)) { cambiarCampo(true);  return true; } // campo der
 
         // Atrás → volver a Inicial
-        if (condicionDentro(x, y, super.atrasSprite)) {
+        if (gestorMenu.condicionDentro(x, y, super.atrasSprite)) {
             super.cambiarMenu(true, new Inicial(super.juego));
             return true;
         }
 
         // OK → construir config y entrar directo a la partida
-        if (condicionDentro(x, y, super.siguienteSprite)) {
+        if (gestorMenu.condicionDentro(x, y, super.siguienteSprite)) {
             ControladorDePartida.Config cfg = new ControladorDePartida.Config.Builder()
                     .agregarSkin(skinP1)
                     .agregarSkin(skinP2)

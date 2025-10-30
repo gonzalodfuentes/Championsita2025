@@ -6,6 +6,7 @@ import com.championsita.Principal;
 import com.championsita.menus.menucarga.Carga;
 import com.championsita.menus.menueleccion.Doble;
 import com.championsita.menus.menueleccion.UnJugador;
+import com.championsita.menus.menuprincipal.GestorInputMenu;
 import com.championsita.menus.menuprincipal.Inicial;
 import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.compartido.Assets;
@@ -15,6 +16,7 @@ public class Local extends Menu {
     private Sprite[] botones; // [0]=2 Jugadores, [1]=Práctica
     private float anchoBoton;
     private float altoBoton;
+    GestorInputMenu gestorMenu;
 
     public Local(Principal juego) { super(juego); }
 
@@ -44,6 +46,9 @@ public class Local extends Menu {
 
         // Sonidos: 2 botones + 1 atrás
         super.inicializarSonido(3);
+
+        //Inicializacion Gestores-Herramientas
+        gestorMenu = new GestorInputMenu(this);
     }
 
     @Override
@@ -68,15 +73,15 @@ public class Local extends Menu {
 
         // Hover de botones
         for (int i = 0; i < botones.length; i++) {
-            boolean dentro = condicionDentro(x, y, botones[i]);
-            condicionColor(dentro, botones[i]);
+            boolean dentro = gestorMenu.condicionDentro(x, y, botones[i]);
+            gestorMenu.condicionColor(dentro, botones[i]);
             super.reproducirSonido(i, dentro);
             hit |= dentro;
         }
 
         // Hover de atrás (índice 2)
-        boolean dentroAtras = condicionDentro(x, y, super.atrasSprite);
-        condicionColor(dentroAtras, super.atrasSprite);
+        boolean dentroAtras = gestorMenu.condicionDentro(x, y, super.atrasSprite);
+        gestorMenu.condicionColor(dentroAtras, super.atrasSprite);
         super.reproducirSonido(2, dentroAtras);
 
         return hit || dentroAtras;
@@ -87,19 +92,19 @@ public class Local extends Menu {
         y = Gdx.graphics.getHeight() - y;
 
         // 0) 2 Jugadores → flujo existente (pantalla Doble)
-        if (condicionDentro(x, y, botones[0])) {
+        if (gestorMenu.condicionDentro(x, y, botones[0])) {
             super.juego.actualizarPantalla(new Doble(super.juego, "1v1"));
             return true;
         }
 
         // 1) Práctica → placeholder; no navega aún
-        if (condicionDentro(x, y, botones[1])) {
+        if (gestorMenu.condicionDentro(x, y, botones[1])) {
             super.juego.actualizarPantalla(new UnJugador(super.juego, "practica"));
             return true;
         }
 
         // Atrás → volver al menú inicial
-        if (condicionDentro(x, y, super.atrasSprite)) {
+        if (gestorMenu.condicionDentro(x, y, super.atrasSprite)) {
             super.cambiarMenu(true, new Inicial(super.juego));
             return true;
         }
