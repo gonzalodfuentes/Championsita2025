@@ -23,6 +23,8 @@ import com.championsita.partida.modosdejuego.implementaciones.Practica;
 import com.championsita.partida.modosdejuego.implementaciones.UnoContraUno;
 import com.championsita.partida.nucleo.Contexto;
 
+import java.util.ArrayList;
+
 /**
  * Controla la ejecución de una partida, independiente del modo.
  * Se encarga de preparar el contexto y delegar la lógica al modo elegido.
@@ -34,16 +36,14 @@ public class ControladorDePartida implements Screen {
      * desde menús sin depender de múltiples clases sueltas.
      */
     public static class Config {
-        public final String jugador1Skin;
-        public final String jugador2Skin;
+        public final ArrayList<String> skinsJugadores;
         public final Campo campo;
         public final OpcionDeGoles goles;
         public final OpcionDeTiempo tiempo;
         public final String modo; // "practica", "1v1", etc.
 
         private Config(Builder b) {
-            this.jugador1Skin = b.jugador1Skin;
-            this.jugador2Skin = b.jugador2Skin;
+            this.skinsJugadores = b.skinsJugadores;
             this.campo = b.campo;
             this.goles = b.goles;
             this.tiempo = b.tiempo;
@@ -51,22 +51,20 @@ public class ControladorDePartida implements Screen {
         }
 
         public static class Builder {
-            private String jugador1Skin;
-            private String jugador2Skin;
+            public ArrayList<String> skinsJugadores = new ArrayList<>();
             private Campo campo;
             private OpcionDeGoles goles = OpcionDeGoles.UNO;
             private OpcionDeTiempo tiempo = OpcionDeTiempo.CORTO;
             private String modo = "practica";
 
-            public Builder jugador1Skin(String v) { this.jugador1Skin = v; return this; }
-            public Builder jugador2Skin(String v) { this.jugador2Skin = v; return this; }
+            public Builder agregarSkin(String skin) {this.skinsJugadores.add(skin); return this; }
             public Builder campo(Campo v) { this.campo = v; return this; }
             public Builder goles(OpcionDeGoles v) { this.goles = v; return this; }
             public Builder tiempo(OpcionDeTiempo v) { this.tiempo = v; return this; }
             public Builder modo(String v) { this.modo = v; return this; }
 
             public Config build() {
-                if (jugador1Skin == null || jugador2Skin == null || campo == null) {
+                if (skinsJugadores.isEmpty() || campo == null) {
                     throw new IllegalStateException("Faltan datos obligatorios en Config (skins/campo)");
                 }
                 return new Config(this);
@@ -81,12 +79,10 @@ public class ControladorDePartida implements Screen {
     private Texture texturaCancha;
     private FitViewport viewport;
 
-    private Personaje jugador1;
-    private Personaje jugador2;
+    private final ArrayList<Personaje> jugadores = new ArrayList<>();
     private Pelota pelota;
 
-    private DibujadorJugador dibJugador1;
-    private DibujadorJugador dibJugador2;
+    private ArrayList<DibujadorJugador> dibujadoresJugadores = new ArrayList<>();
     private DibujadorPelota dibPelota;
 
     private SistemaFisico fisica;
@@ -102,18 +98,8 @@ public class ControladorDePartida implements Screen {
         crearEntidades();
 
         // Crear contexto común
-        Contexto ctx = new Contexto(viewport, batch, texturaCancha, fisica, colisiones);
-        ctx.jugador1 = jugador1;
-        ctx.jugador2 = jugador2;
+        Contexto ctx = new Contexto(viewport, batch, texturaCancha, fisica, colisiones, jugadores);
         ctx.pelota = pelota;
-
-        // Selección del modo
-        String m = config.modo == null ? "practica" : config.modo.toLowerCase();
-        switch (m) {
-            case "1v1", "dosjug", "2jug", "1vs1" -> this.modoJuego = new UnoContraUno();
-            case "practica" -> this.modoJuego = new Practica();
-            default -> this.modoJuego = new Practica();
-        }
 
         modoJuego.iniciar(ctx);
         Gdx.input.setInputProcessor(modoJuego.getProcesadorEntrada());
@@ -133,8 +119,9 @@ public class ControladorDePartida implements Screen {
         batch.draw(texturaCancha, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
 
         // Entidades principales
-        dibJugador1.dibujar(batch);
-        dibJugador2.dibujar(batch);
+        for(DibujadorJugador dibujador : dibujadoresJugadores) {
+            dibujador.dibujar(batch);
+        }
         dibPelota.dibujar(batch);
 
         // Dibujo propio del modo (HUD o indicadores)
@@ -144,27 +131,36 @@ public class ControladorDePartida implements Screen {
     }
 
     private void inicializarBase() {
+        // Selección del modo
+        String m = config.modo == null ? "practica" : config.modo.toLowerCase();
+        switch (m) {
+            case "1v1", "dosjug", "2jug", "1vs1" -> this.modoJuego = new UnoContraUno();
+            default -> this.modoJuego = new Practica();
+        }
         batch = new SpriteBatch();
         // Carga de textura de cancha a partir del enum Campo
         String nombreCampo = config.campo.getNombre();
         texturaCancha = new Texture("campos/campo" + nombreCampo + ".png");
         viewport = new FitViewport(Constantes.MUNDO_ANCHO, Constantes.MUNDO_ALTO);
-
         fisica = new SistemaFisico();
         colisiones = new SistemaColisiones();
     }
 
     private void crearEntidades() {
-        // Configurar personajes según skins
-        ConfiguracionPersonaje c1 = ConfiguracionPersonaje.porDefecto(config.jugador1Skin);
-        ConfiguracionPersonaje c2 = ConfiguracionPersonaje.porDefecto(config.jugador2Skin);
+        jugadores.clear();
+        int cantidadDeJugadores = this.modoJuego.getCantidadDeJugadores();
+        ArrayList<ConfiguracionPersonaje> ConfiguracionPersonajes = new ArrayList<>();
 
-        jugador1 = new Normal("Jugador 1", c1, Constantes.ESCALA_PERSONAJE);
-        jugador2 = new Normal("Jugador 2", c2, Constantes.ESCALA_PERSONAJE);
+        for(int i = 0; i < cantidadDeJugadores; i++ ){
+            ConfiguracionPersonajes.add(ConfiguracionPersonaje.porDefecto(config.skinsJugadores.get(i)));
+            jugadores.add(new Normal("Jugador" + (i+1), ConfiguracionPersonajes.get(i), Constantes.ESCALA_PERSONAJE));
+        }
+
         pelota = new Pelota(Constantes.MUNDO_ANCHO / 2f, Constantes.MUNDO_ALTO / 2f, Constantes.ESCALA_PELOTA);
 
-        dibJugador1 = new DibujadorJugador(jugador1);
-        dibJugador2 = new DibujadorJugador(jugador2);
+        for (int i = 0; i < ConfiguracionPersonajes.size(); i++) {
+            dibujadoresJugadores.add(new DibujadorJugador(jugadores.get(i)));
+        }
         dibPelota = new DibujadorPelota(pelota);
     }
 

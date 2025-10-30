@@ -3,10 +3,13 @@ package com.championsita.partida.nucleo;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.championsita.jugabilidad.entrada.EntradaJugador;
 import com.championsita.jugabilidad.modelo.Pelota;
 import com.championsita.jugabilidad.modelo.Personaje;
 import com.championsita.jugabilidad.sistemas.SistemaColisiones;
 import com.championsita.jugabilidad.sistemas.SistemaFisico;
+
+import java.util.ArrayList;
 
 /**
  * Contiene las referencias principales de una partida.
@@ -26,19 +29,21 @@ public class Contexto {
     public final SistemaColisiones colisiones;
 
     // Entidades
-    public Personaje jugador1;
-    public Personaje jugador2;
+    public ArrayList<Personaje> jugadores;
+    public ArrayList<EntradaJugador> controles = new ArrayList<>();
     public Pelota pelota;
 
     public Contexto(FitViewport viewport,
-                           SpriteBatch batch,
-                           Texture texturaCancha,
-                           SistemaFisico fisica,
-                           SistemaColisiones colisiones) {
+                    SpriteBatch batch,
+                    Texture texturaCancha,
+                    SistemaFisico fisica,
+                    SistemaColisiones colisiones,
+                    ArrayList<Personaje> jugadores) {
         this.viewport = viewport;
         this.batch = batch;
         this.texturaCancha = texturaCancha;
         this.fisica = fisica;
         this.colisiones = colisiones;
+        this.jugadores = jugadores;
     }
 }

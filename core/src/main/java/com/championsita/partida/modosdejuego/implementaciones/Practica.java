@@ -14,48 +14,48 @@ import com.championsita.partida.modosdejuego.ModoDeJuego;
 public class Practica implements ModoDeJuego {
 
     private Contexto ctx;
-    private EntradaJugador entradaJugador1;
     private boolean terminado = false;
+    private int cantidadDeJugadores = 1;
 
     @Override
     public void iniciar(Contexto contexto) {
         this.ctx = contexto;
 
         // Posicionamiento inicial recomendado para práctica
-        if (ctx.jugador1 != null) ctx.jugador1.setPosicion(2.0f, 2.5f);
-
-        // Ocultar jugador2 de la escena por ahora (no se usa en este modo)
-        if (ctx.jugador2 != null) ctx.jugador2.setPosicion(-1000f, -1000f);
+        if (ctx.jugadores.get(0) != null) ctx.jugadores.get(0).setPosicion(2.0f, 2.5f);
 
         // Entrada solo para jugador1 (WASD + CTRL/SHIFT izquierdos)
-        this.entradaJugador1 = new EntradaJugador(
-                ctx.jugador1,
-                Keys.W, Keys.S, Keys.A, Keys.D,
-                Keys.CONTROL_LEFT, Keys.SHIFT_LEFT
+        ctx.controles.add(
+                new EntradaJugador(
+                        ctx.jugadores.get(0),
+                        Keys.W, Keys.S, Keys.A, Keys.D,
+                        Keys.CONTROL_LEFT,
+                        Keys.SHIFT_LEFT
+                )
         );
     }
 
     @Override
     public void actualizar(float delta) {
         // Entrada
-        if (entradaJugador1 != null) entradaJugador1.actualizar(delta);
+        if (ctx.controles.get(0) != null) ctx.controles.get(0).actualizar(delta);
 
         // Físicas jugador1
-        ctx.fisica.actualizarPersonaje(ctx.jugador1, delta);
+        ctx.fisica.actualizarPersonaje(ctx.jugadores.get(0), delta);
 
         // Límites de mundo
         float W = ctx.viewport.getWorldWidth();
         float H = ctx.viewport.getWorldHeight();
-        ctx.fisica.limitarPersonajeAlMundo(ctx.jugador1, W, H);
+        ctx.fisica.limitarPersonajeAlMundo(ctx.jugadores.get(0), W, H);
 
         // Colisión jugador1 ↔ pelota
-        ctx.colisiones.procesarContactoPelotaConJugador(ctx.pelota, ctx.jugador1);
+        ctx.colisiones.procesarContactoPelotaConJugador(ctx.pelota, ctx.jugadores.get(0));
 
         // Físicas de la pelota
         ctx.fisica.actualizarPelota(ctx.pelota, delta);
 
         // Este modo no finaliza automáticamente
-        // terminado = false;
+        terminado = false;
     }
 
     @Override
@@ -66,12 +66,17 @@ public class Practica implements ModoDeJuego {
 
     @Override
     public InputProcessor getProcesadorEntrada() {
-        return this.entradaJugador1;
+        return ctx.controles.get(0);
     }
 
     @Override
     public boolean finalizado() {
         return terminado;
+    }
+
+    @Override
+    public int getCantidadDeJugadores() {
+        return cantidadDeJugadores;
     }
 
     @Override

@@ -27,4 +27,7 @@ public interface ModoDeJuego {
 
     // Libera los recursos propios del modo.
     void liberar();
+
+    // Proporcionar cantidad de jugadores para el ControladorDePartida
+    int getCantidadDeJugadores();
 }

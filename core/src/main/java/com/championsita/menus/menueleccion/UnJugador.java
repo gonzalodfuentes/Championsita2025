@@ -170,8 +170,8 @@ public class UnJugador extends Menu {
         // OK → construir config y entrar directo a la partida
         if (condicionDentro(x, y, super.siguienteSprite)) {
             ControladorDePartida.Config cfg = new ControladorDePartida.Config.Builder()
-                    .jugador1Skin(skinP1)
-                    .jugador2Skin(skinP2)         // builder lo requiere
+                    .agregarSkin(skinP1)
+                    .agregarSkin(skinP2)
                     .campo(campos[idxCampo])      // requerido
                     // goles y tiempo quedan con defaults del builder (UNO / CORTO)
                     .modo(modoDestino == null ? "practica" : modoDestino)

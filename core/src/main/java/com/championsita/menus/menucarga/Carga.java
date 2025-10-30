@@ -226,8 +226,8 @@ public class Carga extends Menu {
         if (hit(super.siguienteSprite, x, y)) {
             // Construye Config para el Controlador directamente
             ControladorDePartida.Config config = new ControladorDePartida.Config.Builder()
-                    .jugador1Skin(this.pielJugador1)
-                    .jugador2Skin(this.pielJugador2)
+                    .agregarSkin(pielJugador1)
+                    .agregarSkin(pielJugador2)
                     .campo(listaCampos[indiceCampo])
                     .goles(mapGoles(opcionesGoles[indiceGoles]))
                     .tiempo(mapTiempo(opcionesTiempo[indiceTiempo]))
