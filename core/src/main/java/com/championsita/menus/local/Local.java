@@ -6,19 +6,17 @@ import com.championsita.Principal;
 import com.championsita.menus.menucarga.Carga;
 import com.championsita.menus.menueleccion.Doble;
 import com.championsita.menus.menueleccion.UnJugador;
-import com.championsita.menus.menuprincipal.GestorInputMenu;
-import com.championsita.menus.menuprincipal.Inicial;
-import com.championsita.menus.menuprincipal.Menu;
+import com.championsita.menus.menuprincipal.*;
 import com.championsita.menus.compartido.Assets;
-import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
 
 public class Local extends Menu {
 
     private Sprite[] botones; // [0]=2 Jugadores, [1]=Práctica
     private float anchoBoton;
     private float altoBoton;
-    GestorInputMenu gestorMenu;
-    RenderizadorDeMenu renderizador;
+    private GestorInputMenu gestorMenu;
+    private RenderizadorDeMenu renderizador;
+    private GestorSonidoMenu gestorSonido;
 
     public Local(Principal juego) { super(juego); }
 
@@ -47,7 +45,7 @@ public class Local extends Menu {
         }
 
         // Sonidos: 2 botones + 1 atrás
-        super.inicializarSonido(3);
+        gestorSonido.inicializarSonido(3);
 
         //Inicializacion Gestores-Herramientas
         gestorMenu = new GestorInputMenu(this);
@@ -72,14 +70,14 @@ public class Local extends Menu {
         for (int i = 0; i < botones.length; i++) {
             boolean dentro = gestorMenu.condicionDentro(x, y, botones[i]);
             gestorMenu.condicionColor(dentro, botones[i]);
-            super.reproducirSonido(i, dentro);
+            gestorSonido.reproducirSonido(i, dentro);
             hit |= dentro;
         }
 
         // Hover de atrás (índice 2)
         boolean dentroAtras = gestorMenu.condicionDentro(x, y, super.atrasSprite);
         gestorMenu.condicionColor(dentroAtras, super.atrasSprite);
-        super.reproducirSonido(2, dentroAtras);
+        gestorSonido.reproducirSonido(2, dentroAtras);
 
         return hit || dentroAtras;
     }

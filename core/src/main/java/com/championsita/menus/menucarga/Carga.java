@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.audio.Sound;
 import com.championsita.Principal;
 import com.championsita.menus.menuprincipal.GestorInputMenu;
+import com.championsita.menus.menuprincipal.GestorSonidoMenu;
 import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.menueleccion.Doble;
 import com.championsita.menus.compartido.Assets;
@@ -76,6 +77,7 @@ public class Carga extends Menu {
     //Gestores-Herramientas
     private GestorInputMenu gestorMenu;
     private RenderizadorDeMenu renderizador;
+    private GestorSonidoMenu gestorSonido;
 
     public Carga(Principal juego, String pielUno, String pielDos, String modo) {
         super(juego);
@@ -151,7 +153,7 @@ public class Carga extends Menu {
         this.tiempoXY = new float[]{ this.cartelTiempo.getX(), this.cartelTiempo.getY() };
 
         this.hoverSound = super.sonido;
-        super.inicializarSonido(2);
+        gestorSonido.inicializarSonido(2);
 
         Gdx.input.setInputProcessor(this);
 
@@ -190,11 +192,11 @@ public class Carga extends Menu {
 
         boolean dentroAtras = hit(super.atrasSprite, x, y);
         gestorMenu.condicionColor(dentroAtras, super.atrasSprite);
-        super.reproducirSonido(0, dentroAtras);
+        gestorSonido.reproducirSonido(0, dentroAtras);
 
         boolean dentroJugar = hit(super.siguienteSprite, x, y);
         gestorMenu.condicionColor(dentroJugar, super.siguienteSprite);
-        super.reproducirSonido(1, dentroJugar);
+        gestorSonido.reproducirSonido(1, dentroJugar);
 
         updateFlechaHover(flechaIzq, x, y, true);
         updateFlechaHover(flechaDer, x, y, false);
