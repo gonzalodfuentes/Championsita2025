@@ -6,13 +6,20 @@
 package com.championsita.jugabilidad.sistemas;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.championsita.jugabilidad.modelo.Arco;
-import com.championsita.jugabilidad.modelo.Cancha;
-import com.championsita.jugabilidad.modelo.Pelota;
+import com.championsita.jugabilidad.modelo.*;
+import com.championsita.partida.ControladorDePartida;
+
+import static com.championsita.jugabilidad.modelo.HabilidadesEspeciales.EXTREMISTA;
 
 public class SistemaPartido {
     float notadorEquipo1 = 0.0F;
     float notadorEquipo2 = 0.0F;
+
+    private ControladorDePartida controlador;
+
+    public SistemaPartido(ControladorDePartida controlador) {
+        this.controlador = controlador;
+    }
 
     public boolean checkGol(Pelota pelota, Arco arco) {
 
@@ -54,10 +61,33 @@ public class SistemaPartido {
             this.reiniciarPelota(pelota);
         }
 
+        // ============================================
+        // EXTREMISTA: aplicar buff/debuff por gol
+        // ============================================
+
+        Personaje personajeQueMetioGol = pelota.getUltimoJugadorQueToco();
+        Equipo meteGol = personajeQueMetioGol.getEquipo();
+        Equipo recibeGol = (meteGol == Equipo.ROJO) ? Equipo.AZUL : Equipo.ROJO;
+
+        for (Personaje pj : controlador.getJugadoresDelEquipo(meteGol)){
+            if (pj.getHabilidadActual() == EXTREMISTA) {
+                pj.activarBuffVelocidad(10f);
+            }
+        }
+
+        for (Personaje pj : controlador.getJugadoresDelEquipo(recibeGol)) {
+            if (pj.getHabilidadActual() == EXTREMISTA) {
+                pj.activarDebuffVelocidad(10f);
+            }
+        }
+
+
     }
 
     public void reiniciarPelota(Pelota pelota) {
         pelota.detenerPelota();
         pelota.setPosicion(4.0F, 2.5F);
     }
+
+
 }

@@ -8,10 +8,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.championsita.jugabilidad.constantes.Constantes;
-import com.championsita.jugabilidad.modelo.Cancha;
-import com.championsita.jugabilidad.modelo.ConfiguracionPersonaje;
-import com.championsita.jugabilidad.modelo.Pelota;
-import com.championsita.jugabilidad.modelo.Personaje;
+import com.championsita.jugabilidad.modelo.*;
 import com.championsita.jugabilidad.personajes.Normal;
 import com.championsita.jugabilidad.sistemas.SistemaColisiones;
 import com.championsita.jugabilidad.sistemas.SistemaFisico;
@@ -27,6 +24,7 @@ import com.championsita.partida.modosdejuego.implementaciones.UnoContraUno;
 import com.championsita.partida.nucleo.Contexto;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controla la ejecución de una partida, independiente del modo.
@@ -158,7 +156,7 @@ public class ControladorDePartida implements Screen {
         viewport = new FitViewport(Constantes.MUNDO_ANCHO, Constantes.MUNDO_ALTO);
         fisica = new SistemaFisico();
         colisiones = new SistemaColisiones();
-        partido = new SistemaPartido();
+        partido = new SistemaPartido(this);
     }
 
     private void crearEntidades() {
@@ -195,5 +193,17 @@ public class ControladorDePartida implements Screen {
         if (batch != null) batch.dispose();
         if (texturaCancha != null) texturaCancha.dispose();
         if (modoJuego != null) modoJuego.liberar();
+    }
+
+    public ArrayList<Personaje> getJugadoresDelEquipo(Equipo equipo) {
+        ArrayList<Personaje> lista = new ArrayList<>();
+
+        for (Personaje pj : jugadores) {
+            if (pj.getEquipo() == equipo) {
+                lista.add(pj);
+            }
+        }
+
+        return lista;
     }
 }

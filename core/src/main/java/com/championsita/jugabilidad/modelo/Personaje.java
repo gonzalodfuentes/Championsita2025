@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.championsita.jugabilidad.sistemas.DiccionarioHabilidades;
+import com.championsita.jugabilidad.sistemas.ModificadorHabilidad;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -24,6 +26,9 @@ public abstract class Personaje {
     private final float  escala;
     private final AtributosPersonaje atributos;
     private final ConfiguracionPersonaje sprites;
+    private Equipo equipo;
+
+
 
     // =========================
     // Estado de stamina/sprint
@@ -42,6 +47,7 @@ public abstract class Personaje {
     private float tiempoAnimacion = 0f; // stateTime
     private boolean estaMoviendo = false;
     private boolean espacioPresionado = false;
+    private boolean sprintActivo = false;
     private Direccion direccionActual = Direccion.ABAJO;
 
 
@@ -58,6 +64,20 @@ public abstract class Personaje {
     private Texture sheetDerecha, sheetIzquierda, sheetArriba, sheetAbajo,
                     sheetArribaDerecha, sheetArribaIzquierda,
                     sheetAbajoDerecha,  sheetAbajoIzquierda;
+
+    // =========================
+// Habilidades especiales
+// =========================
+    private HabilidadesEspeciales habilidadActual = HabilidadesEspeciales.NEUTRO;
+
+    // Modificador que contiene todos los cambios de esa habilidad
+    private ModificadorHabilidad modificador = DiccionarioHabilidades.obtener(HabilidadesEspeciales.NEUTRO);
+
+    // Timers de efectos especiales
+    private float timerCongelado = 0f;   // PEQUEÑIN
+    private float timerLentitud = 0f;    // ATLETA
+    private float timerBuffVelocidad = 0f;  // EXTREMISTA (+25%)
+    private float timerDebuffVelocidad = 0f; // EXTREMISTA (-25%)
 
 
     private final Map<Direccion, Animation<TextureRegion>> animaciones = new EnumMap<>(Direccion.class);
@@ -147,6 +167,47 @@ public abstract class Personaje {
     }
 
     private void actualizarVelocidadYStamina(boolean sprint, float delta) {
+
+        // ============================================
+        // 0. Reducir timers si están activos
+        // ============================================
+        if (timerCongelado > 0) {
+            timerCongelado -= delta;
+            if (timerCongelado < 0) timerCongelado = 0;
+        }
+
+        if (timerLentitud > 0) {
+            timerLentitud -= delta;
+            if (timerLentitud < 0) timerLentitud = 0;
+        }
+
+        if (timerBuffVelocidad > 0) {
+            timerBuffVelocidad -= delta;
+            if (timerBuffVelocidad < 0) timerBuffVelocidad = 0;
+        }
+
+        if (timerDebuffVelocidad > 0) {
+            timerDebuffVelocidad -= delta;
+            if (timerDebuffVelocidad < 0) timerDebuffVelocidad = 0;
+        }
+
+        // ============================================
+        // 1. CONGELAMIENTO — PEQUEÑÍN
+        // ============================================
+        if (habilidadActual == HabilidadesEspeciales.PEQUEÑIN && staminaActual <= 0) {
+            if (timerCongelado <= 0) {
+                timerCongelado = 1.0f;   // 1 segundo congelado
+            }
+        }
+
+        if (timerCongelado > 0) {
+            distanciaEsteFrame = 0; // NO SE PUEDE MOVER
+            return;
+        }
+
+        // ============================================
+        // 2. Calcular velocidad BASE o SPRINT
+        // ============================================
         float velocidad = atributos.getVelocidadBase();
 
         if (sprint && staminaActual > 0f) {
@@ -154,14 +215,14 @@ public abstract class Personaje {
             staminaActual -= atributos.getConsumoSprintPorSegundo() * delta;
             if (staminaActual < 0f) staminaActual = 0f;
 
-            // Si cae por debajo del límite, reducir a base y bloquear recarga un rato
+            // Si cayó bajo el límite, aplicar bloqueo
             if (staminaActual < atributos.getLimiteStaminaBloqueo()) {
                 velocidad = atributos.getVelocidadBase();
-                bloqueoRecarga       = true;
+                bloqueoRecarga = true;
                 tiempoBloqueoRecarga = 0f;
             }
         } else {
-            // Si veníamos bloqueados, esperamos a que pase el tiempo de bloqueo
+            // Recarga o bloqueo
             if (bloqueoRecarga) {
                 if (!sprint) {
                     tiempoBloqueoRecarga += delta;
@@ -170,14 +231,35 @@ public abstract class Personaje {
                     }
                 }
             } else {
-                // Recarga normal
                 staminaActual += atributos.getRecargaStaminaPorSegundo() * delta;
                 if (staminaActual > atributos.getStaminaMaxima()) staminaActual = atributos.getStaminaMaxima();
             }
         }
 
+        // ============================================
+        // 3. LENTITUD — ATLETA
+        // ============================================
+        if (habilidadActual == HabilidadesEspeciales.ATLETA && staminaActual <= 0) {
+            if (timerLentitud <= 0) {
+                timerLentitud = 2.0f;  // 2 segundos lento
+            }
+        }
+        if (timerLentitud > 0) {
+            velocidad *= 0.6f; // aplicar lentitud
+        }
+
+        // ============================================
+        // 4. EXTREMISTA — Buff y Debuff
+        // ============================================
+        if (timerBuffVelocidad > 0) velocidad *= 1.25f;
+        if (timerDebuffVelocidad > 0) velocidad *= 0.75f;
+
+        // ============================================
+        // 5. Guardar distancia final del frame
+        // ============================================
         distanciaEsteFrame = velocidad * delta;
     }
+
 
     private void moverYActualizarDireccion(boolean izquierda, boolean derecha, boolean arriba, boolean abajo) {
         estaMoviendo = izquierda || derecha || arriba || abajo;
@@ -202,6 +284,52 @@ public abstract class Personaje {
         hitbox.setPosition(x + hbOffsetX, y + hbOffsetY);
     }
 
+    public void asignarHabilidad(HabilidadesEspeciales habilidad) {
+        this.habilidadActual = habilidad;
+        this.modificador = DiccionarioHabilidades.obtener(habilidad);
+
+        // Resetear timers por si el personaje cambia de habilidad (modo especial)
+        timerCongelado = 0f;
+        timerLentitud = 0f;
+        timerBuffVelocidad = 0f;
+        timerDebuffVelocidad = 0f;
+    }
+
+    public void aplicarEfectosPermanentesDeHabilidad() {
+
+        // === 1. Reescalar sprite (ancho / alto) ===
+        this.ancho *= modificador.escalaSprite;
+        this.alto  *= modificador.escalaSprite;
+
+        // === 2. Reescalar hitbox ===
+        this.hbAncho *= modificador.escalaSprite;
+        this.hbAlto  *= modificador.escalaSprite;
+        hitbox.setSize(hbAncho, hbAlto);
+
+        // === 3. Actualizar atributos del personaje ===
+        atributos.update(
+                atributos.getVelocidadBase() * modificador.velocidadBase,
+                atributos.getVelocidadSprint() * modificador.velocidadSprint,
+                atributos.getStaminaMaxima() * modificador.staminaMax,
+                atributos.getConsumoSprintPorSegundo() * modificador.consumoSprint,
+                atributos.getRecargaStaminaPorSegundo() * modificador.recargaStamina,
+                atributos.getLimiteStaminaBloqueo(),
+                atributos.getTiempoBloqueoRecargaSegundos()
+        );
+
+        // === 4. Reset de stamina al nuevo máximo ===
+        this.staminaActual = atributos.getStaminaMaxima();
+    }
+
+    public void activarBuffVelocidad(float duracion) {
+        timerBuffVelocidad = duracion;
+    }
+
+    public void activarDebuffVelocidad(float duracion) {
+        timerDebuffVelocidad = duracion;
+    }
+
+
     // =========================
     // API pública (llamada por el Intérprete de Entrada)
     // =========================
@@ -209,6 +337,7 @@ public abstract class Personaje {
                                         boolean sprint, float delta) {
         actualizarVelocidadYStamina(sprint, delta);
         moverYActualizarDireccion(izquierda, derecha, arriba, abajo);
+        this.sprintActivo = sprint;
     }
 
     // Compatibilidad con código antiguo (sin sprint)
@@ -219,6 +348,10 @@ public abstract class Personaje {
 
     public void actualizar(float delta) {
         if (estaMoviendo) tiempoAnimacion += delta;
+        if (timerCongelado > 0) timerCongelado -= delta;
+        if (timerLentitud > 0) timerLentitud -= delta;
+        if (timerBuffVelocidad > 0) timerBuffVelocidad -= delta;
+        if (timerDebuffVelocidad > 0) timerDebuffVelocidad -= delta;
     }
 
     public void dibujar(SpriteBatch pincel) {
@@ -270,6 +403,12 @@ public abstract class Personaje {
                 : frameQuieto;
     }
 
+    public HabilidadesEspeciales getHabilidadActual() { return habilidadActual; }
+
+    public void setEquipo(Equipo eq){};
+    public Equipo getEquipo(){};
+
+
     // =========================
     // Limpieza de recursos
     // =========================
@@ -284,5 +423,9 @@ public abstract class Personaje {
         if (sheetArribaIzquierda != null) sheetArribaIzquierda.dispose();
         if (sheetAbajoDerecha != null)    sheetAbajoDerecha.dispose();
         if (sheetAbajoIzquierda != null)  sheetAbajoIzquierda.dispose();
+    }
+
+    public boolean estaSprintPresionado() {
+        return sprintActivo;
     }
 }
