@@ -54,6 +54,8 @@ public class Practica implements ModoDeJuego {
         // Físicas de la pelota
         ctx.fisica.actualizarPelota(ctx.pelota, delta);
 
+        ctx.partido.verificarSiHayGol(ctx.pelota, ctx.cancha);
+
         // Este modo no finaliza automáticamente
         terminado = false;
     }

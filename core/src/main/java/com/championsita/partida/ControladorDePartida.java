@@ -4,15 +4,18 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.championsita.jugabilidad.constantes.Constantes;
+import com.championsita.jugabilidad.modelo.Cancha;
 import com.championsita.jugabilidad.modelo.ConfiguracionPersonaje;
 import com.championsita.jugabilidad.modelo.Pelota;
 import com.championsita.jugabilidad.modelo.Personaje;
 import com.championsita.jugabilidad.personajes.Normal;
 import com.championsita.jugabilidad.sistemas.SistemaColisiones;
 import com.championsita.jugabilidad.sistemas.SistemaFisico;
+import com.championsita.jugabilidad.sistemas.SistemaPartido;
 import com.championsita.jugabilidad.visuales.DibujadorJugador;
 import com.championsita.jugabilidad.visuales.DibujadorPelota;
 import com.championsita.menus.compartido.OpcionDeGoles;
@@ -78,15 +81,18 @@ public class ControladorDePartida implements Screen {
     private SpriteBatch batch = new SpriteBatch();
     private Texture texturaCancha;
     private FitViewport viewport;
+    private ShapeRenderer renderizadorDeFormas;
 
     private final ArrayList<Personaje> jugadores = new ArrayList<>();
     private Pelota pelota;
+    Cancha cancha;
 
     private ArrayList<DibujadorJugador> dibujadoresJugadores = new ArrayList<>();
     private DibujadorPelota dibPelota;
 
     private SistemaFisico fisica;
     private SistemaColisiones colisiones;
+    private SistemaPartido partido;
 
     public ControladorDePartida(Config config) {
         this.config = config;
@@ -98,7 +104,7 @@ public class ControladorDePartida implements Screen {
         crearEntidades();
 
         // Crear contexto común
-        Contexto ctx = new Contexto(viewport, batch, texturaCancha, fisica, colisiones, jugadores);
+        Contexto ctx = new Contexto(viewport, batch, cancha ,fisica, colisiones, partido, jugadores);
         ctx.pelota = pelota;
 
         modoJuego.iniciar(ctx);
@@ -116,7 +122,7 @@ public class ControladorDePartida implements Screen {
         batch.begin();
 
         // Fondo (cancha)
-        batch.draw(texturaCancha, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+        cancha.dibujarCancha(batch, viewport);
 
         // Entidades principales
         for(DibujadorJugador dibujador : dibujadoresJugadores) {
@@ -128,6 +134,13 @@ public class ControladorDePartida implements Screen {
         modoJuego.renderizar(batch);
 
         batch.end();
+
+        //Dibujamos los arcos
+        renderizadorDeFormas.setProjectionMatrix(viewport.getCamera().combined);
+        renderizadorDeFormas.begin(ShapeRenderer.ShapeType.Line);
+        cancha.getArcoDerecho().dibujar(renderizadorDeFormas);
+        cancha.getArcoIzquierdo().dibujar(renderizadorDeFormas);
+        renderizadorDeFormas.end();
     }
 
     private void inicializarBase() {
@@ -138,15 +151,19 @@ public class ControladorDePartida implements Screen {
             default -> this.modoJuego = new Practica();
         }
         batch = new SpriteBatch();
+        renderizadorDeFormas = new ShapeRenderer();
         // Carga de textura de cancha a partir del enum Campo
         String nombreCampo = config.campo.getNombre();
         texturaCancha = new Texture("campos/campo" + nombreCampo + ".png");
         viewport = new FitViewport(Constantes.MUNDO_ANCHO, Constantes.MUNDO_ALTO);
         fisica = new SistemaFisico();
         colisiones = new SistemaColisiones();
+        partido = new SistemaPartido();
     }
 
     private void crearEntidades() {
+        cancha = new Cancha(0.5f, 0.8f, texturaCancha);
+
         jugadores.clear();
         int cantidadDeJugadores = this.modoJuego.getCantidadDeJugadores();
         ArrayList<ConfiguracionPersonaje> ConfiguracionPersonajes = new ArrayList<>();

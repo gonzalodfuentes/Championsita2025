@@ -90,6 +90,8 @@ public class UnoContraUno implements ModoDeJuego {
         // Físicas pelota
         if (ctx.pelota != null) ctx.fisica.actualizarPelota(ctx.pelota, delta);
 
+        ctx.partido.verificarSiHayGol(ctx.pelota, ctx.cancha);
+
         // Criterio de fin: por ahora nunca (se manejará por marcador en futuro)
         terminado = false;
     }

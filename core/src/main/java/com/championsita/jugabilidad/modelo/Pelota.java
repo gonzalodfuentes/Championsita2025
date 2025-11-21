@@ -142,4 +142,10 @@ public class Pelota {
         return animar ? animacion.getKeyFrame(stateTime, true)
                       : animacion.getKeyFrame(0, true);
     }
+
+    public void detenerPelota() {
+        this.velocidadX = 0.0F;
+        this.velocidadY = 0.0F;
+        this.animar = false;
+    }
 }
