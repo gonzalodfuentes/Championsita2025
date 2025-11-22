@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.audio.Sound;
 import com.championsita.Principal;
+import com.championsita.jugabilidad.modelo.Equipo;
 import com.championsita.menus.menuprincipal.GestorInputMenu;
 import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.menueleccion.Doble;
@@ -21,11 +22,14 @@ import java.util.Map;
 
 public class Carga extends Menu {
 
+    // Ahora soporta equipos especiales
+    private Equipo equipoJ1;
+    private Equipo equipoJ2;
+
     private SpriteBatch batch;
     private final String pielJugador1;
     private final String pielJugador2;
-    private final String modo; // "1v1" o "practica"
-
+    private final String modo; // "1v1", "practica", "especial"
 
     private Texture fondoTex;
     private Texture botonJugarTex;
@@ -73,15 +77,33 @@ public class Carga extends Menu {
     private static final float CAMPOS_ALTURA    = 200f;
     private static final float FLECHA_OFFSET    = 5f;
 
-    //Gestores-Herramientas
+    // Gestores
     private GestorInputMenu gestorMenu;
     private RenderizadorDeMenu renderizador;
 
+    // Constructor normal (1v1 / practica)
     public Carga(Principal juego, String pielUno, String pielDos, String modo) {
         super(juego);
         this.pielJugador1 = pielUno;
         this.pielJugador2 = pielDos;
         this.modo = (modo == null ? "1v1" : modo);
+
+        // En modos normales no hay equipo
+        this.equipoJ1 = null;
+        this.equipoJ2 = null;
+    }
+
+    // Constructor especial (2J especial con equipos)
+    public Carga(Principal juego,
+                 String skinJ1,
+                 String skinJ2,
+                 String modoDestino,
+                 Equipo equipoJ1,
+                 Equipo equipoJ2) {
+
+        this(juego, skinJ1, skinJ2, modoDestino);
+        this.equipoJ1 = equipoJ1;
+        this.equipoJ2 = equipoJ2;
     }
 
     @Override
@@ -155,7 +177,7 @@ public class Carga extends Menu {
 
         Gdx.input.setInputProcessor(this);
 
-        //Inicializar Gestores y Herramientas
+        // Gestores
         gestorMenu = new GestorInputMenu(this);
         renderizador = new RenderizadorDeMenu(this);
     }
@@ -210,7 +232,6 @@ public class Carga extends Menu {
         if (hit(cartelGoles, x, y)) {
             indiceGoles = (indiceGoles + 1) % opcionesGoles.length;
             cartelGoles.setTexture(golesTex[indiceGoles]);
-            cartelGoles.setSize(cartelGoles.getTexture().getWidth(), cartelGoles.getTexture().getHeight());
             cartelGoles.setPosition(golesXY[0], golesXY[1]);
             clic = true;
         }
@@ -218,7 +239,6 @@ public class Carga extends Menu {
         if (hit(cartelTiempo, x, y)) {
             indiceTiempo = (indiceTiempo + 1) % opcionesTiempo.length;
             cartelTiempo.setTexture(tiempoTex[indiceTiempo]);
-            cartelTiempo.setSize(cartelTiempo.getTexture().getWidth(), cartelTiempo.getTexture().getHeight());
             cartelTiempo.setPosition(tiempoXY[0], tiempoXY[1]);
             clic = true;
         }
@@ -227,23 +247,31 @@ public class Carga extends Menu {
         if (hit(flechaDer, x, y)) { cambiarCampo(+1); clic = true; }
 
         if (hit(super.atrasSprite, x, y)) {
-            // en touchUp de Carga, al volver atrás:
             super.cambiarMenu(true, new Doble(super.juego, this.modo));
-
             return true;
         }
 
+        // ============================
+        // BOTÓN JUGAR — ARMAMOS CONFIG
+        // ============================
         if (hit(super.siguienteSprite, x, y)) {
-            // Construye Config para el Controlador directamente
-            ControladorDePartida.Config config = new ControladorDePartida.Config.Builder()
-                    .agregarSkin(pielJugador1)
-                    .agregarSkin(pielJugador2)
-                    .campo(listaCampos[indiceCampo])
-                    .goles(mapGoles(opcionesGoles[indiceGoles]))
-                    .tiempo(mapTiempo(opcionesTiempo[indiceTiempo]))
-                    .modo(this.modo)   // <- importante
-                    .build();
 
+            ControladorDePartida.Config.Builder builder =
+                    new ControladorDePartida.Config.Builder()
+                            .agregarSkin(pielJugador1)
+                            .agregarSkin(pielJugador2)
+                            .campo(listaCampos[indiceCampo])
+                            .goles(mapGoles(opcionesGoles[indiceGoles]))
+                            .tiempo(mapTiempo(opcionesTiempo[indiceTiempo]))
+                            .modo(this.modo);
+
+            // SOLO si viene de Modo Especial: agrega equipos
+            if (equipoJ1 != null && equipoJ2 != null) {
+                builder.agregarEquipo(equipoJ1);
+                builder.agregarEquipo(equipoJ2);
+            }
+
+            ControladorDePartida.Config config = builder.build();
             super.juego.actualizarPantalla(new ControladorDePartida(config));
             return true;
         }
@@ -254,7 +282,6 @@ public class Carga extends Menu {
     @Override
     public void dispose() {
         super.dispose();
-        // No liberamos texturas manejadas por Assets.
     }
 
     private void cambiarCampo(int delta) {
@@ -291,7 +318,6 @@ public class Carga extends Menu {
         this.controlJugador2.setPosition(xDos, y);
     }
 
-    // Mapeos de valores de UI a enums del juego
     private OpcionDeGoles mapGoles(int valor) {
         return switch (valor) {
             case 1 -> OpcionDeGoles.UNO;

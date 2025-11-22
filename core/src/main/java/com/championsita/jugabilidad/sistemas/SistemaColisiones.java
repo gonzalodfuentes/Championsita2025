@@ -23,57 +23,54 @@ public class SistemaColisiones {
         float len = (float) Math.sqrt(dx*dx + dy*dy);
         dx /= len; dy /= len;
 
-        float empujon = 0.01f;
+        // Empuje base
+        float fuerzaA = 0.01f;
+        float fuerzaB = 0.01f;
 
-    // ===============================================
-    // Modificaciones por habilidad (Jugador A)
-    // ===============================================
-        switch (a.getHabilidadActual()) {
-            case EMPUJON:
-                if (a.getStaminaActual() >= a.getStaminaMaxima())
-                    empujon *= 2.0f;  // empuje fuerte con estamina llena
-                else
-                    empujon *= 1.3f;  // empuje moderado con poca estamina
-                break;
+        // --- Si A es EMPUJÓN ---
+        if (a.getHabilidadActual() == HabilidadesEspeciales.EMPUJON) {
 
-            case GRANDOTE:
-                if (a.getStaminaActual() >= a.getStaminaMaxima())
-                    empujon *= 1.7f;  // empuje más pesado
-                break;
-
-            case PEQUEÑIN:
-                empujon *= 0.6f;       // menos empuje por ser liviano
-                break;
+            if (a.getStaminaActual() > 0) {
+                // EMPUJÓN fuerte -> él no se mueve, el otro vuela
+                fuerzaA *= 0.3f;    // casi inmóvil
+                fuerzaB *= 4.0f;    // vuela fuerte
+            } else {
+                // EMPUJÓN sin stamina -> NO empuja, él sale volando
+                fuerzaA *= 3.5f;    // EMPUJÓN rebota
+                fuerzaB *= 0.2f;    // el otro apenas se mueve
+            }
         }
 
-        // ===============================================
-        // Modificaciones por habilidad (Jugador B)
-        // Igual pero aplicado simétricamente
-        // ===============================================
-        float empujonB = empujon;
+        // --- Si B es EMPUJÓN ---
+        if (b.getHabilidadActual() == HabilidadesEspeciales.EMPUJON) {
 
-        switch (b.getHabilidadActual()) {
-            case EMPUJON:
-                if (b.getStaminaActual() >= b.getStaminaMaxima())
-                    empujonB *= 2.0f;
-                else
-                    empujonB *= 1.3f;
-                break;
-
-            case GRANDOTE:
-                if (b.getStaminaActual() >= b.getStaminaMaxima())
-                    empujonB *= 1.7f;
-                break;
-
-            case PEQUEÑIN:
-                empujonB *= 0.6f;
-                break;
+            if (b.getStaminaActual() > 0) {
+                fuerzaB *= 0.3f;
+                fuerzaA *= 4.0f;
+            } else {
+                fuerzaB *= 3.5f;
+                fuerzaA *= 0.2f;
+            }
         }
 
-        // Ahora empujar a y b con valores personalizados:
-        a.setPosicion(a.getX() + dx * empujon, a.getY() + dy * empujon);
-        b.setPosicion(b.getX() - dx * empujonB, b.getY() - dy * empujonB);
+        // GRANDOTE — mayor masa si estamina llena
+        if (a.getHabilidadActual() == HabilidadesEspeciales.GRANDOTE &&
+                a.getStaminaActual() >= a.getStaminaMaxima())
+            fuerzaB *= 1.7f;
 
+        if (b.getHabilidadActual() == HabilidadesEspeciales.GRANDOTE &&
+                b.getStaminaActual() >= b.getStaminaMaxima())
+            fuerzaA *= 1.7f;
+
+        // PEQUEÑÍN — liviano
+        if (a.getHabilidadActual() == HabilidadesEspeciales.PEQUEÑIN)
+            fuerzaA *= 1.5f;
+
+        if (b.getHabilidadActual() == HabilidadesEspeciales.PEQUEÑIN)
+            fuerzaB *= 1.5f;
+
+        a.setPosicion(a.getX() + dx * fuerzaA, a.getY() + dy * fuerzaA);
+        b.setPosicion(b.getX() - dx * fuerzaB, b.getY() - dy * fuerzaB);
     }
 
     /** Maneja contacto jugador↔pelota: corrige penetración (MTV) y registra empuje/disparo. */
@@ -104,14 +101,13 @@ public class SistemaColisiones {
         if (jugador.estaEspacioPresionado()) {
 
             if (jugador.getHabilidadActual() == HabilidadesEspeciales.ZURDO) {
-                pelota.setVelocidadY(pelota.getVelocidadY() + 0.25f);
-                pelota.setVelocidadX(pelota.getVelocidadX() - 0.10f); // leve comba
+                pelota.setCurvaActiva(true, +1); // curva antihorario
             }
 
             if (jugador.getHabilidadActual() == HabilidadesEspeciales.DIESTRO) {
-                pelota.setVelocidadY(pelota.getVelocidadY() - 0.25f);
-                pelota.setVelocidadX(pelota.getVelocidadX() + 0.10f);
+                pelota.setCurvaActiva(true, -1); // curva horario
             }
+
         }
 
         // GRANDOTE – disparo más fuerte con estamina llena
@@ -122,11 +118,7 @@ public class SistemaColisiones {
             dy *= 1.3f;
         }
 
-        // EMPUJON – empuje siempre mayor al tocar la pelota
-        if (jugador.getHabilidadActual() == HabilidadesEspeciales.EMPUJON) {
-            dx *= 1.2f;
-            dy *= 1.2f;
-        }
+
 
         // PEQUEÑIN – NO arrastra pelota (solo rebota)
         if (jugador.getHabilidadActual() == HabilidadesEspeciales.PEQUEÑIN) {

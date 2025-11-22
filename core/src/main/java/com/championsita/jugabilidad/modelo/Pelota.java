@@ -21,6 +21,7 @@ public class Pelota {
     private float stateTime = 0f;
     private boolean animar = false;
 
+
     // === Estado ===
     private float x, y;
     private float width, height;
@@ -28,6 +29,8 @@ public class Pelota {
     private float velocidadY = 0f;
     private Rectangle hitbox;
     public Personaje ultimoJugadorQueToco = null;
+    public boolean curvaActiva = false;
+    public int curvaSigno = 0;
 
 
     // Flags de contacto (para detectar flanco)
@@ -177,4 +180,13 @@ public class Pelota {
         this.ultimoJugadorQueToco = pj;
     }
 
+    public void setCurvaActiva(boolean activa, int signo) {
+        this.curvaActiva = activa;
+        this.curvaSigno = signo;
+    }
+
+    public void setVelocidad(float velocidadX, float velocidadY) {
+        this.velocidadX = velocidadX;
+        this.velocidadY = velocidadY;
+    }
 }

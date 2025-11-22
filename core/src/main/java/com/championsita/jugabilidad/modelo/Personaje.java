@@ -307,7 +307,7 @@ public abstract class Personaje {
         hitbox.setSize(hbAncho, hbAlto);
 
         // === 3. Actualizar atributos del personaje ===
-        atributos.update(
+        this.atributos.update(
                 atributos.getVelocidadBase() * modificador.velocidadBase,
                 atributos.getVelocidadSprint() * modificador.velocidadSprint,
                 atributos.getStaminaMaxima() * modificador.staminaMax,
@@ -405,8 +405,10 @@ public abstract class Personaje {
 
     public HabilidadesEspeciales getHabilidadActual() { return habilidadActual; }
 
-    public void setEquipo(Equipo eq){};
-    public Equipo getEquipo(){};
+    public void setEquipo(Equipo eq){ this.equipo = eq;};
+    public Equipo getEquipo(){
+        return this.equipo;
+    };
 
 
     // =========================

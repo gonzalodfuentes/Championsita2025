@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
 import com.championsita.menus.menucarga.Carga;
 import com.championsita.menus.menueleccion.Doble;
+import com.championsita.menus.menueleccion.Especial;
 import com.championsita.menus.menueleccion.UnJugador;
 import com.championsita.menus.menuprincipal.GestorInputMenu;
 import com.championsita.menus.menuprincipal.Inicial;
@@ -30,7 +31,8 @@ public class Local extends Menu {
         // Reutiliza imágenes existentes para mantener estética
         botones = new Sprite[] {
                 new Sprite(Assets.tex("menuInicial/2jugadoresBoton.png")),
-                new Sprite(Assets.tex("menuInicial/practicaBoton.png"))
+                new Sprite(Assets.tex("menuInicial/practicaBoton.png")),
+                new Sprite(Assets.tex("Especial.png"))
         };
 
         // Tamaño y ubicación similares al menú inicial
@@ -97,6 +99,11 @@ public class Local extends Menu {
         // 1) Práctica → placeholder; no navega aún
         if (gestorMenu.condicionDentro(x, y, botones[1])) {
             super.juego.actualizarPantalla(new UnJugador(super.juego, "practica"));
+            return true;
+        }
+
+        if (gestorMenu.condicionDentro(x, y, botones[2])) {
+            super.juego.actualizarPantalla(new Especial(super.juego));
             return true;
         }
 

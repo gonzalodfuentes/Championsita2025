@@ -10,6 +10,7 @@ import com.championsita.jugabilidad.modelo.Personaje;
 import com.championsita.jugabilidad.sistemas.SistemaColisiones;
 import com.championsita.jugabilidad.sistemas.SistemaFisico;
 import com.championsita.jugabilidad.sistemas.SistemaPartido;
+import com.championsita.partida.ControladorDePartida;
 
 import java.util.ArrayList;
 
@@ -20,6 +21,8 @@ import java.util.ArrayList;
  * No libera recursos. El Screen que lo crea es el responsable.
  */
 public class Contexto {
+
+    public final ControladorDePartida controlador;
 
     // Renderizado y cámara
     public final FitViewport viewport;
@@ -42,7 +45,8 @@ public class Contexto {
                     SistemaFisico fisica,
                     SistemaColisiones colisiones,
                     SistemaPartido partido,
-                    ArrayList<Personaje> jugadores) {
+                    ArrayList<Personaje> jugadores,
+                    ControladorDePartida controlador) {
         this.viewport = viewport;
         this.batch = batch;
         this.cancha = cancha;
@@ -50,5 +54,6 @@ public class Contexto {
         this.colisiones = colisiones;
         this.partido = partido;
         this.jugadores = jugadores;
+        this.controlador = controlador;
     }
 }

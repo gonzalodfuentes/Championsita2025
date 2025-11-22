@@ -24,7 +24,29 @@ public class DiccionarioHabilidades {
         pequenin.consumoSprint = 1.0f; // normal
         diccionario.put(HabilidadesEspeciales.PEQUEÑIN, pequenin);
 
-        // etc. para todas las habilidades
+        ModificadorHabilidad empujon = new ModificadorHabilidad();
+        empujon.consumoSprint *= 1.25f;
+        diccionario.put(HabilidadesEspeciales.EMPUJON, empujon);
+
+        ModificadorHabilidad zurdo = new ModificadorHabilidad();
+        zurdo.recargaStamina *= 0.75f;
+        diccionario.put(HabilidadesEspeciales.ZURDO, zurdo);
+
+        ModificadorHabilidad diestro = new ModificadorHabilidad();
+        zurdo.recargaStamina *= 0.75f;
+        diccionario.put(HabilidadesEspeciales.DIESTRO, diestro);
+
+        ModificadorHabilidad atleta = new ModificadorHabilidad();
+        atleta.staminaMax *= 1.25f;
+        atleta.recargaStamina *= 1.25f;
+        atleta.escalaSprite *= 1.15f;
+        diccionario.put(HabilidadesEspeciales.ATLETA, atleta);
+
+        ModificadorHabilidad extremista = new ModificadorHabilidad();
+        extremista.buffPostGol = 1.5f;
+        extremista.penalizacionPostGol = 1.5f;
+        diccionario.put(HabilidadesEspeciales.EXTREMISTA, extremista);
+
     }
 
     public static ModificadorHabilidad obtener(HabilidadesEspeciales h) {

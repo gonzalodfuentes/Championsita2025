@@ -66,7 +66,19 @@ public class SistemaPartido {
         // ============================================
 
         Personaje personajeQueMetioGol = pelota.getUltimoJugadorQueToco();
+
+        // Si nadie la tocó todavía → no aplicar EXTREMISTA
+        if (personajeQueMetioGol == null) {
+            return;
+        }
+
         Equipo meteGol = personajeQueMetioGol.getEquipo();
+
+        // Si por error el jugador no tiene equipo → no crashear
+        if (meteGol == null) {
+            return;
+        }
+
         Equipo recibeGol = (meteGol == Equipo.ROJO) ? Equipo.AZUL : Equipo.ROJO;
 
         for (Personaje pj : controlador.getJugadoresDelEquipo(meteGol)){

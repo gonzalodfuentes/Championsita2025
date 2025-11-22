@@ -18,7 +18,9 @@ import com.championsita.jugabilidad.visuales.DibujadorPelota;
 import com.championsita.menus.compartido.OpcionDeGoles;
 import com.championsita.menus.compartido.OpcionDeTiempo;
 import com.championsita.menus.menucarga.Campo;
+import com.championsita.menus.menueleccion.Especial;
 import com.championsita.partida.modosdejuego.ModoDeJuego;
+import com.championsita.partida.modosdejuego.implementaciones.ModoEspecial;
 import com.championsita.partida.modosdejuego.implementaciones.Practica;
 import com.championsita.partida.modosdejuego.implementaciones.UnoContraUno;
 import com.championsita.partida.nucleo.Contexto;
@@ -42,6 +44,7 @@ public class ControladorDePartida implements Screen {
         public final OpcionDeGoles goles;
         public final OpcionDeTiempo tiempo;
         public final String modo; // "practica", "1v1", etc.
+        public final ArrayList<Equipo> equiposJugadores; // ← NUEVO
 
         private Config(Builder b) {
             this.skinsJugadores = b.skinsJugadores;
@@ -49,16 +52,28 @@ public class ControladorDePartida implements Screen {
             this.goles = b.goles;
             this.tiempo = b.tiempo;
             this.modo = b.modo;
+            this.equiposJugadores = b.equiposJugadores; // ← NUEVO
         }
 
         public static class Builder {
             public ArrayList<String> skinsJugadores = new ArrayList<>();
+            public ArrayList<Equipo> equiposJugadores = new ArrayList<>(); // ← NUEVO
             private Campo campo;
             private OpcionDeGoles goles = OpcionDeGoles.UNO;
             private OpcionDeTiempo tiempo = OpcionDeTiempo.CORTO;
             private String modo = "practica";
 
-            public Builder agregarSkin(String skin) {this.skinsJugadores.add(skin); return this; }
+            public Builder agregarSkin(String skin) {
+                this.skinsJugadores.add(skin);
+                return this;
+            }
+
+            // NUEVO: agregar equipo por jugador en el mismo orden que las skins
+            public Builder agregarEquipo(Equipo equipo) {
+                this.equiposJugadores.add(equipo);
+                return this;
+            }
+
             public Builder campo(Campo v) { this.campo = v; return this; }
             public Builder goles(OpcionDeGoles v) { this.goles = v; return this; }
             public Builder tiempo(OpcionDeTiempo v) { this.tiempo = v; return this; }
@@ -68,10 +83,17 @@ public class ControladorDePartida implements Screen {
                 if (skinsJugadores.isEmpty() || campo == null) {
                     throw new IllegalStateException("Faltan datos obligatorios en Config (skins/campo)");
                 }
+
+                // opcional: validar que, si se pasaron equipos, coincida la cantidad
+                if (!equiposJugadores.isEmpty() && equiposJugadores.size() != skinsJugadores.size()) {
+                    throw new IllegalStateException("La cantidad de equipos no coincide con la de skins");
+                }
+
                 return new Config(this);
             }
         }
     }
+
 
     private final Config config;
     private ModoDeJuego modoJuego;
@@ -102,7 +124,7 @@ public class ControladorDePartida implements Screen {
         crearEntidades();
 
         // Crear contexto común
-        Contexto ctx = new Contexto(viewport, batch, cancha ,fisica, colisiones, partido, jugadores);
+        Contexto ctx = new Contexto(viewport, batch, cancha ,fisica, colisiones, partido, jugadores, this);
         ctx.pelota = pelota;
 
         modoJuego.iniciar(ctx);
@@ -146,6 +168,7 @@ public class ControladorDePartida implements Screen {
         String m = config.modo == null ? "practica" : config.modo.toLowerCase();
         switch (m) {
             case "1v1", "dosjug", "2jug", "1vs1" -> this.modoJuego = new UnoContraUno();
+            case "especial" -> this.modoJuego = new ModoEspecial();
             default -> this.modoJuego = new Practica();
         }
         batch = new SpriteBatch();
@@ -163,18 +186,44 @@ public class ControladorDePartida implements Screen {
         cancha = new Cancha(0.5f, 0.8f, texturaCancha);
 
         jugadores.clear();
-        int cantidadDeJugadores = this.modoJuego.getCantidadDeJugadores();
-        ArrayList<ConfiguracionPersonaje> ConfiguracionPersonajes = new ArrayList<>();
+        dibujadoresJugadores.clear();
 
-        for(int i = 0; i < cantidadDeJugadores; i++ ){
-            ConfiguracionPersonajes.add(ConfiguracionPersonaje.porDefecto(config.skinsJugadores.get(i)));
-            jugadores.add(new Normal("Jugador" + (i+1), ConfiguracionPersonajes.get(i), Constantes.ESCALA_PERSONAJE));
+        int cantidadDeJugadores = this.modoJuego.getCantidadDeJugadores();
+        ArrayList<ConfiguracionPersonaje> configuraciones = new ArrayList<>();
+
+        for (int i = 0; i < cantidadDeJugadores; i++) {
+            configuraciones.add(ConfiguracionPersonaje.porDefecto(config.skinsJugadores.get(i)));
+            Normal jugador = new Normal("Jugador" + (i + 1),
+                    configuraciones.get(i),
+                    Constantes.ESCALA_PERSONAJE);
+
+            // Si tenemos equipo definido para este índice, lo asignamos
+            if (config.modo.equalsIgnoreCase("especial")) {
+                // Asignación automática si no se pasó equipo
+                Equipo eq = (i == 0) ? Equipo.ROJO : Equipo.AZUL;
+                jugador.setEquipo(eq);
+            }
+            else if (config.equiposJugadores != null
+                    && !config.equiposJugadores.isEmpty()
+                    && i < config.equiposJugadores.size()) {
+
+                jugador.setEquipo(config.equiposJugadores.get(i));
+            }
+            else {
+                // Default para modos normales
+                jugador.setEquipo((i == 0) ? Equipo.ROJO : Equipo.AZUL);
+            }
+
+
+            jugadores.add(jugador);
         }
 
-        pelota = new Pelota(Constantes.MUNDO_ANCHO / 2f, Constantes.MUNDO_ALTO / 2f, Constantes.ESCALA_PELOTA);
+        pelota = new Pelota(Constantes.MUNDO_ANCHO / 2f,
+                Constantes.MUNDO_ALTO / 2f,
+                Constantes.ESCALA_PELOTA);
 
-        for (int i = 0; i < ConfiguracionPersonajes.size(); i++) {
-            dibujadoresJugadores.add(new DibujadorJugador(jugadores.get(i)));
+        for (Personaje jugador : jugadores) {
+            dibujadoresJugadores.add(new DibujadorJugador(jugador));
         }
         dibPelota = new DibujadorPelota(pelota);
     }

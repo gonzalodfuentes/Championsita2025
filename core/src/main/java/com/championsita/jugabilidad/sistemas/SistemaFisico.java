@@ -59,6 +59,38 @@ public class SistemaFisico {
 
     /* Avanza la física/animación de la pelota (sólo una vez por frame). */
     public void actualizarPelota(Pelota pelota, float delta) {
+
         pelota.actualizar(delta);
+
+        float vx = pelota.getVelocidadX();
+        float vy = pelota.getVelocidadY();
+
+        // === Apagar comba cuando la pelota está lenta ===
+        float vel = (float)Math.sqrt(vx*vx + vy*vy);
+        if (vel < 1.0f) {
+            pelota.setCurvaActiva(false, 0);
+        }
+
+        // === 1) Aplicar comba SI está activa ===
+        if (pelota.curvaActiva) {
+
+            float curvaBase = 0.045f;
+            float curva = curvaBase * pelota.curvaSigno;
+
+            float nvx = vx - vy * curva;
+            float nvy = vy + vx * curva;
+
+            vx = nvx;
+            vy = nvy;
+        }
+
+
+        // === 2) Aplicar FRENADO (fricción) ===
+        float friccion = 0.98f;  // ajustable
+        vx *= friccion;
+        vy *= friccion;
+
+        // === 3) Guardar velocidades finales ===
+        pelota.setVelocidad(vx, vy);
     }
 }
