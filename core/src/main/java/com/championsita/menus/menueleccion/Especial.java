@@ -15,6 +15,9 @@ import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.compartido.Assets;
 import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class Especial extends Menu {
 
     // Sprites de los personajes
@@ -173,11 +176,8 @@ public class Especial extends Menu {
         // =========================
         font.setColor(0, 0, 0, 1);
 
-        font.draw(super.batch, habilidades[indiceHabJ1].name(),
-                250, 130);
-
-        font.draw(super.batch, habilidades[indiceHabJ2].name(),
-                640, 130);
+        font.draw(super.batch, habilidades[indiceHabJ1].getNombre(), 250, 130);
+        font.draw(super.batch, habilidades[indiceHabJ2].getNombre(), 640, 130);
 
         super.batch.end();
     }
@@ -227,8 +227,20 @@ public class Especial extends Menu {
             String skin1 = skinsJ1[indiceSkinJ1].getNombre();
             String skin2 = skinsJ2[indiceSkinJ2].getNombre();
 
+            ArrayList<HabilidadesEspeciales> auxHabilidades = new ArrayList<>();
+            auxHabilidades.add(habilidades[indiceHabJ1]);
+            auxHabilidades.add(habilidades[indiceHabJ2]);
+
             super.juego.actualizarPantalla(
-                    new Carga(super.juego, skin1, skin2, modoDestino, equipoJ1, equipoJ2)
+                    new Carga(
+                            super.juego,
+                            skin1,
+                            skin2,
+                            modoDestino,
+                            equipoJ1,
+                            equipoJ2,
+                            auxHabilidades
+                    )
             );
             return true;
         }

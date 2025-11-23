@@ -27,6 +27,7 @@ import com.championsita.partida.nucleo.Contexto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Controla la ejecución de una partida, independiente del modo.
@@ -45,6 +46,7 @@ public class ControladorDePartida implements Screen {
         public final OpcionDeTiempo tiempo;
         public final String modo; // "practica", "1v1", etc.
         public final ArrayList<Equipo> equiposJugadores; // ← NUEVO
+        public ArrayList<HabilidadesEspeciales> habilidadesEspeciales;
 
         private Config(Builder b) {
             this.skinsJugadores = b.skinsJugadores;
@@ -53,6 +55,9 @@ public class ControladorDePartida implements Screen {
             this.tiempo = b.tiempo;
             this.modo = b.modo;
             this.equiposJugadores = b.equiposJugadores; // ← NUEVO
+            if(modo.equals("especial")){
+                this.habilidadesEspeciales = b.habilidadesEspeciales;
+            }
         }
 
         public static class Builder {
@@ -62,6 +67,7 @@ public class ControladorDePartida implements Screen {
             private OpcionDeGoles goles = OpcionDeGoles.UNO;
             private OpcionDeTiempo tiempo = OpcionDeTiempo.CORTO;
             private String modo = "practica";
+            public ArrayList<HabilidadesEspeciales> habilidadesEspeciales = new ArrayList<>();
 
             public Builder agregarSkin(String skin) {
                 this.skinsJugadores.add(skin);
@@ -71,6 +77,11 @@ public class ControladorDePartida implements Screen {
             // NUEVO: agregar equipo por jugador en el mismo orden que las skins
             public Builder agregarEquipo(Equipo equipo) {
                 this.equiposJugadores.add(equipo);
+                return this;
+            }
+
+            public Builder agregarHabilidades(ArrayList<HabilidadesEspeciales> habilidades) {
+                this.habilidadesEspeciales.addAll(habilidades);
                 return this;
             }
 
@@ -125,6 +136,9 @@ public class ControladorDePartida implements Screen {
 
         // Crear contexto común
         Contexto ctx = new Contexto(viewport, batch, cancha ,fisica, colisiones, partido, jugadores, this);
+        if(modoJuego.getClass() == ModoEspecial.class) {
+            ctx = new Contexto(viewport, batch, cancha ,fisica, colisiones, partido, jugadores, this, config.habilidadesEspeciales);
+        }
         ctx.pelota = pelota;
 
         modoJuego.iniciar(ctx);

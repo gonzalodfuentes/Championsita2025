@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.audio.Sound;
 import com.championsita.Principal;
 import com.championsita.jugabilidad.modelo.Equipo;
+import com.championsita.jugabilidad.modelo.HabilidadesEspeciales;
 import com.championsita.menus.menuprincipal.GestorInputMenu;
 import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.menueleccion.Doble;
@@ -17,6 +18,7 @@ import com.championsita.menus.compartido.OpcionDeTiempo;
 import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
 import com.championsita.partida.ControladorDePartida;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +31,7 @@ public class Carga extends Menu {
     private SpriteBatch batch;
     private final String pielJugador1;
     private final String pielJugador2;
+    private ArrayList<HabilidadesEspeciales> habilidades = new ArrayList<>();
     private final String modo; // "1v1", "practica", "especial"
 
     private Texture fondoTex;
@@ -104,6 +107,21 @@ public class Carga extends Menu {
         this(juego, skinJ1, skinJ2, modoDestino);
         this.equipoJ1 = equipoJ1;
         this.equipoJ2 = equipoJ2;
+    }
+
+    public Carga(Principal juego,
+                 String skinJ1,
+                 String skinJ2,
+                 String modoDestino,
+                 Equipo equipoJ1,
+                 Equipo equipoJ2,
+                 ArrayList<HabilidadesEspeciales> habilidades) {
+        this(juego, skinJ1, skinJ2, modoDestino);
+
+        this.equipoJ1 = equipoJ1;
+        this.equipoJ2 = equipoJ2;
+
+        this.habilidades.addAll(habilidades);
     }
 
     @Override
@@ -266,10 +284,14 @@ public class Carga extends Menu {
                             .modo(this.modo);
 
             // SOLO si viene de Modo Especial: agrega equipos
-            if (equipoJ1 != null && equipoJ2 != null) {
-                builder.agregarEquipo(equipoJ1);
-                builder.agregarEquipo(equipoJ2);
+            if(this.modo.equals("especial")){
+                if (equipoJ1 != null && equipoJ2 != null) {
+                    builder.agregarEquipo(equipoJ1);
+                    builder.agregarEquipo(equipoJ2);
+                }
+                builder.agregarHabilidades(habilidades);
             }
+
 
             ControladorDePartida.Config config = builder.build();
             super.juego.actualizarPantalla(new ControladorDePartida(config));

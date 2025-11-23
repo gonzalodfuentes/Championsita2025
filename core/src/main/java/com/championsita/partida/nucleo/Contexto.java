@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.championsita.jugabilidad.entrada.EntradaJugador;
 import com.championsita.jugabilidad.modelo.Cancha;
+import com.championsita.jugabilidad.modelo.HabilidadesEspeciales;
 import com.championsita.jugabilidad.modelo.Pelota;
 import com.championsita.jugabilidad.modelo.Personaje;
 import com.championsita.jugabilidad.sistemas.SistemaColisiones;
@@ -55,5 +56,27 @@ public class Contexto {
         this.partido = partido;
         this.jugadores = jugadores;
         this.controlador = controlador;
+    }
+
+    public ArrayList<HabilidadesEspeciales> habilidadesEspeciales = new ArrayList<>();
+
+    public Contexto(FitViewport viewport,
+                    SpriteBatch batch,
+                    Cancha cancha,
+                    SistemaFisico fisica,
+                    SistemaColisiones colisiones,
+                    SistemaPartido partido,
+                    ArrayList<Personaje> jugadores,
+                    ControladorDePartida controlador,
+                    ArrayList<HabilidadesEspeciales> habilidadesEspeciales) {
+        this.viewport = viewport;
+        this.batch = batch;
+        this.cancha = cancha;
+        this.fisica = fisica;
+        this.colisiones = colisiones;
+        this.partido = partido;
+        this.jugadores = jugadores;
+        this.controlador = controlador;
+        this.habilidadesEspeciales.addAll(habilidadesEspeciales);
     }
 }

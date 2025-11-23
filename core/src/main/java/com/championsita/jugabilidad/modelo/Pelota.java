@@ -180,6 +180,11 @@ public class Pelota {
         this.ultimoJugadorQueToco = pj;
     }
 
+    public void limpiarContacto() {
+        this.huboContactoEsteFrame = false;
+        this.huboContactoPrevio = false;
+    }
+
     public void setCurvaActiva(boolean activa, int signo) {
         this.curvaActiva = activa;
         this.curvaSigno = signo;

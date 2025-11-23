@@ -1,6 +1,8 @@
 package com.championsita.jugabilidad.sistemas;
 
 import com.badlogic.gdx.math.Vector2;
+import com.championsita.jugabilidad.modelo.Arco;
+import com.championsita.jugabilidad.modelo.Cancha;
 import com.championsita.jugabilidad.modelo.Pelota;
 import com.championsita.jugabilidad.modelo.Personaje;
 
@@ -16,11 +18,11 @@ public class SistemaFisico {
         p.limitarMovimiento(anchoMundo, altoMundo);
     }
     /* Mantiene la pelota dentro del área del mundo. */
-    public void rebotarLaPelotaEnLosBordes(Pelota pelota, float anchoMundo, float altoMundo) {
+    public void rebotarLaPelotaEnLosBordes(Pelota pelota, float anchoMundo, float altoMundo, Cancha cancha) {
 
         // Tamaño efectivo de la pelota (la mitad, para chequear bordes)
-        float pelotaHalfWidth  = pelota.getWidth()  / 2f;
-        float pelotaHalfHeight = pelota.getHeight() / 2f;
+        float pelotaHalfWidth  = pelota.getWidth();
+        float pelotaHalfHeight = pelota.getHeight();
 
         // Posición actual
         float pelotaX = pelota.getX();
@@ -28,32 +30,45 @@ public class SistemaFisico {
 
         // --- EJE X: Rebote en paredes izquierda y derecha ---
 
-        boolean hitLeftWall  = pelotaX < pelotaHalfWidth;
-        boolean hitRightWall = pelotaX > anchoMundo - pelotaHalfWidth;
+        boolean tocaIzquierdaPared  = pelotaX < pelotaHalfWidth;
+        boolean tocaDerechaPared = pelotaX > anchoMundo - pelotaHalfWidth;
 
-        if (hitLeftWall) {
-            pelota.setX(pelotaHalfWidth);  // la apoyamos sobre la pared
-            pelota.setVelocidadX(-pelota.getVelocidadX()); // invertimos velocidad
+        Arco arcoIzquierdo = cancha.getArcoIzquierdo();
+        boolean dentroArcoIzquierdo =
+                pelotaY > arcoIzquierdo.getY() &&
+                        pelotaY < arcoIzquierdo.getY() + arcoIzquierdo.getHeight() &&
+                        pelotaX < arcoIzquierdo.getX() + arcoIzquierdo.getWidth();
+
+        if (!dentroArcoIzquierdo) {
+            if (tocaIzquierdaPared) {
+                pelota.setX(pelotaHalfWidth);
+                pelota.setVelocidadX(-Pelota.getFuerzaDisparo());
+                pelota.limpiarContacto();
+            }
         }
 
-        if (hitRightWall) {
+
+        if (tocaDerechaPared) {
             pelota.setX(anchoMundo - pelotaHalfWidth);
-            pelota.setVelocidadX(-pelota.getVelocidadX());
+            pelota.setVelocidadX(-Pelota.getFuerzaDisparo());
+            pelota.limpiarContacto();
         }
 
         // --- EJE Y: Rebote en paredes inferior y superior ---
 
-        boolean hitBottomWall = pelotaY < pelotaHalfHeight;
-        boolean hitTopWall    = pelotaY > altoMundo - pelotaHalfHeight;
+        boolean tocaAbajoPared = pelotaY < pelotaHalfHeight;
+        boolean tocaArribaPared    = pelotaY > altoMundo - pelotaHalfHeight;
 
-        if (hitBottomWall) {
+        if (tocaAbajoPared) {
             pelota.setY(pelotaHalfHeight);
-            pelota.setVelocidadY(-pelota.getVelocidadY());
+            pelota.setVelocidadY(-Pelota.getFuerzaDisparo());
+            pelota.limpiarContacto();
         }
 
-        if (hitTopWall) {
+        if (tocaArribaPared) {
             pelota.setY(altoMundo - pelotaHalfHeight);
-            pelota.setVelocidadY(-pelota.getVelocidadY());
+            pelota.setVelocidadY(-Pelota.getFuerzaDisparo());
+            pelota.limpiarContacto();
         }
     }
 
