@@ -1,6 +1,7 @@
 package com.championsita.jugabilidad.sistemas;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.championsita.jugabilidad.modelo.HabilidadesEspeciales;
 import com.championsita.jugabilidad.modelo.Pelota;
 import com.championsita.jugabilidad.modelo.Personaje;
 
@@ -22,9 +23,54 @@ public class SistemaColisiones {
         float len = (float) Math.sqrt(dx*dx + dy*dy);
         dx /= len; dy /= len;
 
-        float empujon = 0.01f; // tunear a gusto
-        a.setPosicion(a.getX() + dx * empujon, a.getY() + dy * empujon);
-        b.setPosicion(b.getX() - dx * empujon, b.getY() - dy * empujon);
+        // Empuje base
+        float fuerzaA = 0.01f;
+        float fuerzaB = 0.01f;
+
+        // --- Si A es EMPUJÓN ---
+        if (a.getHabilidadActual() == HabilidadesEspeciales.EMPUJON) {
+
+            if (a.getStaminaActual() > 0) {
+                // EMPUJÓN fuerte -> él no se mueve, el otro vuela
+                fuerzaA *= 0.3f;    // casi inmóvil
+                fuerzaB *= 4.0f;    // vuela fuerte
+            } else {
+                // EMPUJÓN sin stamina -> NO empuja, él sale volando
+                fuerzaA *= 3.5f;    // EMPUJÓN rebota
+                fuerzaB *= 0.2f;    // el otro apenas se mueve
+            }
+        }
+
+        // --- Si B es EMPUJÓN ---
+        if (b.getHabilidadActual() == HabilidadesEspeciales.EMPUJON) {
+
+            if (b.getStaminaActual() > 0) {
+                fuerzaB *= 0.3f;
+                fuerzaA *= 4.0f;
+            } else {
+                fuerzaB *= 3.5f;
+                fuerzaA *= 0.2f;
+            }
+        }
+
+        // GRANDOTE — mayor masa si estamina llena
+        if (a.getHabilidadActual() == HabilidadesEspeciales.GRANDOTE &&
+                a.getStaminaActual() >= a.getStaminaMaxima())
+            fuerzaB *= 1.7f;
+
+        if (b.getHabilidadActual() == HabilidadesEspeciales.GRANDOTE &&
+                b.getStaminaActual() >= b.getStaminaMaxima())
+            fuerzaA *= 1.7f;
+
+        // PEQUEÑÍN — liviano
+        if (a.getHabilidadActual() == HabilidadesEspeciales.PEQUEÑIN)
+            fuerzaA *= 1.5f;
+
+        if (b.getHabilidadActual() == HabilidadesEspeciales.PEQUEÑIN)
+            fuerzaB *= 1.5f;
+
+        a.setPosicion(a.getX() + dx * fuerzaA, a.getY() + dy * fuerzaA);
+        b.setPosicion(b.getX() - dx * fuerzaB, b.getY() - dy * fuerzaB);
     }
 
     /** Maneja contacto jugador↔pelota: corrige penetración (MTV) y registra empuje/disparo. */
@@ -47,7 +93,55 @@ public class SistemaColisiones {
         float len = (float) Math.sqrt(dx*dx + dy*dy);
         if (len != 0) { dx /= len; dy /= len; } else { dx = 0; dy = 1; } // fallback
 
+        // ===============================================
+        // MODIFICADORES DE HABILIDAD SOBRE LA PELOTA
+        // ===============================================
+
+        // Comba del disparo (ZURDO / DIESTRO)
+        if (jugador.estaEspacioPresionado()) {
+
+            if (jugador.getHabilidadActual() == HabilidadesEspeciales.ZURDO) {
+                pelota.setCurvaActiva(true, +1); // curva antihorario
+            }
+
+            if (jugador.getHabilidadActual() == HabilidadesEspeciales.DIESTRO) {
+                pelota.setCurvaActiva(true, -1); // curva horario
+            }
+
+        }
+
+        // GRANDOTE – disparo más fuerte con estamina llena
+        if (jugador.getHabilidadActual() == HabilidadesEspeciales.GRANDOTE &&
+                jugador.getStaminaActual() >= jugador.getStaminaMaxima()) {
+
+            dx *= 1.3f;
+            dy *= 1.3f;
+        }
+
+
+
+        // PEQUEÑIN – NO arrastra pelota (solo rebota)
+        if (jugador.getHabilidadActual() == HabilidadesEspeciales.PEQUEÑIN) {
+            // “cortar” el empuje continuo del contacto
+            // Cero dx/dy si NO es disparo
+            if (!jugador.estaEspacioPresionado()) {
+                dx *= 0.6f;   // rebote suave
+                dy *= 0.6f;
+            }
+        }
+
+        // ATLETA – empuje mayor cuando está esprintando
+        if (jugador.getHabilidadActual() == HabilidadesEspeciales.ATLETA) {
+            // ¿Está esprintando?
+            if (jugador.estaSprintPresionado() && jugador.getStaminaActual() > 0) {
+                dx *= 1.25f;
+                dy *= 1.25f;
+            }
+        }
+
+
         boolean esDisparo = jugador.estaEspacioPresionado();
+        pelota.setUltimoJugadorQueToco(jugador);
         pelota.registrarContacto(dx, dy, esDisparo);
     }
 
@@ -81,6 +175,6 @@ public class SistemaColisiones {
             else                      nuevaBY -= solapeY + EPS;
         }
 
-        pelota.setPosition(nuevaBX, nuevaBY);
+        pelota.setPosicion(nuevaBX, nuevaBY);
     }
 }

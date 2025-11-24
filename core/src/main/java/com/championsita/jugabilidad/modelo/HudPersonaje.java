@@ -46,9 +46,6 @@ public class HudPersonaje {
 
         // Dibujar barra proporcional a la stamina
         batch.draw(texturaBarra, xPersonaje + posX, yPersonaje + posY, anchoBarra * porcentaje, altoBarra);
-        //System.out.println("Deberia funcionar");
-
-
     }
 
 
