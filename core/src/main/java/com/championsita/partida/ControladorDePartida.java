@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.championsita.jugabilidad.constantes.Constantes;
@@ -15,6 +16,7 @@ import com.championsita.jugabilidad.sistemas.SistemaFisico;
 import com.championsita.jugabilidad.sistemas.SistemaPartido;
 import com.championsita.jugabilidad.visuales.DibujadorJugador;
 import com.championsita.jugabilidad.visuales.DibujadorPelota;
+import com.championsita.jugabilidad.visuales.HudPartido;
 import com.championsita.menus.compartido.OpcionDeGoles;
 import com.championsita.menus.compartido.OpcionDeTiempo;
 import com.championsita.menus.menucarga.Campo;
@@ -120,6 +122,7 @@ public class ControladorDePartida implements Screen {
 
     private ArrayList<DibujadorJugador> dibujadoresJugadores = new ArrayList<>();
     private DibujadorPelota dibPelota;
+    private HudPartido dibujadorHudPartido;
 
     private SistemaFisico fisica;
     private SistemaColisiones colisiones;
@@ -169,6 +172,16 @@ public class ControladorDePartida implements Screen {
 
         batch.end();
 
+        // --- HUD ---
+        batch.setProjectionMatrix(new Matrix4().setToOrtho2D(
+                0, 0,
+                Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight()
+        ));
+
+        batch.begin();
+        dibujadorHudPartido.dibujarHud(batch, partido);
+        batch.end();
         //Dibujamos los arcos
         renderizadorDeFormas.setProjectionMatrix(viewport.getCamera().combined);
         renderizadorDeFormas.begin(ShapeRenderer.ShapeType.Line);
@@ -240,6 +253,7 @@ public class ControladorDePartida implements Screen {
             dibujadoresJugadores.add(new DibujadorJugador(jugador));
         }
         dibPelota = new DibujadorPelota(pelota);
+        dibujadorHudPartido = new HudPartido(viewport);
     }
 
     @Override

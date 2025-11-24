@@ -1,4 +1,5 @@
 Especial.png
+Minercraftory.ttf
 atrasBoton.png
 barraStamina.png
 campos/campoAzul.png

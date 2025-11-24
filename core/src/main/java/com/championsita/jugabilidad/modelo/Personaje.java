@@ -90,8 +90,7 @@ public abstract class Personaje {
                      AtributosPersonaje atributos,
                      float escala) {
 
-        hudPersonaje = new HudPersonaje(this);
-
+        hud = new HudPersonaje(this);
         this.nombre   = nombre;
         this.sprites  = sprites;
         this.atributos = atributos;
@@ -400,7 +399,7 @@ public abstract class Personaje {
     public AtributosPersonaje getAtributos() { return atributos; }
     public float getEscala() { return escala; }
 
-    public HudPersonaje getHud() { return hudPersonaje; }
+    public HudPersonaje getHud() { return hud; }
 
     public TextureRegion obtenerFrameActual() {
         return estaMoviendo

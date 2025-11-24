@@ -7,6 +7,7 @@ import com.championsita.jugabilidad.modelo.Cancha;
 import com.championsita.jugabilidad.modelo.Equipo;
 import com.championsita.jugabilidad.modelo.HabilidadesEspeciales;
 import com.championsita.jugabilidad.modelo.Personaje;
+import com.championsita.jugabilidad.visuales.HudPartido;
 import com.championsita.partida.ControladorDePartida;
 import com.championsita.partida.modosdejuego.ControladorPosicionesIniciales;
 import com.championsita.partida.modosdejuego.ModoDeJuego;
@@ -142,7 +143,8 @@ public class ModoEspecial implements ModoDeJuego {
 
     @Override
     public void renderizar(SpriteBatch batch) {
-
+        //HudPartido dibujadorHudPartido =  new HudPartido(ctx.viewport);
+        //dibujadorHudPartido.dibujarHud(batch, ctx.partido);
     }
 
     @Override

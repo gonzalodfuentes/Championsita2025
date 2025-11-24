@@ -12,8 +12,8 @@ import com.championsita.partida.ControladorDePartida;
 import static com.championsita.jugabilidad.modelo.HabilidadesEspeciales.EXTREMISTA;
 
 public class SistemaPartido {
-    float notadorEquipo1 = 0.0F;
-    float notadorEquipo2 = 0.0F;
+    int notadorEquipo1 = 0;
+    int notadorEquipo2 = 0;
 
     private ControladorDePartida controlador;
 
@@ -101,5 +101,12 @@ public class SistemaPartido {
         pelota.setPosicion(4.0F, 2.5F);
     }
 
+    public int getNotadorEquipo1() {
+        return this.notadorEquipo1;
+    }
+
+    public int getNotadorEquipo2(){
+        return this.notadorEquipo2;
+    }
 
 }

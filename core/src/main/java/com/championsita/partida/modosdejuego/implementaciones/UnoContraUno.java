@@ -27,6 +27,7 @@ public class UnoContraUno implements ModoDeJuego {
     public void iniciar(Contexto contexto) {
 
         this.ctx = contexto;
+        this.multiplexer = new InputMultiplexer();
         ControladorPosicionesIniciales.PosicionarJugadoresYPelota(this.ctx, this.multiplexer);
 
     }
