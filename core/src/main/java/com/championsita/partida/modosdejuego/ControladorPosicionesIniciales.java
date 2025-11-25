@@ -3,11 +3,11 @@ package com.championsita.partida.modosdejuego;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.championsita.jugabilidad.entrada.EntradaJugador;
-import com.championsita.partida.nucleo.Contexto;
+import com.championsita.partida.nucleo.ContextoModoDeJuego;
 
 public abstract class ControladorPosicionesIniciales {
 
-    public static void PosicionarJugadoresYPelota(Contexto ctx, InputMultiplexer multiplexer){
+    public static void PosicionarJugadoresYPelota(ContextoModoDeJuego ctx, InputMultiplexer multiplexer){
         // Posiciones iniciales simples en extremos opuestos
         if(ctx.jugadores.get(0) != null)
             ctx.jugadores.get(0).setPosicion(2.0f, ctx.viewport.getWorldHeight() / 2f);

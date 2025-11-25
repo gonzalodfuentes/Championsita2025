@@ -9,6 +9,7 @@ import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.compartido.Assets;
 import com.championsita.menus.menucarga.Campo;
 import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
+import com.championsita.partida.herramientas.Config;
 import com.championsita.partida.ControladorDePartida;
 
 /**
@@ -179,7 +180,7 @@ public class UnJugador extends Menu {
 
         // OK → construir config y entrar directo a la partida
         if (gestorMenu.condicionDentro(x, y, super.siguienteSprite)) {
-            ControladorDePartida.Config cfg = new ControladorDePartida.Config.Builder()
+            Config cfg = new Config.Builder()
                     .agregarSkin(skinP1)
                     .agregarSkin(skinP2)
                     .campo(campos[idxCampo])      // requerido

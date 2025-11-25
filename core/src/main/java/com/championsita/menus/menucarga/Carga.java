@@ -16,6 +16,7 @@ import com.championsita.menus.compartido.Assets;
 import com.championsita.menus.compartido.OpcionDeGoles;
 import com.championsita.menus.compartido.OpcionDeTiempo;
 import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
+import com.championsita.partida.herramientas.Config;
 import com.championsita.partida.ControladorDePartida;
 
 import java.util.ArrayList;
@@ -274,8 +275,8 @@ public class Carga extends Menu {
         // ============================
         if (hit(super.siguienteSprite, x, y)) {
 
-            ControladorDePartida.Config.Builder builder =
-                    new ControladorDePartida.Config.Builder()
+            Config.Builder builder =
+                    new Config.Builder()
                             .agregarSkin(pielJugador1)
                             .agregarSkin(pielJugador2)
                             .campo(listaCampos[indiceCampo])
@@ -293,7 +294,7 @@ public class Carga extends Menu {
             }
 
 
-            ControladorDePartida.Config config = builder.build();
+            Config config = builder.build();
             super.juego.actualizarPantalla(new ControladorDePartida(config));
             return true;
         }

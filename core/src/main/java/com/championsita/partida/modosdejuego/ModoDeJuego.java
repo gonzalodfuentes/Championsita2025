@@ -2,7 +2,7 @@ package com.championsita.partida.modosdejuego;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.championsita.partida.nucleo.Contexto;
+import com.championsita.partida.nucleo.ContextoModoDeJuego;
 
 /**
  * Define el contrato base para todos los modos de juego.
@@ -11,7 +11,7 @@ import com.championsita.partida.nucleo.Contexto;
 public interface ModoDeJuego {
 
     // Se llama al crear el modo. Inicializa todo lo necesario.
-    void iniciar(Contexto contexto);
+    void iniciar(ContextoModoDeJuego contextoModoDeJuego);
 
     // Actualiza la lógica del modo (entradas, físicas, reglas, etc).
     void actualizar(float delta);

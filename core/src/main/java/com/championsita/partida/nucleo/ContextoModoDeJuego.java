@@ -1,6 +1,5 @@
 package com.championsita.partida.nucleo;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.championsita.jugabilidad.entrada.EntradaJugador;
@@ -21,7 +20,7 @@ import java.util.ArrayList;
  *
  * No libera recursos. El Screen que lo crea es el responsable.
  */
-public class Contexto {
+public class ContextoModoDeJuego {
 
     public final ControladorDePartida controlador;
 
@@ -40,14 +39,14 @@ public class Contexto {
     public ArrayList<EntradaJugador> controles = new ArrayList<>();
     public Pelota pelota;
 
-    public Contexto(FitViewport viewport,
-                    SpriteBatch batch,
-                    Cancha cancha,
-                    SistemaFisico fisica,
-                    SistemaColisiones colisiones,
-                    SistemaPartido partido,
-                    ArrayList<Personaje> jugadores,
-                    ControladorDePartida controlador) {
+    public ContextoModoDeJuego(FitViewport viewport,
+                               SpriteBatch batch,
+                               Cancha cancha,
+                               SistemaFisico fisica,
+                               SistemaColisiones colisiones,
+                               SistemaPartido partido,
+                               ArrayList<Personaje> jugadores,
+                               ControladorDePartida controlador) {
         this.viewport = viewport;
         this.batch = batch;
         this.cancha = cancha;
@@ -60,15 +59,15 @@ public class Contexto {
 
     public ArrayList<HabilidadesEspeciales> habilidadesEspeciales = new ArrayList<>();
 
-    public Contexto(FitViewport viewport,
-                    SpriteBatch batch,
-                    Cancha cancha,
-                    SistemaFisico fisica,
-                    SistemaColisiones colisiones,
-                    SistemaPartido partido,
-                    ArrayList<Personaje> jugadores,
-                    ControladorDePartida controlador,
-                    ArrayList<HabilidadesEspeciales> habilidadesEspeciales) {
+    public ContextoModoDeJuego(FitViewport viewport,
+                               SpriteBatch batch,
+                               Cancha cancha,
+                               SistemaFisico fisica,
+                               SistemaColisiones colisiones,
+                               SistemaPartido partido,
+                               ArrayList<Personaje> jugadores,
+                               ControladorDePartida controlador,
+                               ArrayList<HabilidadesEspeciales> habilidadesEspeciales) {
         this.viewport = viewport;
         this.batch = batch;
         this.cancha = cancha;
