@@ -1,14 +1,10 @@
 package com.championsita.partida.modosdejuego.implementaciones;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.championsita.jugabilidad.entrada.EntradaJugador;
 import com.championsita.jugabilidad.modelo.Equipo;
 import com.championsita.jugabilidad.modelo.HabilidadesEspeciales;
 import com.championsita.jugabilidad.modelo.Personaje;
 import com.championsita.partida.modosdejuego.ControladorPosicionesIniciales;
-import com.championsita.partida.modosdejuego.ModoDeJuego;
-import com.championsita.partida.nucleo.ContextoModoDeJuego;
 
 import java.util.ArrayList;
 
@@ -16,9 +12,9 @@ import java.util.ArrayList;
 public class ModoEspecial extends ModoBase {
 
     private InputMultiplexer multiplexer;
-    private ArrayList<Personaje> ordenSeleccion = new ArrayList<>();
-    private ArrayList<HabilidadesEspeciales> habilidadesDisponibles = new ArrayList<>();
-    private ArrayList<HabilidadesEspeciales> habilidadesUsadas = new ArrayList<>();
+    private final ArrayList<Personaje> ordenSeleccion = new ArrayList<>();
+    private final ArrayList<HabilidadesEspeciales> habilidadesDisponibles = new ArrayList<>();
+    private final ArrayList<HabilidadesEspeciales> habilidadesUsadas = new ArrayList<>();
     private int indice = 0;
     private boolean seleccionTerminada = false;
 

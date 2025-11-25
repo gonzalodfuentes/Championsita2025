@@ -56,12 +56,6 @@ public class ControladorDePartida implements Screen {
 
     public ControladorDePartida(Config config) {
         this.config = config;
-    }
-
-
-
-    @Override
-    public void show() {
         ContextoPartida contextoPartida= InicializadorPartida.inicializar(config, this);
         this.modoJuego = contextoPartida.modo;
         this.batch = contextoPartida.batch;
@@ -80,6 +74,13 @@ public class ControladorDePartida implements Screen {
         this.dibujadoresJugadores = mundo.dibujadoresJugadores;
 
         this.dibujadorHudPartido = new HudPartido(viewport);
+    }
+
+
+
+    @Override
+    public void show() {
+
 
         ContextoModoDeJuego ctx = new ContextoModoDeJuego(viewport, batch, cancha ,fisica, colisiones, partido, jugadores, this);
 
