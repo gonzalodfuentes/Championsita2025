@@ -75,23 +75,6 @@ public class Menu extends InputAdapter implements Screen {
         if (!this.musica.isPlaying()) this.musica.play();
 
         int cantBotonesGlobales = 2;
-        inicializarSonido(cantBotonesGlobales);
-    }
-
-    protected void inicializarSonido(int cantBotones) {
-        this.cursorSonido = new boolean[cantBotones];
-        for (int i = 0; i < this.cursorSonido.length; i++) this.cursorSonido[i] = false;
-    }
-
-    protected void reproducirSonido(int i, boolean dentro) {
-        if (dentro) {
-            if (!this.cursorSonido[i]) {
-                this.sonido.play(0.5f);
-                this.cursorSonido[i] = true;
-            }
-        } else {
-            this.cursorSonido[i] = false;
-        }
     }
 
     @Override

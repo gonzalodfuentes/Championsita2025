@@ -5,11 +5,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
 import com.championsita.menus.menucarga.Carga;
-import com.championsita.menus.menuprincipal.GestorInputMenu;
-import com.championsita.menus.menuprincipal.Inicial;
-import com.championsita.menus.menuprincipal.Menu;
+import com.championsita.menus.menuprincipal.*;
 import com.championsita.menus.compartido.Assets;
-import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
 
 /**
  * Menú de selección de skins para el modo de 2 jugadores.
@@ -27,6 +24,7 @@ public class Doble extends Menu {
     //Gestores-Herramientas
     GestorInputMenu gestorMenu;
     RenderizadorDeMenu renderizador;
+    GestorSonidoMenu gestorSonido;
 
     private final String modoDestino; // "1v1" o "practica" según origen
 
@@ -53,6 +51,7 @@ public class Doble extends Menu {
         //Inicializar Gestores-Herramientas
         this.gestorMenu = new GestorInputMenu(this);
         this.renderizador = new  RenderizadorDeMenu(this);
+        gestorSonido.inicializarSonido(6);
 
         renderizador.crearFlechas(4);
         int y = 166;
@@ -60,9 +59,6 @@ public class Doble extends Menu {
         super.flechas[1].setPosition(455, y); // WASD derecha
         super.flechas[2].setPosition(519, y); // IJKL izquierda
         super.flechas[3].setPosition(839, y); // IJKL derecha
-
-        // Sonidos: 4 flechas + atrás + ok → 6 slots
-        super.inicializarSonido(6);
     }
 
     private Sprite crearSpriteJugador(String nombre, float x, float y) {
@@ -116,17 +112,17 @@ public class Doble extends Menu {
 
         for (int i = 0; i < super.flechas.length; i++) {
             boolean dentro = gestorMenu.condicionFlechas(super.flechas[i], x, y);
-            super.reproducirSonido(i, dentro);
+            gestorSonido.reproducirSonido(i, dentro);
             hit |= dentro;
         }
 
         boolean dentroAtras = gestorMenu.condicionDentro(x, y, super.atrasSprite);
         gestorMenu.condicionColor(dentroAtras, super.atrasSprite);
-        super.reproducirSonido(4, dentroAtras);
+        gestorSonido.reproducirSonido(4, dentroAtras);
 
         boolean dentroOk = gestorMenu.condicionDentro(x, y, super.siguienteSprite);
         gestorMenu.condicionColor(dentroOk, super.siguienteSprite);
-        super.reproducirSonido(5, dentroOk);
+        gestorSonido.reproducirSonido(5, dentroOk);
 
         return hit || dentroAtras || dentroOk;
     }

@@ -21,17 +21,12 @@ public class Pelota {
     private float stateTime = 0f;
     private boolean animar = false;
 
-
     // === Estado ===
     private float x, y;
     private float width, height;
     private float velocidadX = 0f;
     private float velocidadY = 0f;
     private Rectangle hitbox;
-    public Personaje ultimoJugadorQueToco = null;
-    public boolean curvaActiva = false;
-    public int curvaSigno = 0;
-
 
     // Flags de contacto (para detectar flanco)
     private boolean huboContactoEsteFrame = false;
@@ -132,9 +127,7 @@ public class Pelota {
     // Getters
     public Rectangle getHitbox() { return hitbox; }
     public float getX() { return x; }
-    public void setX(float x) { this.x = x;}
     public float getY() { return y; }
-    public void setY(float y) { this.y = y;}
     public void setPosicion(float nuevaX, float nuevaY) { this.x = nuevaX; this.y = nuevaY; hitbox.setPosition(nuevaX, nuevaY); }
 
     public static float getFuerzaEmpuje()  { return FUERZA_EMPUJE; }
@@ -148,50 +141,5 @@ public class Pelota {
         // si querés que “quieta” muestre el primer frame:
         return animar ? animacion.getKeyFrame(stateTime, true)
                       : animacion.getKeyFrame(0, true);
-    }
-
-    public void detenerPelota() {
-        this.velocidadX = 0.0F;
-        this.velocidadY = 0.0F;
-        this.animar = false;
-    }
-
-    public float getVelocidadX() {
-        return velocidadX;
-    }
-
-    public float getVelocidadY() {
-        return velocidadY;
-    }
-
-    public void setVelocidadX(float vx) {
-        this.velocidadX = vx;
-    }
-
-    public void setVelocidadY(float vy) {
-        this.velocidadY = vy;
-    }
-
-    public Personaje getUltimoJugadorQueToco() {
-        return ultimoJugadorQueToco;
-    }
-
-    public void setUltimoJugadorQueToco(Personaje pj) {
-        this.ultimoJugadorQueToco = pj;
-    }
-
-    public void limpiarContacto() {
-        this.huboContactoEsteFrame = false;
-        this.huboContactoPrevio = false;
-    }
-
-    public void setCurvaActiva(boolean activa, int signo) {
-        this.curvaActiva = activa;
-        this.curvaSigno = signo;
-    }
-
-    public void setVelocidad(float velocidadX, float velocidadY) {
-        this.velocidadX = velocidadX;
-        this.velocidadY = velocidadY;
     }
 }

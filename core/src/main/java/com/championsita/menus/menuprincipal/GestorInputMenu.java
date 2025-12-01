@@ -3,7 +3,7 @@ package com.championsita.menus.menuprincipal;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class GestorInputMenu {
-    Menu menu;
+    public Menu menu;
     public GestorInputMenu(Menu m){
         this.menu = m;
     }
