@@ -13,7 +13,6 @@ public class Inicial extends Menu {
     private float altoBotones;
     private GestorInputMenu gestorMenu;
     private RenderizadorDeMenu renderizador;
-    private GestorSonidoMenu gestorSonido;
 
     public Inicial(Principal juego) { super(juego); }
 
@@ -41,13 +40,15 @@ public class Inicial extends Menu {
             apilar += 80;
         }
 
+        // 4 botones + (opcional) atrás/ok globales => 6 slots de sonido
+        super.inicializarSonido(6);
+
         // Registrar input en este menú
         Gdx.input.setInputProcessor(this);
 
         //Inicializar Gestores-Herramientas
         gestorMenu = new GestorInputMenu(this);
         renderizador = new RenderizadorDeMenu(this);
-        gestorSonido.inicializarSonido(6);
     }
 
     @Override
@@ -83,7 +84,7 @@ public class Inicial extends Menu {
             Sprite boton = botones[i];
             boolean dentro = gestorMenu.condicionDentro(x, y, boton);
             gestorMenu.condicionColor(dentro, boton);
-            gestorSonido.reproducirSonido(i, dentro);
+            super.reproducirSonido(i, dentro);
             hitAlgo |= dentro;
         }
         return hitAlgo;
