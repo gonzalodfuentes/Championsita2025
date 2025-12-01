@@ -3,9 +3,13 @@ package com.championsita.menus.menueleccion;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
-import com.championsita.menus.menuprincipal.*;
+import com.championsita.menus.menuprincipal.GestorInputMenu;
+import com.championsita.menus.menuprincipal.Inicial;
+import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.compartido.Assets;
 import com.championsita.menus.menucarga.Campo;
+import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
+import com.championsita.partida.herramientas.Config;
 import com.championsita.partida.ControladorDePartida;
 
 /**
@@ -35,7 +39,6 @@ public class UnJugador extends Menu {
     //Gestores y Herramientas
     GestorInputMenu gestorMenu;
     RenderizadorDeMenu renderizador;
-    GestorSonidoMenu gestorSonido;
 
     public UnJugador(Principal juego, String modoDestino) {
         super(juego);
@@ -64,7 +67,7 @@ public class UnJugador extends Menu {
         this.previewCampo.setSize(300, 170);
 
         // Sonidos: 4 flechas + atrás + ok => 6
-        gestorSonido.inicializarSonido(6);
+        super.inicializarSonido(6);
 
         //Inicializar Gestores/Herramientas
         this.gestorMenu = new GestorInputMenu(this);
@@ -144,17 +147,17 @@ public class UnJugador extends Menu {
 
         for (int i = 0; i < super.flechas.length; i++) {
             boolean dentro = gestorMenu.condicionFlechas(super.flechas[i], x, y);
-            gestorSonido.reproducirSonido(i, dentro);
+            super.reproducirSonido(i, dentro);
             hit |= dentro;
         }
 
         boolean dentroAtras = gestorMenu.condicionDentro(x, y, super.atrasSprite);
         gestorMenu.condicionColor(dentroAtras, super.atrasSprite);
-        gestorSonido.reproducirSonido(4, dentroAtras);
+        super.reproducirSonido(4, dentroAtras);
 
         boolean dentroOk = gestorMenu.condicionDentro(x, y, super.siguienteSprite);
         gestorMenu.condicionColor(dentroOk, super.siguienteSprite);
-        gestorSonido.reproducirSonido(5, dentroOk);
+        super.reproducirSonido(5, dentroOk);
 
         return hit || dentroAtras || dentroOk;
     }
@@ -177,7 +180,7 @@ public class UnJugador extends Menu {
 
         // OK → construir config y entrar directo a la partida
         if (gestorMenu.condicionDentro(x, y, super.siguienteSprite)) {
-            ControladorDePartida.Config cfg = new ControladorDePartida.Config.Builder()
+            Config cfg = new Config.Builder()
                     .agregarSkin(skinP1)
                     .agregarSkin(skinP2)
                     .campo(campos[idxCampo])      // requerido
