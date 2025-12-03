@@ -61,25 +61,33 @@ public class ModoEspecial extends ModoBase {
 
             HabilidadesEspeciales habilidadElegida = elecciones.get(indice);
 
-            boolean usada = habilidadesUsadas.contains(habilidadElegida);
+            // asignar sin restricciones
+            pj.asignarHabilidad(habilidadElegida);
+            pj.aplicarEfectosPermanentesDeHabilidad();
+            indice++;
 
-            // condición original pero corregida
-            if (habilidadElegida == HabilidadesEspeciales.NEUTRO || !usada) {
+            if (indice >= ordenSeleccion.size()) seleccionTerminada = true;
 
-                // asignar
-                pj.asignarHabilidad(habilidadElegida);
-                pj.aplicarEfectosPermanentesDeHabilidad();
+//            boolean usada = habilidadesUsadas.contains(habilidadElegida);
+//
+//            // condición original pero corregida
+//            if (habilidadElegida == HabilidadesEspeciales.NEUTRO || !usada) {
+//
+//                // asignar
+//                pj.asignarHabilidad(habilidadElegida);
+//                pj.aplicarEfectosPermanentesDeHabilidad();
+//
+//                if (habilidadElegida != HabilidadesEspeciales.NEUTRO)
+//                    habilidadesUsadas.add(habilidadElegida);
+//
+//                // siguiente jugador
+//                indice++;
+//
+//                if (indice >= ordenSeleccion.size()) {
+//                    seleccionTerminada = true;
+//                }
+//            }
 
-                if (habilidadElegida != HabilidadesEspeciales.NEUTRO)
-                    habilidadesUsadas.add(habilidadElegida);
-
-                // siguiente jugador
-                indice++;
-
-                if (indice >= ordenSeleccion.size()) {
-                    seleccionTerminada = true;
-                }
-            }
         }
     }
 
