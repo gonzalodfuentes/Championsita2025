@@ -1,3 +1,5 @@
+Especial.png
+Minercraftory.ttf
 atrasBoton.png
 barraStamina.png
 campos/campoAzul.png
@@ -76,6 +78,7 @@ jugador/verde/jugadorMirandoArribaDerecha.png
 jugador/verde/jugadorMirandoArribaIzquierda.png
 jugador/verde/jugadorMirandoDerecha.png
 jugador/verde/jugadorMirandoIzquierda.png
+light-arial.ttf
 lobbyEspera/jugador1.png
 lobbyEspera/jugador2.png
 menuCreacion/campoCartel.png
@@ -101,11 +104,12 @@ menuInicial/onlineBoton.png
 menuInicial/opcionesBoton.png
 menuInicial/practicaBoton.png
 menuInicial/salirBoton.png
+opcion/color.png
+opcion/volumen/vol0.png
+opcion/volumen/vol100.png
+opcion/volumen/vol120.png
+opcion/volumen/vol20.png
+opcion/volumen/vol40.png
+opcion/volumen/vol60.png
+opcion/volumen/vol80.png
 pelota/pelotaAnimada.png
-volumen/vol0.png
-volumen/vol100.png
-volumen/vol120.png
-volumen/vol20.png
-volumen/vol40.png
-volumen/vol60.png
-volumen/vol80.png
