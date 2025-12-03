@@ -1,4 +1,4 @@
-package com.championsita.modelo;
+package com.championsita.jugabilidad.modelo;
 
 public class ConfiguracionJugador {
 	public String nombreJugador;

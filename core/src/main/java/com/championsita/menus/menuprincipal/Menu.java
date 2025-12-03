@@ -59,8 +59,8 @@ public class Menu extends InputAdapter implements Screen {
         this.atrasSprite.setSize(140, 70);
         this.atrasSprite.setPosition(15, 670);
 
-        this.colorBoton = new Color(this.atrasSprite.getColor());
-        this.colorAccion = new Color(0, 1, 0, 1);
+        this.colorBoton = new Color(1, 1, 1, 1);
+        this.colorAccion = this.juego.getAccionColor();
 
         this.siguienteSprite = new Sprite(this.siguiente);
         this.siguienteSprite.setSize(140, 70);
@@ -70,8 +70,9 @@ public class Menu extends InputAdapter implements Screen {
         this.fondoSprite.setSize(this.anchoPantalla, this.altoPantalla);
 
         // Música
-        this.musica.setVolume(0.03f);
+
         this.musica.setLooping(true);
+        this.musica.setVolume(this.juego.getVolumenMusica());
         if (!this.musica.isPlaying()) this.musica.play();
 
         int cantBotonesGlobales = 2;
@@ -113,5 +114,9 @@ public class Menu extends InputAdapter implements Screen {
         }
 
         this.juego.actualizarPantalla(nuevaPantalla);
+    }
+
+    public void demostracionTemporalMusica(float volumen) {
+        this.musica.setVolume(volumen);
     }
 }

@@ -1,6 +1,7 @@
 package com.championsita.menus.menuprincipal;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
 import com.championsita.menus.local.Local;
@@ -14,36 +15,37 @@ public class Inicial extends Menu {
     private GestorInputMenu gestorMenu;
     private RenderizadorDeMenu renderizador;
 
-    public Inicial(Principal juego) { super(juego); }
+    public Inicial(Principal juego) {
+        super(juego);
+    }
 
     @Override
     public void show() {
         super.show();
 
-        // Cargar botones usando Assets para mantener el ciclo de vida unificado
         this.botones = new Sprite[] {
-                new Sprite(Assets.tex("menuInicial/onlineBoton.png")),
-                new Sprite(Assets.tex("menuInicial/localBoton.png")),
-                new Sprite(Assets.tex("menuInicial/opcionesBoton.png")),
-                new Sprite(Assets.tex("menuInicial/salirBoton.png"))
+                new Sprite(new Texture("menuInicial/onlineBoton.png")),
+                new Sprite(new Texture("menuInicial/localBoton.png")),
+                new Sprite(new Texture("menuInicial/opcionesBoton.png")),
+                new Sprite(new Texture("menuInicial/salirBoton.png"))
         };
 
+
         this.anchoBotones = botones[0].getWidth() - 100;
-        this.altoBotones  = botones[0].getHeight() - 20;
+        this.altoBotones = botones[0].getHeight() - 20;
 
         int apilar = 0;
-        for (int i = 0; i < botones.length; i++) {
+        for(int i = 0; i < botones.length; i++) {
             botones[i].setSize(anchoBotones, altoBotones);
-            float x = super.anchoPantalla / 2f - anchoBotones / 2f;
-            float y = super.altoPantalla / 1.6f - altoBotones / 2f - apilar;
-            botones[i].setPosition(x, y);
+            float xBoton = super.anchoPantalla / 2f - anchoBotones / 2f;
+            float yBoton = super.altoPantalla / 1.6f - altoBotones / 2f - apilar;
+            this.botones[i].setPosition(xBoton, yBoton);
             apilar += 80;
         }
 
-        // 4 botones + (opcional) atrás/ok globales => 6 slots de sonido
-        super.inicializarSonido(6);
+        int cantBotones = 6;
+        super.inicializarSonido(cantBotones);
 
-        // Registrar input en este menú
         Gdx.input.setInputProcessor(this);
 
         //Inicializar Gestores-Herramientas
@@ -65,6 +67,7 @@ public class Inicial extends Menu {
 
         for (int i = 0; i < botones.length; i++) {
             Sprite boton = botones[i];
+
             float bx = boton.getX();
             float by = boton.getY();
             if (x >= bx && x <= bx + anchoBotones && y >= by && y <= by + altoBotones) {
@@ -102,7 +105,7 @@ public class Inicial extends Menu {
                 break;
             }
             case 2: {
-                // OPCIONES (pendiente)
+                super.juego.actualizarPantalla(new Opcion(super.juego));
                 break;
             }
             case 3: {
@@ -116,6 +119,5 @@ public class Inicial extends Menu {
     @Override
     public void dispose() {
         super.dispose();
-        // Texturas y sonidos quedan bajo control de Assets
     }
 }
