@@ -1,176 +1,151 @@
 package com.championsita.partida;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.championsita.jugabilidad.constantes.Constantes;
-import com.championsita.jugabilidad.entrada.EntradaJugador;
-import com.championsita.jugabilidad.modelo.ConfiguracionPersonaje;
-import com.championsita.jugabilidad.modelo.Pelota;
-import com.championsita.jugabilidad.modelo.Personaje;
-import com.championsita.jugabilidad.personajes.Normal;
+import com.championsita.jugabilidad.modelo.*;
+import com.championsita.jugabilidad.sistemas.SistemaColisiones;
+import com.championsita.jugabilidad.sistemas.SistemaFisico;
+import com.championsita.jugabilidad.sistemas.SistemaPartido;
 import com.championsita.jugabilidad.visuales.DibujadorJugador;
 import com.championsita.jugabilidad.visuales.DibujadorPelota;
-import com.championsita.jugabilidad.sistemas.SistemaFisico;
-import com.championsita.jugabilidad.sistemas.SistemaColisiones;
+import com.championsita.jugabilidad.visuales.HudPartido;
+import com.championsita.partida.herramientas.Config;
+import com.championsita.partida.herramientas.MundoPartida;
+import com.championsita.partida.modosdejuego.ModoDeJuego;
+import com.championsita.partida.modosdejuego.implementaciones.ModoEspecial;
+import com.championsita.partida.modosdejuego.implementaciones.Practica;
+import com.championsita.partida.modosdejuego.implementaciones.UnoContraUno;
+import com.championsita.partida.nucleo.ContextoModoDeJuego;
+import com.championsita.partida.herramientas.*;
+import com.championsita.partida.nucleo.ContextoPartida;
 
-public class ControladorDePartida extends InputAdapter implements Screen {
+import java.util.ArrayList;
 
-    private String campoRuta, pielJugUno, pielJugDos;
-    private final ConfiguracionPersonaje configJugador1;
-    private final ConfiguracionPersonaje configJugador2;
+/**
+ * Controla la ejecución de una partida, independiente del modo.
+ * Se encarga de preparar el contexto y delegar la lógica al modo elegido.
+ */
+public class ControladorDePartida implements Screen {
 
-    public ControladorDePartida(String campoRuta, String pielJugUno, String pielJugDos) {
-        this.campoRuta = campoRuta;
-        this.pielJugUno = pielJugUno;
-        this.pielJugDos = pielJugDos;
+    private final Config config;
+    private ModoDeJuego modoJuego;
 
-        this.configJugador1 = ConfiguracionPersonaje.porDefecto(pielJugUno);
-        this.configJugador2 = ConfiguracionPersonaje.porDefecto(pielJugDos);
+    private SpriteBatch batch = new SpriteBatch();
+    private Texture texturaCancha;
+    private FitViewport viewport;
+    private ShapeRenderer renderizadorDeFormas;
+
+    private ArrayList<Personaje> jugadores = new ArrayList<>();
+    private Pelota pelota;
+    Cancha cancha;
+
+    private ArrayList<DibujadorJugador> dibujadoresJugadores = new ArrayList<>();
+    private DibujadorPelota dibPelota;
+    private HudPartido dibujadorHudPartido;
+
+    private SistemaFisico fisica;
+    private SistemaColisiones colisiones;
+    private SistemaPartido partido;
+
+    public ControladorDePartida(Config config) {
+        this.config = config;
+        ContextoPartida contextoPartida= InicializadorPartida.inicializar(config, this);
+        this.modoJuego = contextoPartida.modo;
+        this.batch = contextoPartida.batch;
+        this.renderizadorDeFormas = contextoPartida.rendererFormas;
+        this.viewport = contextoPartida.viewport;
+        this.texturaCancha = contextoPartida.texturaCancha;
+        this.fisica = contextoPartida.fisica;
+        this.colisiones = contextoPartida.colisiones;
+        this.partido = contextoPartida.partido;
+
+        MundoPartida mundo = PartidaFactory.crearDesdeConfig(config);
+        this.cancha = mundo.cancha;
+        this.pelota = mundo.pelota;
+        this.jugadores = mundo.jugadores;
+        this.dibPelota = mundo.dibPelota;
+        this.dibujadoresJugadores = mundo.dibujadoresJugadores;
+
+        this.dibujadorHudPartido = new HudPartido(viewport);
     }
 
 
-    // Render / cámara
-    private SpriteBatch pintor;
-    private Texture texturaCancha;
-    private FitViewport vistaAjustada;
-
-    // Actores
-    private Personaje jugador1;
-    private Personaje jugador2;
-    private Pelota    pelota;
-
-    // Vistas
-    private DibujadorJugador dibujadorJugador1;
-    private DibujadorJugador dibujadorJugador2;
-    private DibujadorPelota  dibujadorPelota;
-
-    // Entrada
-    private EntradaJugador entradaJugador1;
-    private EntradaJugador entradaJugador2;
-    private InputMultiplexer multiplexorEntradas;
-
-    // Sistemas
-    private SistemaFisico    sistemaFisico;
-    private SistemaColisiones sistemaColisiones;
 
     @Override
     public void show() {
-        inicializarRenderYCamara();
-        crearActores();
-        configurarEntradas();
-        crearSistemas();
+
+
+        ContextoModoDeJuego ctx = new ContextoModoDeJuego(viewport, batch, cancha ,fisica, colisiones, partido, jugadores, this);
+
+        if(modoJuego.getClass() == ModoEspecial.class) {
+            ctx = new ContextoModoDeJuego(viewport, batch, cancha ,fisica, colisiones, partido, jugadores, this, config.habilidadesEspeciales);
+        }
+
+        ctx.pelota = pelota;
+
+        modoJuego.iniciar(ctx);
+        Gdx.input.setInputProcessor(modoJuego.getProcesadorEntrada());
     }
 
     @Override
     public void render(float delta) {
+        RenderizadorPartida render = new RenderizadorPartida();
 
-        // 1) Entrada
-        entradaJugador1.actualizar(delta);
-        entradaJugador2.actualizar(delta);
+        ScreenUtils.clear(Color.BLACK);
 
-        // 2) Físicas: personajes (animaciones/estado)
-        sistemaFisico.actualizarPersonaje(jugador1, delta);
-        sistemaFisico.actualizarPersonaje(jugador2, delta);
+        modoJuego.actualizar(delta);
 
-        // 3) Físicas: límites del mundo
-        float W = vistaAjustada.getWorldWidth();
-        float H = vistaAjustada.getWorldHeight();
-        sistemaFisico.limitarPersonajeAlMundo(jugador1, W, H);
-        sistemaFisico.limitarPersonajeAlMundo(jugador2, W, H);
+        // 1. FONDO (cancha)
+        render.renderFondo(batch, viewport, cancha);
 
-        // 4) Colisiones: jugador ↔ jugador
-        sistemaColisiones.separarJugadoresSiChocan(jugador1, jugador2);
+        // 2. ENTIDADES (jugadores + pelota)
+        render.renderEntidades(batch, viewport, dibujadoresJugadores, dibPelota, modoJuego);
 
-        // 5) Colisiones: jugador ↔ pelota (ambos)
-        sistemaColisiones.procesarContactoPelotaConJugador(pelota, jugador1);
-        sistemaColisiones.procesarContactoPelotaConJugador(pelota, jugador2);
+        // 3. HUD DEL MODO (proyección del mundo)
+        render.renderHudModo(batch, modoJuego, viewport);
 
-        // 6) Físicas: pelota (una sola vez)
-        sistemaFisico.actualizarPelota(pelota, delta);
+        // 4. HUD DEL PARTIDO (pantalla)
+        render.renderHudPartido(batch, dibujadorHudPartido, partido,
+                Gdx.graphics.getWidth(),
+                Gdx.graphics.getHeight());
 
-        // 7) Dibujo
-        dibujarEscena();
+        // 5. ARCOS (ShapeRenderer sobre mundo)
+        render.renderArcos(renderizadorDeFormas, viewport, cancha);
     }
+
 
     @Override
-    public void resize(int ancho, int alto) {
-        vistaAjustada.update(ancho, alto, true);
+    public void resize(int width, int height) {
+        viewport.update(width, height, true);
     }
 
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
+    @Override public void pause() {}
+    @Override public void resume() {}
+    @Override public void hide() {}
 
     @Override
     public void dispose() {
-        if (pintor != null) pintor.dispose();
+        if (batch != null) batch.dispose();
         if (texturaCancha != null) texturaCancha.dispose();
-        // si tus modelos tienen dispose(), llamalos acá
+        if (modoJuego != null) modoJuego.liberar();
     }
 
-    // ======================== Privados ========================
+    public ArrayList<Personaje> getJugadoresDelEquipo(Equipo equipo) {
+        ArrayList<Personaje> lista = new ArrayList<>();
 
-    private void inicializarRenderYCamara() {
-        pintor = new SpriteBatch();
-        texturaCancha = new Texture("campos/campo" + this.campoRuta + ".png");
-        vistaAjustada = new FitViewport(Constantes.MUNDO_ANCHO, Constantes.MUNDO_ALTO);
-    }
+        for (Personaje pj : jugadores) {
+            if (pj.getEquipo() == equipo) {
+                lista.add(pj);
+            }
+        }
 
-    private void crearActores() {
-        jugador1 = new Normal("Jugador 1", configJugador1, Constantes.ESCALA_PERSONAJE);
-        jugador2 = new Normal("Jugador 2", configJugador2, Constantes.ESCALA_PERSONAJE);
-
-        jugador1.setPosicion(2.0f, 2.5f);
-        jugador2.setPosicion(6.0f, 2.5f);
-
-        dibujadorJugador1 = new DibujadorJugador(jugador1);
-        dibujadorJugador2 = new DibujadorJugador(jugador2);
-
-        pelota = new Pelota(Constantes.MUNDO_ANCHO / 2f, Constantes.MUNDO_ALTO / 2f, Constantes.ESCALA_PELOTA);
-        dibujadorPelota = new DibujadorPelota(pelota);
-    }
-
-    private void configurarEntradas() {
-        entradaJugador1 = new EntradaJugador(jugador1, Keys.W, Keys.S, Keys.A, Keys.D, Keys.CONTROL_LEFT, Keys.SHIFT_LEFT);
-        entradaJugador2 = new EntradaJugador(jugador2, Keys.UP, Keys.DOWN, Keys.LEFT, Keys.RIGHT, Keys.CONTROL_RIGHT, Keys.SHIFT_RIGHT);
-        multiplexorEntradas = new InputMultiplexer(entradaJugador1, entradaJugador2);
-        Gdx.input.setInputProcessor(multiplexorEntradas);
-    }
-
-    private void crearSistemas() {
-        sistemaFisico    = new SistemaFisico();
-        sistemaColisiones = new SistemaColisiones();
-    }
-
-    private void dibujarEscena() {
-        ScreenUtils.clear(Color.BLACK);
-
-        vistaAjustada.apply();
-        pintor.setProjectionMatrix(vistaAjustada.getCamera().combined);
-        pintor.begin();
-
-        pintor.draw(texturaCancha, 0, 0, vistaAjustada.getWorldWidth(), vistaAjustada.getWorldHeight());
-
-        dibujadorJugador1.dibujar(pintor);
-        dibujadorJugador2.dibujar(pintor);
-        dibujadorPelota.dibujar(pintor);
-
-        pintor.end();
+        return lista;
     }
 }

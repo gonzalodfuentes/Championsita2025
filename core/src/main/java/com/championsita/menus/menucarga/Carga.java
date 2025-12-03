@@ -7,19 +7,33 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.audio.Sound;
 import com.championsita.Principal;
+import com.championsita.jugabilidad.modelo.Equipo;
+import com.championsita.jugabilidad.modelo.HabilidadesEspeciales;
+import com.championsita.menus.menuprincipal.GestorInputMenu;
 import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.menueleccion.Doble;
-import com.championsita.partida.ControladorDePartida;
 import com.championsita.menus.compartido.Assets;
+import com.championsita.menus.compartido.OpcionDeGoles;
+import com.championsita.menus.compartido.OpcionDeTiempo;
+import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
+import com.championsita.partida.herramientas.Config;
+import com.championsita.partida.ControladorDePartida;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Carga extends Menu {
 
+    // Ahora soporta equipos especiales
+    private Equipo equipoJ1;
+    private Equipo equipoJ2;
+
     private SpriteBatch batch;
     private final String pielJugador1;
     private final String pielJugador2;
+    private ArrayList<HabilidadesEspeciales> habilidades = new ArrayList<>();
+    private final String modo; // "1v1", "practica", "especial"
 
     private Texture fondoTex;
     private Texture botonJugarTex;
@@ -67,10 +81,48 @@ public class Carga extends Menu {
     private static final float CAMPOS_ALTURA    = 200f;
     private static final float FLECHA_OFFSET    = 5f;
 
-    public Carga(Principal juego, String pielUno, String pielDos) {
+    // Gestores
+    private GestorInputMenu gestorMenu;
+    private RenderizadorDeMenu renderizador;
+
+    // Constructor normal (1v1 / practica)
+    public Carga(Principal juego, String pielUno, String pielDos, String modo) {
         super(juego);
         this.pielJugador1 = pielUno;
         this.pielJugador2 = pielDos;
+        this.modo = (modo == null ? "1v1" : modo);
+
+        // En modos normales no hay equipo
+        this.equipoJ1 = null;
+        this.equipoJ2 = null;
+    }
+
+    // Constructor especial (2J especial con equipos)
+    public Carga(Principal juego,
+                 String skinJ1,
+                 String skinJ2,
+                 String modoDestino,
+                 Equipo equipoJ1,
+                 Equipo equipoJ2) {
+
+        this(juego, skinJ1, skinJ2, modoDestino);
+        this.equipoJ1 = equipoJ1;
+        this.equipoJ2 = equipoJ2;
+    }
+
+    public Carga(Principal juego,
+                 String skinJ1,
+                 String skinJ2,
+                 String modoDestino,
+                 Equipo equipoJ1,
+                 Equipo equipoJ2,
+                 ArrayList<HabilidadesEspeciales> habilidades) {
+        this(juego, skinJ1, skinJ2, modoDestino);
+
+        this.equipoJ1 = equipoJ1;
+        this.equipoJ2 = equipoJ2;
+
+        this.habilidades.addAll(habilidades);
     }
 
     @Override
@@ -143,13 +195,17 @@ public class Carga extends Menu {
         super.inicializarSonido(2);
 
         Gdx.input.setInputProcessor(this);
+
+        // Gestores
+        gestorMenu = new GestorInputMenu(this);
+        renderizador = new RenderizadorDeMenu(this);
     }
 
     @Override
     public void render(float delta) {
         batch.begin();
-        super.render(delta);
-        super.cargarAtrasSiguiente();
+        renderizador.renderFondo(delta);
+        renderizador.cargarAtrasSiguiente();
 
         controlJugador1.draw(batch);
         controlJugador2.draw(batch);
@@ -174,11 +230,11 @@ public class Carga extends Menu {
         cartelTiempo.setColor(dentroT ? colorHover : colorNormal);
 
         boolean dentroAtras = hit(super.atrasSprite, x, y);
-        super.condicionColor(dentroAtras, super.atrasSprite);
+        gestorMenu.condicionColor(dentroAtras, super.atrasSprite);
         super.reproducirSonido(0, dentroAtras);
 
         boolean dentroJugar = hit(super.siguienteSprite, x, y);
-        super.condicionColor(dentroJugar, super.siguienteSprite);
+        gestorMenu.condicionColor(dentroJugar, super.siguienteSprite);
         super.reproducirSonido(1, dentroJugar);
 
         updateFlechaHover(flechaIzq, x, y, true);
@@ -195,7 +251,6 @@ public class Carga extends Menu {
         if (hit(cartelGoles, x, y)) {
             indiceGoles = (indiceGoles + 1) % opcionesGoles.length;
             cartelGoles.setTexture(golesTex[indiceGoles]);
-            cartelGoles.setSize(cartelGoles.getTexture().getWidth(), cartelGoles.getTexture().getHeight());
             cartelGoles.setPosition(golesXY[0], golesXY[1]);
             clic = true;
         }
@@ -203,7 +258,6 @@ public class Carga extends Menu {
         if (hit(cartelTiempo, x, y)) {
             indiceTiempo = (indiceTiempo + 1) % opcionesTiempo.length;
             cartelTiempo.setTexture(tiempoTex[indiceTiempo]);
-            cartelTiempo.setSize(cartelTiempo.getTexture().getWidth(), cartelTiempo.getTexture().getHeight());
             cartelTiempo.setPosition(tiempoXY[0], tiempoXY[1]);
             clic = true;
         }
@@ -212,16 +266,36 @@ public class Carga extends Menu {
         if (hit(flechaDer, x, y)) { cambiarCampo(+1); clic = true; }
 
         if (hit(super.atrasSprite, x, y)) {
-            super.cambiarMenu(true, new Doble(super.juego));
+            super.cambiarMenu(true, new Doble(super.juego, this.modo));
             return true;
         }
 
+        // ============================
+        // BOTÓN JUGAR — ARMAMOS CONFIG
+        // ============================
         if (hit(super.siguienteSprite, x, y)) {
-            String nombreCampo = listaCampos[indiceCampo].getNombre();
-            // En el siguiente refactor podemos crear un GameConfig y pasar todo junto.
-            super.juego.actualizarPantalla(
-                    new ControladorDePartida(nombreCampo, this.pielJugador1, this.pielJugador2)
-            );
+
+            Config.Builder builder =
+                    new Config.Builder()
+                            .agregarSkin(pielJugador1)
+                            .agregarSkin(pielJugador2)
+                            .campo(listaCampos[indiceCampo])
+                            .goles(mapGoles(opcionesGoles[indiceGoles]))
+                            .tiempo(mapTiempo(opcionesTiempo[indiceTiempo]))
+                            .modo(this.modo);
+
+            // SOLO si viene de Modo Especial: agrega equipos
+            if(this.modo.equals("especial")){
+                if (equipoJ1 != null && equipoJ2 != null) {
+                    builder.agregarEquipo(equipoJ1);
+                    builder.agregarEquipo(equipoJ2);
+                }
+                builder.agregarHabilidades(habilidades);
+            }
+
+
+            Config config = builder.build();
+            super.juego.actualizarPantalla(new ControladorDePartida(config));
             return true;
         }
 
@@ -231,7 +305,6 @@ public class Carga extends Menu {
     @Override
     public void dispose() {
         super.dispose();
-        // No liberamos texturas manejadas por Assets.
     }
 
     private void cambiarCampo(int delta) {
@@ -266,5 +339,23 @@ public class Carga extends Menu {
         this.controlJugador2 = new Sprite(controlJugador2Tex);
         this.controlJugador1.setPosition(xUno, y);
         this.controlJugador2.setPosition(xDos, y);
+    }
+
+    private OpcionDeGoles mapGoles(int valor) {
+        return switch (valor) {
+            case 1 -> OpcionDeGoles.UNO;
+            case 3 -> OpcionDeGoles.TRES;
+            case 5 -> OpcionDeGoles.CINCO;
+            default -> OpcionDeGoles.UNO;
+        };
+    }
+
+    private OpcionDeTiempo mapTiempo(int cod) {
+        return switch (cod) {
+            case 1 -> OpcionDeTiempo.CORTO;
+            case 2 -> OpcionDeTiempo.MEDIO;
+            case 3 -> OpcionDeTiempo.LARGO;
+            default -> OpcionDeTiempo.CORTO;
+        };
     }
 }

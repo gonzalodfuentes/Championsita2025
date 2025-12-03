@@ -6,8 +6,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.championsita.jugabilidad.sistemas.DiccionarioHabilidades;
+import com.championsita.jugabilidad.sistemas.ModificadorHabilidad;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 // Ajustá este import a donde tengas el enum Direccion
@@ -23,6 +26,9 @@ public abstract class Personaje {
     private final float  escala;
     private final AtributosPersonaje atributos;
     private final ConfiguracionPersonaje sprites;
+    private Equipo equipo;
+
+
 
     // =========================
     // Estado de stamina/sprint
@@ -41,9 +47,10 @@ public abstract class Personaje {
     private float tiempoAnimacion = 0f; // stateTime
     private boolean estaMoviendo = false;
     private boolean espacioPresionado = false;
+    private boolean sprintActivo = false;
     private Direccion direccionActual = Direccion.ABAJO;
 
-    // Hitbox con offset (más angosta y “apoyada” abajo para mejor gamefeel)
+
     private final Rectangle hitbox = new Rectangle();
     private float hbAncho, hbAlto, hbOffsetX, hbOffsetY;
 
@@ -58,6 +65,21 @@ public abstract class Personaje {
                     sheetArribaDerecha, sheetArribaIzquierda,
                     sheetAbajoDerecha,  sheetAbajoIzquierda;
 
+    // =========================
+// Habilidades especiales
+// =========================
+    private HabilidadesEspeciales habilidadActual = HabilidadesEspeciales.NEUTRO;
+
+    // Modificador que contiene todos los cambios de esa habilidad
+    private ModificadorHabilidad modificador = DiccionarioHabilidades.obtener(HabilidadesEspeciales.NEUTRO);
+
+    // Timers de efectos especiales
+    private float timerCongelado = 0f;   // PEQUEÑIN
+    private float timerLentitud = 0f;    // ATLETA
+    private float timerBuffVelocidad = 0f;  // EXTREMISTA (+25%)
+    private float timerDebuffVelocidad = 0f; // EXTREMISTA (-25%)
+
+
     private final Map<Direccion, Animation<TextureRegion>> animaciones = new EnumMap<>(Direccion.class);
 
     // =========================
@@ -68,11 +90,12 @@ public abstract class Personaje {
                      AtributosPersonaje atributos,
                      float escala) {
 
+        hud = new HudPersonaje(this);
         this.nombre   = nombre;
         this.sprites  = sprites;
         this.atributos = atributos;
         this.escala   = escala;
-
+        this.hud = new HudPersonaje(this);
         this.staminaActual = atributos.getStaminaMaxima();
 
         // Cargar texturas base
@@ -145,21 +168,64 @@ public abstract class Personaje {
     }
 
     private void actualizarVelocidadYStamina(boolean sprint, float delta) {
+
+        // ============================================
+        // 0. Reducir timers si están activos
+        // ============================================
+        if (timerCongelado > 0) {
+            timerCongelado -= delta;
+            if (timerCongelado < 0) timerCongelado = 0;
+        }
+
+        if (timerLentitud > 0) {
+            timerLentitud -= delta;
+            if (timerLentitud < 0) timerLentitud = 0;
+        }
+
+        if (timerBuffVelocidad > 0) {
+            timerBuffVelocidad -= delta;
+            if (timerBuffVelocidad < 0) timerBuffVelocidad = 0;
+        }
+
+        if (timerDebuffVelocidad > 0) {
+            timerDebuffVelocidad -= delta;
+            if (timerDebuffVelocidad < 0) timerDebuffVelocidad = 0;
+        }
+
+        // ============================================
+        // 1. CONGELAMIENTO — PEQUEÑÍN
+        // ============================================
+        if (habilidadActual == HabilidadesEspeciales.PEQUEÑIN && staminaActual <= 0) {
+            if (timerCongelado <= 0) {
+                timerCongelado = 1.0f;   // 1 segundo congelado
+            }
+        }
+
+        if (timerCongelado > 0) {
+            distanciaEsteFrame = 0; // NO SE PUEDE MOVER
+            return;
+        }
+
+        // ============================================
+        // 2. Calcular velocidad BASE o SPRINT
+        // ============================================
         float velocidad = atributos.getVelocidadBase();
+
+//        System.out.println(staminaActual);
 
         if (sprint && staminaActual > 0f) {
             velocidad = atributos.getVelocidadSprint();
             staminaActual -= atributos.getConsumoSprintPorSegundo() * delta;
             if (staminaActual < 0f) staminaActual = 0f;
 
-            // Si cae por debajo del límite, reducir a base y bloquear recarga un rato
+            // Si cayó bajo el límite, aplicar bloqueo
             if (staminaActual < atributos.getLimiteStaminaBloqueo()) {
                 velocidad = atributos.getVelocidadBase();
-                bloqueoRecarga       = true;
+                bloqueoRecarga = true;
                 tiempoBloqueoRecarga = 0f;
             }
         } else {
-            // Si veníamos bloqueados, esperamos a que pase el tiempo de bloqueo
+            // Recarga o bloqueo
             if (bloqueoRecarga) {
                 if (!sprint) {
                     tiempoBloqueoRecarga += delta;
@@ -168,14 +234,35 @@ public abstract class Personaje {
                     }
                 }
             } else {
-                // Recarga normal
                 staminaActual += atributos.getRecargaStaminaPorSegundo() * delta;
                 if (staminaActual > atributos.getStaminaMaxima()) staminaActual = atributos.getStaminaMaxima();
             }
         }
 
+        // ============================================
+        // 3. LENTITUD — ATLETA
+        // ============================================
+        if (habilidadActual == HabilidadesEspeciales.ATLETA && staminaActual <= 0) {
+            if (timerLentitud <= 0) {
+                timerLentitud = 2.0f;  // 2 segundos lento
+            }
+        }
+        if (timerLentitud > 0) {
+            velocidad *= 0.6f; // aplicar lentitud
+        }
+
+        // ============================================
+        // 4. EXTREMISTA — Buff y Debuff
+        // ============================================
+        if (timerBuffVelocidad > 0) velocidad *= 1.25f;
+        if (timerDebuffVelocidad > 0) velocidad *= 0.75f;
+
+        // ============================================
+        // 5. Guardar distancia final del frame
+        // ============================================
         distanciaEsteFrame = velocidad * delta;
     }
+
 
     private void moverYActualizarDireccion(boolean izquierda, boolean derecha, boolean arriba, boolean abajo) {
         estaMoviendo = izquierda || derecha || arriba || abajo;
@@ -200,6 +287,52 @@ public abstract class Personaje {
         hitbox.setPosition(x + hbOffsetX, y + hbOffsetY);
     }
 
+    public void asignarHabilidad(HabilidadesEspeciales habilidad) {
+        this.habilidadActual = habilidad;
+        this.modificador = DiccionarioHabilidades.obtener(habilidad);
+
+        // Resetear timers por si el personaje cambia de habilidad (modo especial)
+        timerCongelado = 0f;
+        timerLentitud = 0f;
+        timerBuffVelocidad = 0f;
+        timerDebuffVelocidad = 0f;
+    }
+
+    public void aplicarEfectosPermanentesDeHabilidad() {
+
+        // === 1. Reescalar sprite (ancho / alto) ===
+        this.ancho *= modificador.escalaSprite;
+        this.alto  *= modificador.escalaSprite;
+
+        // === 2. Reescalar hitbox ===
+        this.hbAncho *= modificador.escalaSprite;
+        this.hbAlto  *= modificador.escalaSprite;
+        hitbox.setSize(hbAncho, hbAlto);
+
+        // === 3. Actualizar atributos del personaje ===
+        this.atributos.update(
+                atributos.getVelocidadBase() * modificador.velocidadBase,
+                atributos.getVelocidadSprint() * modificador.velocidadSprint,
+                atributos.getStaminaMaxima() * modificador.staminaMax,
+                atributos.getConsumoSprintPorSegundo() * modificador.consumoSprint,
+                atributos.getRecargaStaminaPorSegundo() * modificador.recargaStamina,
+                atributos.getLimiteStaminaBloqueo(),
+                atributos.getTiempoBloqueoRecargaSegundos()
+        );
+
+        // === 4. Reset de stamina al nuevo máximo ===
+        this.staminaActual = atributos.getStaminaMaxima();
+    }
+
+    public void activarBuffVelocidad(float duracion) {
+        timerBuffVelocidad = duracion;
+    }
+
+    public void activarDebuffVelocidad(float duracion) {
+        timerDebuffVelocidad = duracion;
+    }
+
+
     // =========================
     // API pública (llamada por el Intérprete de Entrada)
     // =========================
@@ -207,6 +340,7 @@ public abstract class Personaje {
                                         boolean sprint, float delta) {
         actualizarVelocidadYStamina(sprint, delta);
         moverYActualizarDireccion(izquierda, derecha, arriba, abajo);
+        this.sprintActivo = sprint;
     }
 
     // Compatibilidad con código antiguo (sin sprint)
@@ -217,6 +351,10 @@ public abstract class Personaje {
 
     public void actualizar(float delta) {
         if (estaMoviendo) tiempoAnimacion += delta;
+        if (timerCongelado > 0) timerCongelado -= delta;
+        if (timerLentitud > 0) timerLentitud -= delta;
+        if (timerBuffVelocidad > 0) timerBuffVelocidad -= delta;
+        if (timerDebuffVelocidad > 0) timerDebuffVelocidad -= delta;
     }
 
     public void dibujar(SpriteBatch pincel) {
@@ -262,11 +400,20 @@ public abstract class Personaje {
     public float getEscala() { return escala; }
 
     public HudPersonaje getHud() { return hud; }
+
     public TextureRegion obtenerFrameActual() {
         return estaMoviendo
                 ? animaciones.get(direccionActual).getKeyFrame(tiempoAnimacion, true)
                 : frameQuieto;
     }
+
+    public HabilidadesEspeciales getHabilidadActual() { return habilidadActual; }
+
+    public void setEquipo(Equipo eq){ this.equipo = eq;};
+    public Equipo getEquipo(){
+        return this.equipo;
+    };
+
 
     // =========================
     // Limpieza de recursos
@@ -283,307 +430,8 @@ public abstract class Personaje {
         if (sheetAbajoDerecha != null)    sheetAbajoDerecha.dispose();
         if (sheetAbajoIzquierda != null)  sheetAbajoIzquierda.dispose();
     }
-}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*package com.championsita.modelo;
-
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
-import com.championsita.visuales.DibujadorHud;
-
-import java.util.EnumMap;
-import java.util.Map;
-
-public abstract class Personaje {
-
-    // === HUD  === //
-    public DibujadorHud hud;
-
-    // === Constantes sprint/stamina ===
-    private static final float LIMITE_STAMINA_BLOQUEO = 0.9f; // cuando cae por debajo, bloquea recarga breve
-    private static final float TIEMPO_BLOQUEO_RECARGA = 2f;
-
-    // === Identidad / configuración ===
-    private final String nombre;
-    private final float escala;
-    private final float velocidadBase;
-    private final float velocidadSprint;
-    private final float staminaMax;
-
-    // === Estado sprint/stamina ===
-    private float stamina;
-    private final float consumoSprint = 5f;   // por segundo
-    private final float recargaStamina = 10f; // por segundo
-    private boolean bloqueoRecarga = false;
-    private float tiempoDesdeShiftSoltado = 0f;
-    private float move = 0f; // distancia por frame (velocidad * delta)
-
-    // === Estado de render/movimiento ===
-    private float x, y, width, height, stateTime;
-    private boolean estaMoviendo;
-    private boolean espacioPresionado = false;
-    private Direccion direccionActual = Direccion.ABAJO;
-
-    // Hitbox (más angosta/alta para colisiones agradables)
-    private Rectangle hitbox;
-
-    // Offset fijo para mantener la hitbox centrada respecto al sprite
-    // (recalculado cuando cambian width/height; reutilizado en setPosition/clamp)
-    private float hbW, hbH, hbOx, hbOy;
-
-    // === Texturas / animaciones ===
-    private Texture textureQuieto;
-    private TextureRegion frameQuieto;
-
-    private Texture sheetDerecha, sheetIzquierda, sheetArriba, sheetAbajo,
-                    sheetArribaDerecha, sheetArribaIzquierda, sheetAbajoDerecha, sheetAbajoIzquierda;
-
-    private final Map<Direccion, Animation<TextureRegion>> animaciones = new EnumMap<>(Direccion.class);
-
-    // === Constructor ===
-    public Personaje(String nombre, ConfiguracionPersonaje config, float escala,
-                     float velocidadBase, float velocidadSprint, float staminaMax) {
-
-        this.nombre = nombre;
-        this.escala = escala;
-        this.velocidadBase = velocidadBase;
-        this.velocidadSprint = velocidadSprint;
-        this.staminaMax = staminaMax;
-        this.stamina = staminaMax;
-
-        hud = new DibujadorHud(this);
-
-        // Textura quieto
-        textureQuieto = new Texture(config.getTexturaQuieto());
-        frameQuieto = new TextureRegion(textureQuieto);
-
-        // Sheets desde config (no hardcodeamos rutas)
-        sheetDerecha         = new Texture(config.getSheetDerecha());
-        sheetIzquierda       = new Texture(config.getSheetIzquierda());
-        sheetArriba          = new Texture(config.getSheetArriba());
-        sheetAbajo           = new Texture(config.getSheetAbajo());
-        sheetArribaDerecha   = new Texture(config.getSheetArribaDerecha());
-        sheetArribaIzquierda = new Texture(config.getSheetArribaIzquierda());
-        sheetAbajoDerecha    = new Texture(config.getSheetAbajoDerecha());
-        sheetAbajoIzquierda  = new Texture(config.getSheetAbajoIzquierda());
-
-        // Animaciones
-        animaciones.put(Direccion.DERECHA,          crearAnimacion(sheetDerecha, 7, 1));
-        animaciones.put(Direccion.IZQUIERDA,        crearAnimacion(sheetIzquierda, 7, 1));
-        animaciones.put(Direccion.ARRIBA,           crearAnimacion(sheetArriba, 6, 1));
-        animaciones.put(Direccion.ABAJO,            crearAnimacion(sheetAbajo, 6, 1));
-        animaciones.put(Direccion.ARRIBA_DERECHA,   crearAnimacion(sheetArribaDerecha, 6, 1));
-        animaciones.put(Direccion.ARRIBA_IZQUIERDA, crearAnimacion(sheetArribaIzquierda, 6, 1));
-        animaciones.put(Direccion.ABAJO_DERECHA,    crearAnimacion(sheetAbajoDerecha, 6, 1));
-        animaciones.put(Direccion.ABAJO_IZQUIERDA,  crearAnimacion(sheetAbajoIzquierda, 6, 1));
-
-        // Tamaño base (desde un frame de derecha)
-        TextureRegion f0 = animaciones.get(Direccion.DERECHA).getKeyFrame(0);
-        width  = f0.getRegionWidth()  * escala;
-        height = f0.getRegionHeight() * escala;
-
-        // Posición inicial
-        x = 1f; y = 1f; stateTime = 0f;
-
-        // Hitbox centrada (60% ancho, 80% alto; apoyada abajo)
-        hbW = width  * 0.60f;
-        hbH = height * 0.80f;
-        hbOx = (width - hbW) / 2f;
-        hbOy = 0f;
-
-        hitbox = new Rectangle(x + hbOx, y + hbOy, hbW, hbH);
-    }
-
-    // === Helpers ===
-    private Animation<TextureRegion> crearAnimacion(Texture sheet, int columnas, int filas) {
-        TextureRegion[][] tmp = TextureRegion.split(sheet, sheet.getWidth() / columnas, sheet.getHeight() / filas);
-        TextureRegion[] frames = new TextureRegion[columnas * filas];
-        int k = 0;
-        for (int i = 0; i < filas; i++) {
-            for (int j = 0; j < columnas; j++) frames[k++] = tmp[i][j];
-        }
-        return new Animation<>(0.1f, frames);
-    }
-
-    private Direccion calcularDireccion(boolean izquierda, boolean derecha, boolean arriba, boolean abajo) {
-        if (izquierda && arriba) return Direccion.ARRIBA_IZQUIERDA;
-        if (derecha   && arriba) return Direccion.ARRIBA_DERECHA;
-        if (izquierda && abajo)  return Direccion.ABAJO_IZQUIERDA;
-        if (derecha   && abajo)  return Direccion.ABAJO_DERECHA;
-        if (izquierda) return Direccion.IZQUIERDA;
-        if (derecha)   return Direccion.DERECHA;
-        if (arriba)    return Direccion.ARRIBA;
-        if (abajo)     return Direccion.ABAJO;
-        return direccionActual;
-    }
-
-    private void actualizarVelocidad(boolean sprint, float delta) {
-        float v = velocidadBase;
-
-        if (sprint && stamina > 0f) {
-            v = velocidadSprint;
-            stamina -= consumoSprint * delta;
-            if (stamina < 0f) stamina = 0f;
-
-            if (stamina < LIMITE_STAMINA_BLOQUEO) {
-                v = velocidadBase;
-                bloqueoRecarga = true;
-                tiempoDesdeShiftSoltado = 0f;
-            }
-        } else {
-            if (bloqueoRecarga) {
-                if (!sprint) {
-                    tiempoDesdeShiftSoltado += delta;
-                    if (tiempoDesdeShiftSoltado >= TIEMPO_BLOQUEO_RECARGA) {
-                        bloqueoRecarga = false;
-                    }
-                }
-            } else {
-                stamina += recargaStamina * delta;
-                if (stamina > staminaMax) stamina = staminaMax;
-                v = velocidadBase;
-            }
-        }
-        move = v * delta;
-    }
-
-    private void actualizarDireccionYPos(boolean izquierda, boolean derecha, boolean arriba, boolean abajo) {
-        estaMoviendo = izquierda || derecha || arriba || abajo;
-        if (!estaMoviendo) return;
-
-        direccionActual = calcularDireccion(izquierda, derecha, arriba, abajo);
-
-        float dx = 0f, dy = 0f;
-        if (izquierda) dx -= 1f;
-        if (derecha)   dx += 1f;
-        if (arriba)    dy += 1f;
-        if (abajo)     dy -= 1f;
-
-        float len = (float) Math.sqrt(dx * dx + dy * dy);
-        if (len != 0f) { dx /= len; dy /= len; }
-
-        x += dx * move;
-        y += dy * move;
-
-        // Sincronizar hitbox con offset
-        hitbox.setPosition(x + hbOx, y + hbOy);
-    }
-
-    // === API pública usada por ManejadorInput ===
-    public void actualizarEstadojugador(boolean arriba, boolean abajo, boolean izquierda, boolean derecha,
-                                        boolean sprint, float delta) {
-        actualizarVelocidad(sprint, delta);
-        actualizarDireccionYPos(izquierda, derecha, arriba, abajo);
-    }
-
-    // Compatibilidad con código viejo (sin sprint)
-    public void moverDesdeInput(boolean arriba, boolean abajo, boolean izquierda, boolean derecha, float delta) {
-        move = velocidadBase * delta;
-        actualizarDireccionYPos(izquierda, derecha, arriba, abajo);
-    }
-
-    public void update(float delta) {
-        if (estaMoviendo) stateTime += delta;
-    }
-
-    public void render(SpriteBatch batch) {
-        TextureRegion frameActual = estaMoviendo
-                ? animaciones.get(direccionActual).getKeyFrame(stateTime, true)
-                : frameQuieto;
-        batch.draw(frameActual, x, y, width, height);
-    }
-
-    public void limitarMovimiento(float worldWidth, float worldHeight) {
-        x = MathUtils.clamp(x, 0, worldWidth - width);
-        y = MathUtils.clamp(y, 0, worldHeight - height);
-
-        // Re-sincronizar hitbox tras el clamp
-        hitbox.setPosition(x + hbOx, y + hbOy);
-    }
-
-    // === Getters / setters ===
-    public void setEspacioPresionado(boolean valor) { this.espacioPresionado = valor; }
-    public boolean estaEspacioPresionado() { return espacioPresionado; }
-    public Direccion getDireccion() { return direccionActual; }
-    public Rectangle getHitbox() { return hitbox; }
-    public float getStamina() { return stamina; }
-    public float getStaminaMax() { return staminaMax; }
-    public float getX() { return x; }
-    public float getY() { return y; }
-
-    // >>> FIX CLAVE: setPosition actualiza la hitbox con el MISMO offset <<<
-    public void setPosition(float nx, float ny) {
-        this.x = nx;
-        this.y = ny;
-        hitbox.setPosition(x + hbOx, y + hbOy);
-    }
-
-    public float getWidth()  { return width; }
-    public float getHeight() { return height; }
-
-    // === Limpieza de recursos ===
-    public void dispose() {
-        if (textureQuieto != null) textureQuieto.dispose();
-        if (sheetDerecha != null)         sheetDerecha.dispose();
-        if (sheetIzquierda != null)       sheetIzquierda.dispose();
-        if (sheetArriba != null)          sheetArriba.dispose();
-        if (sheetAbajo != null)           sheetAbajo.dispose();
-        if (sheetArribaDerecha != null)   sheetArribaDerecha.dispose();
-        if (sheetArribaIzquierda != null) sheetArribaIzquierda.dispose();
-        if (sheetAbajoDerecha != null)    sheetAbajoDerecha.dispose();
-        if (sheetAbajoIzquierda != null)  sheetAbajoIzquierda.dispose();
+    public boolean estaSprintPresionado() {
+        return sprintActivo;
     }
 }
-*/

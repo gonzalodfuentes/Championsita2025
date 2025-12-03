@@ -59,8 +59,8 @@ public class Menu extends InputAdapter implements Screen {
         this.atrasSprite.setSize(140, 70);
         this.atrasSprite.setPosition(15, 670);
 
-        this.colorBoton = new Color(this.atrasSprite.getColor());
-        this.colorAccion = new Color(0, 1, 0, 1);
+        this.colorBoton = new Color(1, 1, 1, 1);
+        this.colorAccion = this.juego.getAccionColor();
 
         this.siguienteSprite = new Sprite(this.siguiente);
         this.siguienteSprite.setSize(140, 70);
@@ -70,8 +70,9 @@ public class Menu extends InputAdapter implements Screen {
         this.fondoSprite.setSize(this.anchoPantalla, this.altoPantalla);
 
         // Música
-        this.musica.setVolume(0.03f);
+
         this.musica.setLooping(true);
+        this.musica.setVolume(this.juego.getVolumenMusica());
         if (!this.musica.isPlaying()) this.musica.play();
 
         int cantBotonesGlobales = 2;
@@ -94,68 +95,28 @@ public class Menu extends InputAdapter implements Screen {
         }
     }
 
-    protected void crearFlechas(int cantFlechas) {
-        this.flecha = Assets.tex("menuDosJugadores/flechaNormal.png");
-        this.flechaCursor = Assets.tex("menuDosJugadores/flechaInvertida.png");
-        this.flechas = new Sprite[cantFlechas];
-        this.flechasInvertidas = new Sprite[cantFlechas];
-
-        for (int i = 0; i < cantFlechas; i++) {
-            this.flechas[i] = new Sprite(this.flecha);
-            this.flechasInvertidas[i] = new Sprite(this.flechaCursor);
-            this.flechasInvertidas[i].setSize(this.flechas[i].getWidth(), this.flechas[i].getHeight());
-            if (i % 2 != 0) {
-                this.flechas[i].setRotation(180);
-                this.flechasInvertidas[i].setRotation(180);
-            }
-        }
-    }
-
     @Override
-    public void render(float delta) {
-        this.fondoSprite.draw(this.batch);
-    }
-
-    protected void cargarAtrasSiguiente() {
-        this.atrasSprite.draw(this.batch);
-        this.siguienteSprite.draw(this.batch);
-    }
-
+    public void render(float delta) {}
     @Override public void resize(int width, int height) {}
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void hide() {}
-
-    @Override
-    public void dispose() {
+    @Override public void dispose() {
         // Nada que disposear acá: lo maneja Assets.
         // Si en algún momento querés liberar todo (salida del juego), llamar a Assets.disposeAll() desde Principal.
     }
 
-    protected boolean condicionDentro(int x, int y, Sprite sprite) {
-        return x >= sprite.getX() && x <= sprite.getX() + sprite.getWidth() &&
-                y >= sprite.getY() && y <= sprite.getY() + sprite.getHeight();
-    }
+    protected void cambiarMenu(boolean dentro, Menu nuevaPantalla) {
+        if (!dentro) return;
 
-    protected boolean condicionColor(boolean dentro, Sprite sprite) {
-        sprite.setColor(dentro ? this.colorAccion : this.colorBoton);
-        return dentro;
-    }
-
-    protected void cambiarMenu(boolean dentro, Menu atrasAdelante) {
-        if (dentro) {
-            this.juego.actualizarPantalla(atrasAdelante);
+        if (this.musica != null && this.musica.isPlaying()) {
+            this.musica.stop();
         }
+
+        this.juego.actualizarPantalla(nuevaPantalla);
     }
 
-    protected boolean condicionFlechas(Sprite flecha, int x, int y) {
-        float fx = flecha.getX();
-        float fy = flecha.getY();
-        float fAnc = flecha.getWidth();
-        float fAlt = flecha.getHeight();
-
-        boolean dentro = x >= fx && x <= fx + fAnc && y >= fy && y <= fy + fAlt;
-        flecha.setTexture(dentro ? this.flechaCursor : this.flecha);
-        return dentro;
+    public void demostracionTemporalMusica(float volumen) {
+        this.musica.setVolume(volumen);
     }
 }

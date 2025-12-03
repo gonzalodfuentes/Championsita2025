@@ -3,16 +3,23 @@ package com.championsita.menus.local;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
-import com.championsita.menus.menuprincipal.Menu;
-import com.championsita.menus.menueleccion.Doble;   // ya existe
+import com.championsita.menus.menucarga.Carga;
+import com.championsita.menus.menueleccion.Doble;
+import com.championsita.menus.menueleccion.Especial;
+import com.championsita.menus.menueleccion.UnJugador;
+import com.championsita.menus.menuprincipal.GestorInputMenu;
 import com.championsita.menus.menuprincipal.Inicial;
+import com.championsita.menus.menuprincipal.Menu;
 import com.championsita.menus.compartido.Assets;
+import com.championsita.menus.menuprincipal.RenderizadorDeMenu;
 
 public class Local extends Menu {
 
-    private Sprite[] botones;
+    private Sprite[] botones; // [0]=2 Jugadores, [1]=Práctica
     private float anchoBoton;
     private float altoBoton;
+    GestorInputMenu gestorMenu;
+    RenderizadorDeMenu renderizador;
 
     public Local(Principal juego) { super(juego); }
 
@@ -21,13 +28,14 @@ public class Local extends Menu {
         super.show();
         Gdx.input.setInputProcessor(this);
 
-        // Reusamos tus PNG del menú inicial para mantener estética
+        // Reutiliza imágenes existentes para mantener estética
         botones = new Sprite[] {
-                new Sprite(Assets.tex("menuInicial/2jugadoresBoton.png")), // idx 0
-                new Sprite(Assets.tex("menuInicial/practicaBoton.png"))    // idx 1
+                new Sprite(Assets.tex("menuInicial/2jugadoresBoton.png")),
+                new Sprite(Assets.tex("menuInicial/practicaBoton.png")),
+                new Sprite(Assets.tex("Especial.png"))
         };
 
-        // Mismo sizing/stacking que usás en Inicial
+        // Tamaño y ubicación similares al menú inicial
         anchoBoton = botones[0].getWidth() - 100;
         altoBoton  = botones[0].getHeight() - 20;
 
@@ -40,22 +48,21 @@ public class Local extends Menu {
             apilar += 80;
         }
 
-        // slots de sonido: 2 botones + atrás + ok = 4
-        super.inicializarSonido(4);
+        // Sonidos: 2 botones + 1 atrás
+        super.inicializarSonido(3);
+
+        //Inicializacion Gestores-Herramientas
+        gestorMenu = new GestorInputMenu(this);
+        renderizador = new RenderizadorDeMenu(this);
     }
 
     @Override
     public void render(float delta) {
         super.batch.begin();
-        super.render(delta);
-        cargarAtrasSiguiente();
+        super.render(delta); // fondo
+        renderizador.cargarAtrasSiguiente(); // solo dibuja atrás en este menú
         for (Sprite b : botones) b.draw(super.batch);
         super.batch.end();
-    }
-
-    @Override
-    protected void cargarAtrasSiguiente() {
-        this.atrasSprite.draw(this.batch);
     }
 
     @Override
@@ -63,48 +70,46 @@ public class Local extends Menu {
         y = Gdx.graphics.getHeight() - y;
         boolean hit = false;
 
+        // Hover de botones
         for (int i = 0; i < botones.length; i++) {
-            boolean dentro = condicionDentro(x, y, botones[i]);
-            condicionColor(dentro, botones[i]);
+            boolean dentro = gestorMenu.condicionDentro(x, y, botones[i]);
+            gestorMenu.condicionColor(dentro, botones[i]);
             super.reproducirSonido(i, dentro);
             hit |= dentro;
         }
 
-        boolean dentroAtras = condicionDentro(x, y, super.atrasSprite);
-        condicionColor(dentroAtras, super.atrasSprite);
+        // Hover de atrás (índice 2)
+        boolean dentroAtras = gestorMenu.condicionDentro(x, y, super.atrasSprite);
+        gestorMenu.condicionColor(dentroAtras, super.atrasSprite);
         super.reproducirSonido(2, dentroAtras);
 
-        boolean dentroOk = condicionDentro(x, y, super.siguienteSprite);
-        condicionColor(dentroOk, super.siguienteSprite);
-        super.reproducirSonido(3, dentroOk);
-
-        return hit || dentroAtras || dentroOk;
+        return hit || dentroAtras;
     }
 
     @Override
     public boolean touchUp(int x, int y, int pointer, int button) {
         y = Gdx.graphics.getHeight() - y;
 
-        // 0) 2 Jugadores → al flujo existente (tu pantalla Doble)
-        if (condicionDentro(x, y, botones[0])) {
-            super.juego.actualizarPantalla(new Doble(super.juego));
+        // 0) 2 Jugadores → flujo existente (pantalla Doble)
+        if (gestorMenu.condicionDentro(x, y, botones[0])) {
+            super.juego.actualizarPantalla(new Doble(super.juego, "1v1"));
             return true;
         }
 
-        // 1) Práctica → por ahora no funciona (no navega)
-        if (condicionDentro(x, y, botones[1])) {
-            // Placeholder: no hace nada. Si querés, mostrar un sonido o log.
+        // 1) Práctica → placeholder; no navega aún
+        if (gestorMenu.condicionDentro(x, y, botones[1])) {
+            super.juego.actualizarPantalla(new UnJugador(super.juego, "practica"));
+            return true;
+        }
+
+        if (gestorMenu.condicionDentro(x, y, botones[2])) {
+            super.juego.actualizarPantalla(new Especial(super.juego));
             return true;
         }
 
         // Atrás → volver al menú inicial
-        if (condicionDentro(x, y, super.atrasSprite)) {
+        if (gestorMenu.condicionDentro(x, y, super.atrasSprite)) {
             super.cambiarMenu(true, new Inicial(super.juego));
-            return true;
-        }
-
-        // OK → sin acción específica acá
-        if (condicionDentro(x, y, super.siguienteSprite)) {
             return true;
         }
 
@@ -114,6 +119,6 @@ public class Local extends Menu {
     @Override
     public void dispose() {
         super.dispose();
-        // Nada que liberar: todo via Assets
+        // Recursos bajo control de Assets
     }
 }
