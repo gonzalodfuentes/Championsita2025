@@ -60,7 +60,7 @@ public class Local extends Menu {
     public void render(float delta) {
         super.batch.begin();
         super.render(delta); // fondo
-        renderizador.cargarAtrasSiguiente(); // solo dibuja atrás en este menú
+        renderizador.cargarAtras();
         for (Sprite b : botones) b.draw(super.batch);
         super.batch.end();
     }

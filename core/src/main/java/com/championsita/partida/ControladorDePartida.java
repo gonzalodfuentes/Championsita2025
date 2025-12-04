@@ -2,13 +2,14 @@ package com.championsita.partida;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.championsita.jugabilidad.constantes.Constantes;
+import com.championsita.Principal;
 import com.championsita.jugabilidad.modelo.*;
 import com.championsita.jugabilidad.sistemas.SistemaColisiones;
 import com.championsita.jugabilidad.sistemas.SistemaFisico;
@@ -16,12 +17,12 @@ import com.championsita.jugabilidad.sistemas.SistemaPartido;
 import com.championsita.jugabilidad.visuales.DibujadorJugador;
 import com.championsita.jugabilidad.visuales.DibujadorPelota;
 import com.championsita.jugabilidad.visuales.HudPartido;
+import com.championsita.menus.menupausa.Pausa;
+import com.championsita.menus.menupausa.PausaBoton;
 import com.championsita.partida.herramientas.Config;
 import com.championsita.partida.herramientas.MundoPartida;
 import com.championsita.partida.modosdejuego.ModoDeJuego;
 import com.championsita.partida.modosdejuego.implementaciones.ModoEspecial;
-import com.championsita.partida.modosdejuego.implementaciones.Practica;
-import com.championsita.partida.modosdejuego.implementaciones.UnoContraUno;
 import com.championsita.partida.nucleo.ContextoModoDeJuego;
 import com.championsita.partida.herramientas.*;
 import com.championsita.partida.nucleo.ContextoPartida;
@@ -32,7 +33,7 @@ import java.util.ArrayList;
  * Controla la ejecución de una partida, independiente del modo.
  * Se encarga de preparar el contexto y delegar la lógica al modo elegido.
  */
-public class ControladorDePartida implements Screen {
+public class ControladorDePartida extends InputAdapter implements Screen {
 
     private final Config config;
     private ModoDeJuego modoJuego;
@@ -54,7 +55,9 @@ public class ControladorDePartida implements Screen {
     private SistemaColisiones colisiones;
     private SistemaPartido partido;
 
-    public ControladorDePartida(Config config) {
+    private Pausa pausa;
+
+    public ControladorDePartida(Config config, Principal juego) {
         this.config = config;
         ContextoPartida contextoPartida= InicializadorPartida.inicializar(config, this);
         this.modoJuego = contextoPartida.modo;
@@ -74,14 +77,12 @@ public class ControladorDePartida implements Screen {
         this.dibujadoresJugadores = mundo.dibujadoresJugadores;
 
         this.dibujadorHudPartido = new HudPartido(viewport);
+
+        this.pausa = new Pausa(juego);
     }
-
-
 
     @Override
     public void show() {
-
-
         ContextoModoDeJuego ctx = new ContextoModoDeJuego(viewport, batch, cancha ,fisica, colisiones, partido, jugadores, this);
 
         if(modoJuego.getClass() == ModoEspecial.class) {
@@ -91,7 +92,12 @@ public class ControladorDePartida implements Screen {
         ctx.pelota = pelota;
 
         modoJuego.iniciar(ctx);
-        Gdx.input.setInputProcessor(modoJuego.getProcesadorEntrada());
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(this); // ControladorDePartida escucha ESC y mouse
+        multiplexer.addProcessor(modoJuego.getProcesadorEntrada()); // el modo sigue recibiendo input
+        Gdx.input.setInputProcessor(multiplexer);
+
+        this.pausa.show();
     }
 
     @Override
@@ -99,7 +105,6 @@ public class ControladorDePartida implements Screen {
         RenderizadorPartida render = new RenderizadorPartida();
 
         ScreenUtils.clear(Color.BLACK);
-
         modoJuego.actualizar(delta);
 
         // 1. FONDO (cancha)
@@ -118,8 +123,26 @@ public class ControladorDePartida implements Screen {
 
         // 5. ARCOS (ShapeRenderer sobre mundo)
         render.renderArcos(renderizadorDeFormas, viewport, cancha);
+
+        this.pausa.renderizar(batch);
     }
 
+    @Override
+    public boolean keyDown(int key) {
+        return this.pausa.keyDown(key);
+    }
+
+    @Override
+    public boolean mouseMoved(int x, int y) {
+        y = Gdx.graphics.getHeight() - y;
+        return this.pausa.mouseMoved(x, y);
+    }
+
+    @Override
+    public boolean touchUp(int x, int y, int pointer, int button) {
+        y = Gdx.graphics.getHeight() - y;
+        return this.pausa.touchUp(x, y, pointer, button);
+    }
 
     @Override
     public void resize(int width, int height) {

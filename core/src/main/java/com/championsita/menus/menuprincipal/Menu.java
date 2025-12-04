@@ -64,7 +64,7 @@ public class Menu extends InputAdapter implements Screen {
 
         this.siguienteSprite = new Sprite(this.siguiente);
         this.siguienteSprite.setSize(140, 70);
-        this.siguienteSprite.setPosition(Gdx.graphics.getWidth() - this.siguienteSprite.getWidth() - 15, 670);
+        this.siguienteSprite.setPosition(this.anchoPantalla - this.siguienteSprite.getWidth() - 15, 670);
 
         this.fondoSprite = new Sprite(this.fondo);
         this.fondoSprite.setSize(this.anchoPantalla, this.altoPantalla);
@@ -84,7 +84,7 @@ public class Menu extends InputAdapter implements Screen {
         for (int i = 0; i < this.cursorSonido.length; i++) this.cursorSonido[i] = false;
     }
 
-    protected void reproducirSonido(int i, boolean dentro) {
+    public void reproducirSonido(int i, boolean dentro) {
         if (dentro) {
             if (!this.cursorSonido[i]) {
                 this.sonido.play(0.5f);

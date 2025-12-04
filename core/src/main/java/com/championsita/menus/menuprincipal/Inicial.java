@@ -64,16 +64,17 @@ public class Inicial extends Menu {
     public boolean touchUp(int x, int y, int pointer, int button) {
         y = Gdx.graphics.getHeight() - y;
 
+        boolean click = false;
         for (int i = 0; i < botones.length; i++) {
             Sprite boton = botones[i];
             float bx = boton.getX();
             float by = boton.getY();
             if (x >= bx && x <= bx + anchoBotones && y >= by && y <= by + altoBotones) {
                 cambiarMenu(i);
-                return true;
+                click = true;
             }
         }
-        return false;
+        return click;
     }
 
     @Override

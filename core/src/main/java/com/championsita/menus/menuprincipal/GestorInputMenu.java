@@ -28,5 +28,4 @@ public class GestorInputMenu {
         sprite.setColor(dentro ? menu.colorAccion : menu.colorBoton);
         return dentro;
     }
-
 }

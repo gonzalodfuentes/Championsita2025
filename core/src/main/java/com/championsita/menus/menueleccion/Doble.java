@@ -101,7 +101,8 @@ public class Doble extends Menu {
 
         super.batch.begin();
         renderizador.renderFondo(delta);
-        renderizador.cargarAtrasSiguiente();
+        renderizador.cargarAtras();
+        renderizador.cargarSiguiente();
         for (Sprite f : super.flechas) f.draw(super.batch);
         spriteWASD.draw(super.batch);
         spriteIJKL.draw(super.batch);

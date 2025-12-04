@@ -166,7 +166,8 @@ public class Especial extends Menu {
         // =========================
         // Dibujado común del menú
         // =========================
-        renderizador.cargarAtrasSiguiente();
+        renderizador.cargarAtras();
+        renderizador.cargarSiguiente();
         for (Sprite f : super.flechas) f.draw(super.batch);
         spriteJ1.draw(super.batch);
         spriteJ2.draw(super.batch);

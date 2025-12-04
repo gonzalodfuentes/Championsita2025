@@ -151,7 +151,7 @@ public class Carga extends Menu {
         this.cartelCampoTex = Assets.tex("menuCreacion/campoCartel.png");
         this.cartelCampo = new Sprite(this.cartelCampoTex);
         this.cartelCampo.setPosition(
-                Gdx.graphics.getWidth() / 2f - this.cartelCampo.getWidth() / 2f,
+                super.anchoPantalla / 2f - this.cartelCampo.getWidth() / 2f,
                 CAMPOS_PANEL_Y
         );
 
@@ -187,7 +187,7 @@ public class Carga extends Menu {
 
         int ubiX = 30, ubiY = 70;
         this.cartelGoles.setPosition(ubiX, ubiY);
-        this.cartelTiempo.setPosition(Gdx.graphics.getWidth() - ubiX - this.cartelTiempo.getWidth(), ubiY);
+        this.cartelTiempo.setPosition(super.anchoPantalla - ubiX - this.cartelTiempo.getWidth(), ubiY);
         this.golesXY  = new float[]{ this.cartelGoles.getX(), this.cartelGoles.getY() };
         this.tiempoXY = new float[]{ this.cartelTiempo.getX(), this.cartelTiempo.getY() };
 
@@ -205,7 +205,8 @@ public class Carga extends Menu {
     public void render(float delta) {
         batch.begin();
         renderizador.renderFondo(delta);
-        renderizador.cargarAtrasSiguiente();
+        renderizador.cargarAtras();
+        renderizador.cargarSiguiente();
 
         controlJugador1.draw(batch);
         controlJugador2.draw(batch);
@@ -295,7 +296,7 @@ public class Carga extends Menu {
 
 
             Config config = builder.build();
-            super.juego.actualizarPantalla(new ControladorDePartida(config));
+            super.juego.actualizarPantalla(new ControladorDePartida(config, super.juego));
             return true;
         }
 

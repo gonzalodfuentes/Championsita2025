@@ -18,8 +18,11 @@ public class RenderizadorDeMenu{
         menu.fondoSprite.draw(menu.batch);
     }
 
-    public void cargarAtrasSiguiente() {
+    public void cargarAtras() {
         menu.atrasSprite.draw(menu.batch);
+    }
+
+    public void cargarSiguiente() {
         menu.siguienteSprite.draw(menu.batch);
     }
 

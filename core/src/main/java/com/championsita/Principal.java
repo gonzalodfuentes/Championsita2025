@@ -12,7 +12,7 @@ public class Principal extends Game {
 
     private SpriteBatch batch;
     private Menu menu;
-    private float volumenMusica;
+    private float volumenMusica, volumenAnterior;
     private int indiceMusica;
     private Color accionColor;
 
@@ -20,6 +20,7 @@ public class Principal extends Game {
     public void create() {
         this.batch = new SpriteBatch();
         this.volumenMusica = 0.09f;
+        this.volumenAnterior = this.volumenMusica;
         this.indiceMusica = 1;
         this.accionColor = new Color(0, 1, 0, 1);
         this.menu = new Inicial(this);
@@ -48,7 +49,12 @@ public class Principal extends Game {
     }
 
     public void setVolumenMusica(float volumenMusica) {
+        this.volumenAnterior = this.volumenMusica;
         this.volumenMusica = volumenMusica;
+    }
+
+    public void volumenAnterior() {
+        this.setVolumenMusica(this.volumenAnterior);
     }
 
     public float getVolumenMusica() {

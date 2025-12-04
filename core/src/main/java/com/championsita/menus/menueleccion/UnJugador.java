@@ -126,7 +126,8 @@ public class UnJugador extends Menu {
     public void render(float delta) {
         super.batch.begin();
         renderizador.renderFondo(delta);
-        renderizador.cargarAtrasSiguiente();
+        renderizador.cargarAtras();
+        renderizador.cargarSiguiente();
 
         // Dibujar flechas
         for (Sprite f : super.flechas) f.draw(super.batch);
@@ -188,7 +189,7 @@ public class UnJugador extends Menu {
                     .modo(modoDestino == null ? "practica" : modoDestino)
                     .build();
 
-            super.juego.actualizarPantalla(new ControladorDePartida(cfg));
+            super.juego.actualizarPantalla(new ControladorDePartida(cfg, super.juego));
             return true;
         }
 
