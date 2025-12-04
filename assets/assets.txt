@@ -112,4 +112,6 @@ opcion/volumen/vol20.png
 opcion/volumen/vol40.png
 opcion/volumen/vol60.png
 opcion/volumen/vol80.png
+pausa/continuar.png
+pausa/salir.png
 pelota/pelotaAnimada.png
