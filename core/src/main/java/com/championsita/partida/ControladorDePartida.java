@@ -20,6 +20,7 @@ import com.championsita.partida.herramientas.Config;
 import com.championsita.partida.herramientas.MundoPartida;
 import com.championsita.partida.modosdejuego.ModoDeJuego;
 import com.championsita.partida.modosdejuego.implementaciones.ModoEspecial;
+import com.championsita.partida.modosdejuego.implementaciones.ModoFutbol;
 import com.championsita.partida.modosdejuego.implementaciones.Practica;
 import com.championsita.partida.modosdejuego.implementaciones.UnoContraUno;
 import com.championsita.partida.nucleo.ContextoModoDeJuego;
@@ -53,6 +54,7 @@ public class ControladorDePartida implements Screen {
     private SistemaFisico fisica;
     private SistemaColisiones colisiones;
     private SistemaPartido partido;
+
 
     public ControladorDePartida(Config config) {
         this.config = config;
@@ -88,6 +90,8 @@ public class ControladorDePartida implements Screen {
             ctx = new ContextoModoDeJuego(viewport, batch, cancha ,fisica, colisiones, partido, jugadores, this, config.habilidadesEspeciales);
         }
 
+
+
         ctx.pelota = pelota;
 
         modoJuego.iniciar(ctx);
@@ -118,6 +122,11 @@ public class ControladorDePartida implements Screen {
 
         // 5. ARCOS (ShapeRenderer sobre mundo)
         render.renderArcos(renderizadorDeFormas, viewport, cancha);
+
+
+        render.renderHitbox(renderizadorDeFormas, viewport, cancha, pelota);
+
+
     }
 
 

@@ -15,6 +15,12 @@ public class Pelota {
     private static final float KICK_FORCE      = 0.35f; // “pateo” automático cortito en flanco de contacto
     private static final float UMBRAL_MOV      = 0.01f; // umbral de “velocidad ≈ 0”
 
+    //
+    private Personaje ultimoJugadorQueLaToco; // para los saques
+    private Personaje jugadorTocandoPelota;
+
+
+
     // === Animación ===
     private Texture sheet;
     private Animation<TextureRegion> animacion;
@@ -28,7 +34,6 @@ public class Pelota {
     private float velocidadX = 0f;
     private float velocidadY = 0f;
     private Rectangle hitbox;
-    public Personaje ultimoJugadorQueToco = null;
     public boolean curvaActiva = false;
     public int curvaSigno = 0;
 
@@ -36,6 +41,8 @@ public class Pelota {
     // Flags de contacto (para detectar flanco)
     private boolean huboContactoEsteFrame = false;
     private boolean huboContactoPrevio    = false;
+
+
 
     public Pelota(float xInicial, float yInicial, float escala) {
         sheet = new Texture("pelota/pelotaAnimada.png");
@@ -65,8 +72,10 @@ public class Pelota {
      * @param dy dirección Y normalizada
      * @param disparo true si está presionando “disparo” (SPACE u otro)
      */
-    public void registrarContacto(float dx, float dy, boolean disparo) {
+    public void registrarContacto(Personaje jugador, float dx, float dy, boolean disparo) {
         huboContactoEsteFrame = true;
+
+        this.jugadorTocandoPelota = jugador;
 
         if (disparo) {
             // Disparo fuerte: setea velocidad y reinicia animación
@@ -118,6 +127,8 @@ public class Pelota {
         // preparar flags para el próximo frame
         huboContactoPrevio    = huboContactoEsteFrame;
         huboContactoEsteFrame = false;
+
+        //this.jugadorTocandoPelota = null;
     }
 
     /*
@@ -172,13 +183,6 @@ public class Pelota {
         this.velocidadY = vy;
     }
 
-    public Personaje getUltimoJugadorQueToco() {
-        return ultimoJugadorQueToco;
-    }
-
-    public void setUltimoJugadorQueToco(Personaje pj) {
-        this.ultimoJugadorQueToco = pj;
-    }
 
     public void limpiarContacto() {
         this.huboContactoEsteFrame = false;
@@ -194,4 +198,28 @@ public class Pelota {
         this.velocidadX = velocidadX;
         this.velocidadY = velocidadY;
     }
+
+    public Personaje getUltimoJugadorQueLaToco() {
+        return ultimoJugadorQueLaToco;
+    }
+
+    public void setUltimoJugadorQueLaToco(Personaje pj){
+        ultimoJugadorQueLaToco = pj;
+    }
+
+
+
+    public Personaje getJugadorTocandoPelota() {
+        return jugadorTocandoPelota;
+    }
+
+    public void setJugadorTocandoPelota(Personaje jugador) {
+        this.jugadorTocandoPelota =  jugador;
+    }
+
+    public void resetJugadorTocando() {
+        this.jugadorTocandoPelota = null;
+    }
+
+
 }

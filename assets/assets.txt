@@ -13,6 +13,7 @@ cursor.mp3
 fondoBarraStamina.png
 fondoChampionsita.png
 futebol.mp3
+hs_err_pid3000.log
 interiorBarraStamina.png
 jugador/amarillo/Jugador.png
 jugador/amarillo/jugadorCorriendoAbajo.png
@@ -99,6 +100,8 @@ menuDosJugadores/jugarBoton.png
 menuDosJugadores/menuElegir2.png
 menuDosJugadores/okBoton.png
 menuInicial/2jugadoresBoton.png
+menuInicial/futbolBoton.png
+menuInicial/futsalBoton.png
 menuInicial/localBoton.png
 menuInicial/onlineBoton.png
 menuInicial/opcionesBoton.png

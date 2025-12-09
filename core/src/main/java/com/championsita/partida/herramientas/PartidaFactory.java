@@ -12,13 +12,16 @@ import java.util.ArrayList;
 
 public class PartidaFactory {
 
+
     public static MundoPartida crearDesdeConfig(Config config) {
 
         MundoPartida mundo = new MundoPartida();
 
+
+
         // Cancha
         Texture canchaTexture = new Texture("campos/campo" + config.campo.getNombre() + ".png");
-        mundo.cancha = new Cancha(0.5f, 0.8f, canchaTexture);
+        mundo.cancha = new Cancha(0.5f, 0.8f,config.getAltoMapa(), config.getAnchoMapa(), canchaTexture);
 
         // Jugadores
         mundo.jugadores = new ArrayList<>();
@@ -43,12 +46,20 @@ public class PartidaFactory {
 
         // Pelota
         mundo.pelota = new Pelota(
-                Constantes.MUNDO_ANCHO / 2f,
-                Constantes.MUNDO_ALTO / 2f,
-                Constantes.ESCALA_PELOTA
+                config.getAnchoMapa() / 2f,
+                config.getAltoMapa() / 2f,
+                config.getEscalaPelota()
         );
         mundo.dibPelota = new DibujadorPelota(mundo.pelota);
 
         return mundo;
     }
+
+
+
+
+
+
+
+
 }

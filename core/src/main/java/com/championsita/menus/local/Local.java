@@ -4,9 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.championsita.Principal;
 import com.championsita.menus.menucarga.Carga;
-import com.championsita.menus.menueleccion.Doble;
-import com.championsita.menus.menueleccion.Especial;
-import com.championsita.menus.menueleccion.UnJugador;
+import com.championsita.menus.menueleccion.*;
 import com.championsita.menus.menuprincipal.GestorInputMenu;
 import com.championsita.menus.menuprincipal.Inicial;
 import com.championsita.menus.menuprincipal.Menu;
@@ -32,7 +30,9 @@ public class Local extends Menu {
         botones = new Sprite[] {
                 new Sprite(Assets.tex("menuInicial/2jugadoresBoton.png")),
                 new Sprite(Assets.tex("menuInicial/practicaBoton.png")),
-                new Sprite(Assets.tex("Especial.png"))
+                new Sprite(Assets.tex("Especial.png")),
+                new Sprite(Assets.tex("menuInicial/futbolBoton.png")),
+                new Sprite(Assets.tex("menuInicial/futsalBoton.png"))
         };
 
         // Tamaño y ubicación similares al menú inicial
@@ -49,7 +49,7 @@ public class Local extends Menu {
         }
 
         // Sonidos: 2 botones + 1 atrás
-        super.inicializarSonido(3);
+        super.inicializarSonido(5);
 
         //Inicializacion Gestores-Herramientas
         gestorMenu = new GestorInputMenu(this);
@@ -105,6 +105,15 @@ public class Local extends Menu {
         if (gestorMenu.condicionDentro(x, y, botones[2])) {
             super.juego.actualizarPantalla(new Especial(super.juego));
             return true;
+        }
+
+        if(gestorMenu.condicionDentro(x, y, botones[3])) {
+            super.juego.actualizarPantalla(new Futbol(super.juego, "futbol"));
+            return true;
+        }
+
+        if(gestorMenu.condicionDentro(x, y, botones[4])) {
+            super.juego.actualizarPantalla(new Futsal(super.juego, "futsal"));
         }
 
         // Atrás → volver al menú inicial

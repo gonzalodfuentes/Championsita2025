@@ -7,6 +7,11 @@ import com.championsita.jugabilidad.modelo.Personaje;
 
 public class SistemaColisiones {
 
+    //Para saber quien la toca para los saques
+
+
+
+
     /** Empuja a los jugadores si se superponen (pequeño empujón de separación). */
     public void separarJugadoresSiChocan(Personaje a, Personaje b) {
         if (!a.getHitbox().overlaps(b.getHitbox())) return;
@@ -72,6 +77,8 @@ public class SistemaColisiones {
         a.setPosicion(a.getX() + dx * fuerzaA, a.getY() + dy * fuerzaA);
         b.setPosicion(b.getX() - dx * fuerzaB, b.getY() - dy * fuerzaB);
     }
+    
+
 
     /** Maneja contacto jugador↔pelota: corrige penetración (MTV) y registra empuje/disparo. */
     public void procesarContactoPelotaConJugador(Pelota pelota, Personaje jugador) {
@@ -81,6 +88,9 @@ public class SistemaColisiones {
 
         // 1) Corregir penetración (MTV AABB) moviendo SOLO la pelota
         corregirPenetracionPelotaContraJugador(pelota, jugador);
+
+        pelota.setJugadorTocandoPelota(jugador);
+         // Para verificar para saque de pelota
 
         // 2) Dirección de empuje “jugador → pelota”
         float centroPelotaX  = B.x + B.width  / 2f;
@@ -141,9 +151,11 @@ public class SistemaColisiones {
 
 
         boolean esDisparo = jugador.estaEspacioPresionado();
-        pelota.setUltimoJugadorQueToco(jugador);
-        pelota.registrarContacto(dx, dy, esDisparo);
+        pelota.setUltimoJugadorQueLaToco(jugador);
+        pelota.registrarContacto(jugador, dx, dy, esDisparo);
     }
+
+
 
     /** AABB vs AABB: empuja la pelota hacia afuera por el eje de menor solape (MTV). */
     private void corregirPenetracionPelotaContraJugador(Pelota pelota, Personaje jugador) {
@@ -177,4 +189,8 @@ public class SistemaColisiones {
 
         pelota.setPosicion(nuevaBX, nuevaBY);
     }
+
+
+
+
 }

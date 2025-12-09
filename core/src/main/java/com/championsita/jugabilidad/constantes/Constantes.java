@@ -1,16 +1,28 @@
 package com.championsita.jugabilidad.constantes;
 
 public final class Constantes {
-	  private Constantes() {}
+
+
+
+	private Constantes() {}
 
 
 
 
 	  // Mundo
-	  public static final float MUNDO_ANCHO = 8f;
-	  public static final float MUNDO_ALTO  = 5f;
+	  public static float MUNDO_ANCHO = 8f;   //8f original
+	  public static float MUNDO_ALTO  = 5f;   //5f original
 
-	  // Fuentes
+	  public static float MUNDO_ANCHO_MODO_FUTBOL = 10f;   //8f original
+	  public static float MUNDO_ALTO_MODO_FUTBOL  = 5f;   //5f original
+
+		public static float MUNDO_ANCHO_MODO_FUTSAL = 6f;   //8f original
+		public static float MUNDO_ALTO_MODO_FUTSAL  = 4f;   //5f original
+
+
+
+
+	// Fuentes
 	  public static final String fuente1 = "Minercraftory.ttf";
 	  public static final String fuente2 = "light-arial.ttf";
 
@@ -19,12 +31,16 @@ public final class Constantes {
 	  public static final float anchoCancha = 0.3f;
 
 	  // Pelota
+	  public static final float ESCALA_PELOTA_FUTSAL = 0.001f;
+	  public static final float ESCALA_PELOTA_FUTBOL = 0.003f;
 	  public static final float ESCALA_PELOTA   = 0.002f;
 	  public static final float FRICCION_PELOTA = 0.95f;
 	  public static final float FUERZA_DISPARO  = 2.5f;
 	  public static final float FUERZA_EMPUJE   = 1.0f;
 	  public static final float UMBRAL_VEL_CASI_CERO = 0.01f;
 	  public static final float EMPUJON_CORTO = 0.35f;
+
+	  public static final float radioSaque = 1.5f;
 
 	  // Personaje
 	  public static final float ESCALA_PERSONAJE = 0.003f;

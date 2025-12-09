@@ -2,6 +2,7 @@ package com.championsita.partida.nucleo;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.championsita.jugabilidad.constantes.Constantes;
 import com.championsita.jugabilidad.entrada.EntradaJugador;
 import com.championsita.jugabilidad.modelo.Cancha;
 import com.championsita.jugabilidad.modelo.HabilidadesEspeciales;
@@ -78,4 +79,10 @@ public class ContextoModoDeJuego {
         this.controlador = controlador;
         this.habilidadesEspeciales.addAll(habilidadesEspeciales);
     }
+
+
+
+
+
+
 }

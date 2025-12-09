@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.audio.Sound;
 import com.championsita.Principal;
+import com.championsita.jugabilidad.constantes.Constantes;
 import com.championsita.jugabilidad.modelo.Equipo;
 import com.championsita.jugabilidad.modelo.HabilidadesEspeciales;
 import com.championsita.menus.menuprincipal.GestorInputMenu;
@@ -96,6 +97,7 @@ public class Carga extends Menu {
         this.equipoJ1 = null;
         this.equipoJ2 = null;
     }
+
 
     // Constructor especial (2J especial con equipos)
     public Carga(Principal juego,
@@ -291,6 +293,22 @@ public class Carga extends Menu {
                     builder.agregarEquipo(equipoJ2);
                 }
                 builder.agregarHabilidades(habilidades);
+            }
+
+            if(this.modo.equals("futbol")){
+
+                builder.AltoMapa(Constantes.MUNDO_ALTO_MODO_FUTBOL);
+                builder.AnchoMapa(Constantes.MUNDO_ANCHO_MODO_FUTBOL);
+                builder.EscalaPelota(Constantes.ESCALA_PELOTA_FUTBOL);
+            }
+
+            if(this.modo.equals("futsal")){
+
+                builder.EscalaPelota(Constantes.ESCALA_PELOTA_FUTSAL);
+                builder.AltoMapa(Constantes.MUNDO_ALTO_MODO_FUTSAL);
+                builder.AnchoMapa(Constantes.MUNDO_ANCHO_MODO_FUTSAL);
+
+
             }
 
 

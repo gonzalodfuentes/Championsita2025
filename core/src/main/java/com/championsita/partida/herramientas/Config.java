@@ -1,5 +1,6 @@
 package com.championsita.partida.herramientas;
 
+import com.championsita.jugabilidad.constantes.Constantes;
 import com.championsita.jugabilidad.modelo.Equipo;
 import com.championsita.jugabilidad.modelo.HabilidadesEspeciales;
 import com.championsita.menus.compartido.OpcionDeGoles;
@@ -16,6 +17,10 @@ public class Config {
     public final String modo; // "practica", "1v1", etc.
     public final ArrayList<Equipo> equiposJugadores; // ← NUEVO
     public ArrayList<HabilidadesEspeciales> habilidadesEspeciales;
+    private float AltoMapa;
+    private float AnchoMapa;
+    private float EscalaPelota;
+
 
     private Config(Builder b) {
         this.skinsJugadores = b.skinsJugadores;
@@ -27,6 +32,10 @@ public class Config {
         if(modo.equals("especial")){
             this.habilidadesEspeciales = b.habilidadesEspeciales;
         }
+        this.AltoMapa = b.AltoMapa;
+        this.AnchoMapa = b.AnchoMapa;
+        this.EscalaPelota = b.EscalaPelota;
+
     }
 
     public static class Builder {
@@ -37,6 +46,9 @@ public class Config {
         private OpcionDeTiempo tiempo = OpcionDeTiempo.CORTO;
         private String modo = "practica";
         public ArrayList<HabilidadesEspeciales> habilidadesEspeciales = new ArrayList<>();
+        private float AltoMapa = Constantes.MUNDO_ALTO;
+        private float AnchoMapa = Constantes.MUNDO_ANCHO;
+        private float EscalaPelota = Constantes.ESCALA_PELOTA;
 
         public Builder agregarSkin(String skin) {
             this.skinsJugadores.add(skin);
@@ -58,6 +70,12 @@ public class Config {
         public Builder goles(OpcionDeGoles v) { this.goles = v; return this; }
         public Builder tiempo(OpcionDeTiempo v) { this.tiempo = v; return this; }
         public Builder modo(String v) { this.modo = v; return this; }
+        public Builder AltoMapa(float v) { this.AltoMapa = v; return this; }
+        public Builder AnchoMapa(float v) { this.AnchoMapa = v; return this; }
+        public Builder EscalaPelota(float v) { this.EscalaPelota = v; return this; }
+
+
+
 
         public Config build() {
             if (skinsJugadores.isEmpty() || campo == null) {
@@ -72,4 +90,18 @@ public class Config {
             return new Config(this);
         }
     }
+
+    public float getAltoMapa() { // El getter es público
+        return AltoMapa;
+    }
+
+    public float getAnchoMapa() {
+        return AnchoMapa;
+    }
+
+    public float getEscalaPelota() {
+        return EscalaPelota;
+    }
+
+
 }

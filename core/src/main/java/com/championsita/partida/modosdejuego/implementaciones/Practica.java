@@ -8,7 +8,7 @@ import com.championsita.jugabilidad.entrada.EntradaJugador;
  * Modo de práctica con un solo jugador.
  * Controla entrada, físicas y colisiones solo para jugador1 y la pelota.
  */
-public class Practica extends ModoBase {
+public class Practica extends ModoRebote {
 
     @Override
     protected void onIniciar() {

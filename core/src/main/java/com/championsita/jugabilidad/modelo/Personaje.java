@@ -34,6 +34,7 @@ public abstract class Personaje {
     // Estado de stamina/sprint
     // =========================
     // Regla: mostramos "velocidad actual" como distancia por frame (velocidad * delta).
+    private boolean puedeMover = true;
     private float staminaActual;
     private boolean bloqueoRecarga = false;
     private float   tiempoBloqueoRecarga = 0f;
@@ -265,6 +266,9 @@ public abstract class Personaje {
 
 
     private void moverYActualizarDireccion(boolean izquierda, boolean derecha, boolean arriba, boolean abajo) {
+
+        if(!puedeMover) return;
+
         estaMoviendo = izquierda || derecha || arriba || abajo;
         if (!estaMoviendo) return;
 
@@ -410,6 +414,7 @@ public abstract class Personaje {
     public HabilidadesEspeciales getHabilidadActual() { return habilidadActual; }
 
     public void setEquipo(Equipo eq){ this.equipo = eq;};
+
     public Equipo getEquipo(){
         return this.equipo;
     };
@@ -434,4 +439,20 @@ public abstract class Personaje {
     public boolean estaSprintPresionado() {
         return sprintActivo;
     }
+
+    public float getHeight() {
+        return alto;
+    }
+
+    public void setPuedeMover(boolean valor) {
+        this.puedeMover = valor;
+    }
+
+    public boolean getPuedeMover() {
+        return puedeMover;
+    }
+
+
+
+
 }

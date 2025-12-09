@@ -5,18 +5,20 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.championsita.jugabilidad.constantes.Constantes;
 
-public class Cancha {   //La idea es que sea abstracta para las distintas canchas y modos
+public class Cancha {
 
     private Texture texturaCancha;
 
     private Arco arcoIzquierdo;
     private Arco arcoDerecho;
 
+    private CanchaHitbox canchaHitbox;
+
     private float anchoArco;
     private float altoArco;
     private float yCentro;
 
-    public Cancha(float anchoArco, float altoArco, Texture pngCancha) {
+    public Cancha(float anchoArco, float altoArco,float AltoMundo, float AnchoMundo, Texture pngCancha) {
         this.texturaCancha = pngCancha;
 
         this.anchoArco = anchoArco;
@@ -27,10 +29,12 @@ public class Cancha {   //La idea es que sea abstracta para las distintas cancha
 
         // Posiciones horizontales
         float posicionArcoIzquierdoX = -desplazamientoHorizontal;
-        float posicionArcoDerechoX   = Constantes.MUNDO_ANCHO - anchoArco + desplazamientoHorizontal;
+        float posicionArcoDerechoX   = AnchoMundo - anchoArco + desplazamientoHorizontal;
 
         // Posición vertical centrada
-        float posicionArcoY = (Constantes.MUNDO_ALTO / 2f) - (altoArco / 2f);
+        float posicionArcoY = (AltoMundo / 2f) - (altoArco / 2f);
+
+        canchaHitbox = new CanchaHitbox(AnchoMundo, AltoMundo);
 
         // Crear arcos
         arcoIzquierdo = new Arco(posicionArcoIzquierdoX, posicionArcoY, anchoArco, altoArco);
@@ -59,5 +63,10 @@ public class Cancha {   //La idea es que sea abstracta para las distintas cancha
 
     public Arco getArcoDerecho() {
         return arcoDerecho;
+    }
+
+    public CanchaHitbox getCanchaHitbox() {return canchaHitbox;}
+
+    public CanchaHitbox getHitbox() {  return canchaHitbox;
     }
 }

@@ -9,10 +9,9 @@ import com.championsita.jugabilidad.constantes.Constantes;
 import com.championsita.jugabilidad.sistemas.SistemaColisiones;
 import com.championsita.jugabilidad.sistemas.SistemaFisico;
 import com.championsita.jugabilidad.sistemas.SistemaPartido;
+import com.championsita.jugabilidad.sistemas.SistemaSaqueLateral;
 import com.championsita.partida.ControladorDePartida;
-import com.championsita.partida.modosdejuego.implementaciones.ModoEspecial;
-import com.championsita.partida.modosdejuego.implementaciones.Practica;
-import com.championsita.partida.modosdejuego.implementaciones.UnoContraUno;
+import com.championsita.partida.modosdejuego.implementaciones.*;
 import com.championsita.partida.nucleo.ContextoPartida;
 
 public class InicializadorPartida {
@@ -26,7 +25,9 @@ public class InicializadorPartida {
 
         base.modo = switch (modoTexto) {
             case "1v1", "dosjug", "2jug", "1vs1" -> new UnoContraUno();
+            case "futbol" -> new ModoFutbol()   ;
             case "especial" -> new ModoEspecial();
+            case "futsal" -> new ModoFutsal();
             default -> new Practica();
         };
 
@@ -38,7 +39,7 @@ public class InicializadorPartida {
         // 3. VISUALES BASE
         base.batch = new SpriteBatch();
         base.rendererFormas = new ShapeRenderer();
-        base.viewport = new FitViewport(Constantes.MUNDO_ANCHO, Constantes.MUNDO_ALTO);
+        base.viewport = new FitViewport(config.getAnchoMapa(), config.getAltoMapa());
 
         // 4. TEXTURA CANCHA
         base.texturaCancha = new Texture("campos/campo" + config.campo.getNombre() + ".png");

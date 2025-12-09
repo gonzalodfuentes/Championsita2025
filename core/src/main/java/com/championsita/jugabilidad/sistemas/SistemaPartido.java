@@ -15,6 +15,8 @@ public class SistemaPartido {
     int notadorEquipo1 = 0;
     int notadorEquipo2 = 0;
 
+
+
     private ControladorDePartida controlador;
 
     public SistemaPartido(ControladorDePartida controlador) {
@@ -65,7 +67,7 @@ public class SistemaPartido {
         // EXTREMISTA: aplicar buff/debuff por gol
         // ============================================
 
-        Personaje personajeQueMetioGol = pelota.getUltimoJugadorQueToco();
+        Personaje personajeQueMetioGol = pelota.getUltimoJugadorQueLaToco();
 
         // Si nadie la tocó todavía → no aplicar EXTREMISTA
         if (personajeQueMetioGol == null) {
@@ -107,6 +109,35 @@ public class SistemaPartido {
 
     public int getNotadorEquipo2(){
         return this.notadorEquipo2;
+    }
+
+    public enum EstadoPartido {
+        JUGANDO,
+        SAQUE_LATERAL
+    }
+
+
+
+
+    private EstadoPartido estado = EstadoPartido.JUGANDO;
+
+    public void setEstado(EstadoPartido e) {
+        this.estado = e;
+    }
+
+    public EstadoPartido getEstado() {
+        return estado;
+    }
+
+
+    private Equipo equipoQueSaca = null;
+
+    public void setEquipoQueSaca(Equipo equipo) {
+        this.equipoQueSaca = equipo;
+    }
+
+    public Equipo getEquipoQueSaca() {
+        return equipoQueSaca;
     }
 
 }

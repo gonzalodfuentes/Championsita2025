@@ -54,6 +54,38 @@ public class EntradaJugador implements InputProcessor {
         personaje.setEspacioPresionado(espacioPresionado);
     }
 
+    public boolean disparoPresionado(){
+        return espacioPresionado;
+    }
+
+    public Personaje getPersonaje(){
+        return this.personaje;
+    }
+
+    // Dentro de EntradaJugador.java
+
+    public float getDireccionX() {
+        float dx = 0f;
+        if (izquierda) {
+            dx -= 1f;
+        }
+        if (derecha) {
+            dx += 1f;
+        }
+        return dx;
+    }
+
+    public float getDireccionY() {
+        float dy = 0f;
+        if (abajo) {
+            dy -= 1f;
+        }
+        if (arriba) {
+            dy += 1f;
+        }
+        return dy;
+    }
+
     // Métodos no usados
     @Override public boolean keyTyped(char character) { return false; }
     @Override public boolean touchDown(int screenX, int screenY, int pointer, int button) { return false; }
